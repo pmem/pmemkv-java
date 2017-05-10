@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>io.pmem</groupId>
+    <artifactId>pmemkv</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>pmemkv</name>
+    <description>Java bindings for pmemkv</description>
+    <url>https://github.com/pmem/pmemkv-java</url>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.5</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+        </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>version.properties</include>
+                </includes>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.mscharhag.oleaster</groupId>
+            <artifactId>oleaster-matcher</artifactId>
+            <version>RELEASE</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>RELEASE</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>RELEASE</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <developers>
+        <developer>
+            <id>RobDickinson</id>
+            <name>Rob Dickinson</name>
+            <email>robert.a.dickinson@intel.com</email>
+            <url>https://github.com/RobDickinson</url>
+            <organization>Intel</organization>
+            <organizationUrl>http://intel.com</organizationUrl>
+            <roles>
+                <role>architect</role>
+                <role>developer</role>
+            </roles>
+            <timezone>America/Denver</timezone>
+            <properties>
+                <picUrl>http://resurface.io/headshot_rob_128.jpg</picUrl>
+            </properties>
+        </developer>
+    </developers>
+
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/pmem/pmemkv-java/issues</url>
+    </issueManagement>
+
+    <licenses>
+        <license>
+            <name>3-Clause BSD License</name>
+            <url>https://github.com/pmem/pmemkv-java/blob/master/LICENSE</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <organization>
+        <name>Intel</name>
+        <url>http://intel.com</url>
+    </organization>
+
+    <scm>
+        <connection>scm:git:git@github.com:pmem/pmemkv-java.git</connection>
+        <developerConnection>scm:git:git@github.com:pmem/pmemkv-java.git</developerConnection>
+        <url>scm:git:git@github.com:pmem/pmemkv-java.git</url>
+    </scm>
+</project>
