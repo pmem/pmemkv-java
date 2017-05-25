@@ -259,12 +259,11 @@ public class KVTreeTest {
     @Test
     public void throwsExceptionOnPutWhenOutOfSpaceTest() {
         KVTree kv = new KVTree(PATH, SIZE);
-        for (int i = 0; i < 20692; i++) {
-            String istr = String.valueOf(i);
-            kv.put(istr, istr);
-        }
         try {
-            kv.put("20693", "20693");
+            for (int i = 0; i < 100000; i++) {
+                String istr = String.valueOf(i);
+                kv.put(istr, istr);
+            }
             Assert.fail();
         } catch (RuntimeException re) {
             expect(re.getMessage()).toEqual("unable to put value");
