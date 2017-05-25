@@ -34,4 +34,56 @@ package io.pmem.pmemkv;
 
 public class KVTree {
 
+    public KVTree(String path, long size) {
+        pointer = kvtree_open(path, size);
+    }
+
+    public void close() {
+        if (!closed) {
+            closed = true;
+            kvtree_close(pointer);
+        }
+    }
+
+    public boolean closed() {
+        return closed;
+    }
+
+    public String get(String key) {
+        return kvtree_get(pointer, key);
+    }
+
+    public void put(String key, String value) {
+        kvtree_put(pointer, key, value);
+    }
+
+    public void remove(String key) {
+        kvtree_remove(pointer, key);
+    }
+
+    public long size() {
+        return kvtree_size(pointer);
+    }
+
+    private boolean closed;
+    private final long pointer;
+
+    // JNI METHODS --------------------------------------------------------------------------------
+
+    private native long kvtree_open(String path, long size);
+
+    private native void kvtree_close(long pointer);
+
+    private native String kvtree_get(long pointer, String key);
+
+    private native void kvtree_put(long pointer, String key, String value);
+
+    private native void kvtree_remove(long pointer, String key);
+
+    private native long kvtree_size(long pointer);
+
+    static {
+        System.loadLibrary("pmemkv-jni");
+    }
+
 }
