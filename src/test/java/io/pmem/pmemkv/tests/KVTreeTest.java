@@ -144,16 +144,24 @@ public class KVTreeTest {
     @Test
     public void putsEmptyKeyTest() {
         KVTree kv = new KVTree(PATH, SIZE);
-        kv.put("", "value1");
-        expect(kv.get("")).toEqual("value1");
+        kv.put("", "empty");
+        kv.put(" ", "single-space");
+        kv.put("\t\t", "two-tab");
+        expect(kv.get("")).toEqual("empty");
+        expect(kv.get(" ")).toEqual("single-space");
+        expect(kv.get("\t\t")).toEqual("two-tab");
         kv.close();
     }
 
     @Test
     public void putsEmptyValueTest() {
         KVTree kv = new KVTree(PATH, SIZE);
-        kv.put("key1", "");
-        expect(kv.get("key1")).toEqual("");
+        kv.put("empty", "");
+        kv.put("single-space", " ");
+        kv.put("two-tab", "\t\t");
+        expect(kv.get("empty")).toEqual("");
+        expect(kv.get("single-space")).toEqual(" ");
+        expect(kv.get("two-tab")).toEqual("\t\t");
         kv.close();
     }
 
