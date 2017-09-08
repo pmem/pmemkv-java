@@ -32,16 +32,16 @@
 
 package io.pmem.pmemkv;
 
-public class KVTree {
+public class KVEngine {
 
-    public KVTree(String path, long size) {
-        pointer = kvtree_open(path, size);
+    public KVEngine(String path, long size) {
+        pointer = kvengine_open(path, size);
     }
 
     public void close() {
         if (!closed) {
             closed = true;
-            kvtree_close(pointer);
+            kvengine_close(pointer);
         }
     }
 
@@ -50,19 +50,19 @@ public class KVTree {
     }
 
     public String get(String key) {
-        return kvtree_get(pointer, key);
+        return kvengine_get(pointer, key);
     }
 
     public void put(String key, String value) {
-        kvtree_put(pointer, key, value);
+        kvengine_put(pointer, key, value);
     }
 
     public void remove(String key) {
-        kvtree_remove(pointer, key);
+        kvengine_remove(pointer, key);
     }
 
     public long size() {
-        return kvtree_size(pointer);
+        return kvengine_size(pointer);
     }
 
     private boolean closed;
@@ -70,17 +70,17 @@ public class KVTree {
 
     // JNI METHODS --------------------------------------------------------------------------------
 
-    private native long kvtree_open(String path, long size);
+    private native long kvengine_open(String path, long size);
 
-    private native void kvtree_close(long pointer);
+    private native void kvengine_close(long pointer);
 
-    private native String kvtree_get(long pointer, String key);
+    private native String kvengine_get(long pointer, String key);
 
-    private native void kvtree_put(long pointer, String key, String value);
+    private native void kvengine_put(long pointer, String key, String value);
 
-    private native void kvtree_remove(long pointer, String key);
+    private native void kvengine_remove(long pointer, String key);
 
-    private native long kvtree_size(long pointer);
+    private native long kvengine_size(long pointer);
 
     static {
         System.loadLibrary("pmemkv-jni");

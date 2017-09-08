@@ -32,7 +32,7 @@
 
 package io.pmem.pmemkv.tests;
 
-import io.pmem.pmemkv.KVTree;
+import io.pmem.pmemkv.KVEngine;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -44,7 +44,7 @@ import java.nio.file.Paths;
 
 import static com.mscharhag.oleaster.matcher.Matchers.expect;
 
-public class KVTreeTest {
+public class KVEngineTest {
 
     private final String PATH = "/dev/shm/pmemkv-java";
     private final long SIZE = 1024 * 1024 * 8;
@@ -71,7 +71,7 @@ public class KVTreeTest {
     @Test
     public void createsInstanceTest() {
         long size = 1024 * 1024 * 11;
-        KVTree kv = new KVTree(PATH, size);
+        KVEngine kv = new KVEngine(PATH, size);
         expect(kv).toBeNotNull();
         expect(kv.closed()).toBeFalse();
         expect(kv.size()).toEqual(size);
@@ -82,9 +82,9 @@ public class KVTreeTest {
     @Test
     public void createsInstanceFromExistingPoolTest() {
         long size = 1024 * 1024 * 13;
-        KVTree kv = new KVTree(PATH, size);
+        KVEngine kv = new KVEngine(PATH, size);
         kv.close();
-        kv = new KVTree(PATH, 0);
+        kv = new KVEngine(PATH, 0);
         expect(kv.closed()).toBeFalse();
         expect(kv.size()).toEqual(size);
         kv.close();
@@ -93,7 +93,7 @@ public class KVTreeTest {
 
     @Test
     public void closesInstanceMultipleTimesTest() {
-        KVTree kv = new KVTree(PATH, SIZE);
+        KVEngine kv = new KVEngine(PATH, SIZE);
         expect(kv.closed()).toBeFalse();
         expect(kv.size()).toEqual(SIZE);
         kv.close();
@@ -106,14 +106,14 @@ public class KVTreeTest {
 
     @Test
     public void getsMissingKeyTest() {
-        KVTree kv = new KVTree(PATH, SIZE);
+        KVEngine kv = new KVEngine(PATH, SIZE);
         expect(kv.get("key1")).toBeNull();
         kv.close();
     }
 
     @Test
     public void putsBasicValueTest() {
-        KVTree kv = new KVTree(PATH, SIZE);
+        KVEngine kv = new KVEngine(PATH, SIZE);
         kv.put("key1", "value1");
         expect(kv.get("key1")).toEqual("value1");
         kv.close();
@@ -126,7 +126,7 @@ public class KVTreeTest {
 
     @Test
     public void putsBinaryValueTest() {
-        KVTree kv = new KVTree(PATH, SIZE);
+        KVEngine kv = new KVEngine(PATH, SIZE);
         kv.put("key1", "A\0B\0\0C");
         expect(kv.get("key1")).toEqual("A\0B\0\0C");
         kv.close();
@@ -134,7 +134,7 @@ public class KVTreeTest {
 
     @Test
     public void putsComplexValueTest() {
-        KVTree kv = new KVTree(PATH, SIZE);
+        KVEngine kv = new KVEngine(PATH, SIZE);
         String val = "one\ttwo or <p>three</p>\n {four}   and ^five";
         kv.put("key1", val);
         expect(kv.get("key1")).toEqual(val);
@@ -143,7 +143,7 @@ public class KVTreeTest {
 
     @Test
     public void putsEmptyKeyTest() {
-        KVTree kv = new KVTree(PATH, SIZE);
+        KVEngine kv = new KVEngine(PATH, SIZE);
         kv.put("", "empty");
         kv.put(" ", "single-space");
         kv.put("\t\t", "two-tab");
@@ -155,7 +155,7 @@ public class KVTreeTest {
 
     @Test
     public void putsEmptyValueTest() {
-        KVTree kv = new KVTree(PATH, SIZE);
+        KVEngine kv = new KVEngine(PATH, SIZE);
         kv.put("empty", "");
         kv.put("single-space", " ");
         kv.put("two-tab", "\t\t");
@@ -167,7 +167,7 @@ public class KVTreeTest {
 
     @Test
     public void putsMultipleValuesTest() {
-        KVTree kv = new KVTree(PATH, SIZE);
+        KVEngine kv = new KVEngine(PATH, SIZE);
         kv.put("key1", "value1");
         kv.put("key2", "value2");
         kv.put("key3", "value3");
@@ -179,7 +179,7 @@ public class KVTreeTest {
 
     @Test
     public void putsOverwritingExistingValueTest() {
-        KVTree kv = new KVTree(PATH, SIZE);
+        KVEngine kv = new KVEngine(PATH, SIZE);
         kv.put("key1", "value1");
         expect(kv.get("key1")).toEqual("value1");
         kv.put("key1", "value123");
@@ -191,7 +191,7 @@ public class KVTreeTest {
 
     @Test
     public void putsUtf8KeyTest() {
-        KVTree kv = new KVTree(PATH, SIZE);
+        KVEngine kv = new KVEngine(PATH, SIZE);
         String val = "to remember, note, record";
         kv.put("记", val);
         expect(kv.get("记")).toEqual(val);
@@ -200,7 +200,7 @@ public class KVTreeTest {
 
     @Test
     public void putsUtf8ValueTest() {
-        KVTree kv = new KVTree(PATH, SIZE);
+        KVEngine kv = new KVEngine(PATH, SIZE);
         String val = "记 means to remember, note, record";
         kv.put("key1", val);
         expect(kv.get("key1")).toEqual(val);
@@ -214,7 +214,7 @@ public class KVTreeTest {
 
     @Test
     public void removesKeyandValueTest() {
-        KVTree kv = new KVTree(PATH, SIZE);
+        KVEngine kv = new KVEngine(PATH, SIZE);
         kv.put("key1", "value1");
         expect(kv.get("key1")).toEqual("value1");
         kv.remove("key1");
@@ -224,9 +224,9 @@ public class KVTreeTest {
 
     @Test
     public void throwsExceptionOnCreateWhenPathIsInvalidTest() {
-        KVTree kv = null;
+        KVEngine kv = null;
         try {
-            kv = new KVTree("/tmp/123/234/345/456/567/678/nope.nope", SIZE);
+            kv = new KVEngine("/tmp/123/234/345/456/567/678/nope.nope", SIZE);
             Assert.fail();
         } catch (IllegalArgumentException iae) {
             expect(iae.getMessage()).toEqual("unable to open persistent pool");
@@ -238,9 +238,9 @@ public class KVTreeTest {
 
     @Test
     public void throwsExceptionOnCreateWithHugeSizeTest() {
-        KVTree kv = null;
+        KVEngine kv = null;
         try {
-            kv = new KVTree(PATH, 9223372036854775807L); // 9.22 exabytes
+            kv = new KVEngine(PATH, 9223372036854775807L); // 9.22 exabytes
             Assert.fail();
         } catch (IllegalArgumentException iae) {
             expect(iae.getMessage()).toEqual("unable to open persistent pool");
@@ -252,9 +252,9 @@ public class KVTreeTest {
 
     @Test
     public void throwsExceptionOnCreateWithTinySizeTest() {
-        KVTree kv = null;
+        KVEngine kv = null;
         try {
-            kv = new KVTree(PATH, SIZE - 1); // too small
+            kv = new KVEngine(PATH, SIZE - 1); // too small
             Assert.fail();
         } catch (IllegalArgumentException iae) {
             expect(iae.getMessage()).toEqual("unable to open persistent pool");
@@ -266,7 +266,7 @@ public class KVTreeTest {
 
     @Test
     public void throwsExceptionOnPutWhenOutOfSpaceTest() {
-        KVTree kv = new KVTree(PATH, SIZE);
+        KVEngine kv = new KVEngine(PATH, SIZE);
         try {
             for (int i = 0; i < 100000; i++) {
                 String istr = String.valueOf(i);
