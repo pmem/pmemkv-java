@@ -33,11 +33,13 @@
 #include <jni.h>
 #include <libpmemkv.h>
 
-extern "C" JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_KVTree_kvtree_1open
+using pmemkv::KVEngine;
+
+extern "C" JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1open
         (JNIEnv* env, jobject obj, jstring path, jlong size) {
 
     const char* cpath = env->GetStringUTFChars(path, NULL);
-    pmemkv::KVTree* result = pmemkv::kvtree_open(cpath, (size_t) size);
+    KVEngine* result = pmemkv::kvengine_open(cpath, (size_t) size);
     env->ReleaseStringUTFChars(path, cpath);
     if (result == NULL) {
         env->ThrowNew(env->FindClass("java/lang/IllegalArgumentException"),
@@ -46,13 +48,13 @@ extern "C" JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_KVTree_kvtree_1open
     return (jlong) result;
 }
 
-extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVTree_kvtree_1close
+extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1close
         (JNIEnv* env, jobject obj, jlong pointer) {
 
-    pmemkv::kvtree_close((pmemkv::KVTree*) pointer);
+    pmemkv::kvengine_close((KVEngine*) pointer);
 }
 
-extern "C" JNIEXPORT jstring JNICALL Java_io_pmem_pmemkv_KVTree_kvtree_1get
+extern "C" JNIEXPORT jstring JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1get
         (JNIEnv* env, jobject obj, jlong pointer, jstring key) {
 
     const jsize limit = 1024;
@@ -61,7 +63,7 @@ extern "C" JNIEXPORT jstring JNICALL Java_io_pmem_pmemkv_KVTree_kvtree_1get
     int32_t cvaluebytes = 0;
 
     const char* ckey = env->GetStringUTFChars(key, NULL);
-    int8_t res = pmemkv::kvtree_get((pmemkv::KVTree*) pointer, ckey, limit, cvalue, &cvaluebytes);
+    int8_t res = pmemkv::kvengine_get((KVEngine*) pointer, ckey, limit, cvalue, &cvaluebytes);
     env->ReleaseStringUTFChars(key, ckey);
 
     if (res == 0) {
@@ -74,13 +76,13 @@ extern "C" JNIEXPORT jstring JNICALL Java_io_pmem_pmemkv_KVTree_kvtree_1get
     }
 }
 
-extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVTree_kvtree_1put
+extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1put
         (JNIEnv* env, jobject obj, jlong pointer, jstring key, jstring value) {
 
     const char* ckey = env->GetStringUTFChars(key, NULL);
     const char* cvalue = env->GetStringUTFChars(value, NULL);
     int32_t cvaluebytes = env->GetStringUTFLength(value);
-    int8_t res = pmemkv::kvtree_put((pmemkv::KVTree*) pointer, ckey, cvalue, &cvaluebytes);
+    int8_t res = pmemkv::kvengine_put((KVEngine*) pointer, ckey, cvalue, &cvaluebytes);
     env->ReleaseStringUTFChars(key, ckey);
     env->ReleaseStringUTFChars(value, cvalue);
     if (res != 1) {
@@ -88,15 +90,15 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVTree_kvtree_1put
     }
 }
 
-extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVTree_kvtree_1remove
+extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1remove
         (JNIEnv* env, jobject obj, jlong pointer, jstring key) {
 
     const char* ckey = env->GetStringUTFChars(key, NULL);
-    pmemkv::kvtree_remove((pmemkv::KVTree*) pointer, ckey);
+    pmemkv::kvengine_remove((KVEngine*) pointer, ckey);
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_KVTree_kvtree_1size
+extern "C" JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1size
         (JNIEnv* env, jobject obj, jlong pointer) {
 
-    return pmemkv::kvtree_size((pmemkv::KVTree*) pointer);
+    return pmemkv::kvengine_size((KVEngine*) pointer);
 }

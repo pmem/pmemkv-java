@@ -30,7 +30,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "io_pmem_pmemkv_KVTree.h"
+#include "io_pmem_pmemkv_KVEngine.h"
 #include "gtest/gtest.h"
 
 int main(int argc, char* argv[]) {

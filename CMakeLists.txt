@@ -32,7 +32,7 @@ cmake_minimum_required(VERSION 3.6)
 project(pmemkv-jni)
 
 set(CMAKE_CXX_STANDARD 11)
-set(SOURCE_FILES src/io_pmem_pmemkv_KVTree.cpp src/io_pmem_pmemkv_KVTree.h)
+set(SOURCE_FILES src/io_pmem_pmemkv_KVEngine.cpp src/io_pmem_pmemkv_KVEngine.h)
 set(3RDPARTY ${PROJECT_SOURCE_DIR}/3rdparty)
 set(GTEST_VERSION 1.7.0)
 
