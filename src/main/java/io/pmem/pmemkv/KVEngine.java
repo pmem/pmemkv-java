@@ -34,8 +34,8 @@ package io.pmem.pmemkv;
 
 public class KVEngine {
 
-    public KVEngine(String path, long size) {
-        pointer = kvengine_open(path, size);
+    public KVEngine(String engine, String path, long size) {
+        pointer = kvengine_open(engine, path, size);
     }
 
     public void close() {
@@ -70,7 +70,7 @@ public class KVEngine {
 
     // JNI METHODS --------------------------------------------------------------------------------
 
-    private native long kvengine_open(String path, long size);
+    private native long kvengine_open(String engine, String path, long size);
 
     private native void kvengine_close(long pointer);
 
