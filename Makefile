@@ -1,6 +1,6 @@
 prefix=/usr/local
 
-all: clean example test
+all: clean test
 
 clean:
 	rm -rf ./bin googletest-*.zip
