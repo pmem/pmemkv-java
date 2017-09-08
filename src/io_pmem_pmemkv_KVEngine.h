@@ -10,10 +10,10 @@ extern "C" {
 /*
  * Class:     io_pmem_pmemkv_KVEngine
  * Method:    kvengine_open
- * Signature: (Ljava/lang/String;J)J
+ * Signature: (Ljava/lang/String;Ljava/lang/String;J)J
  */
 JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1open
-  (JNIEnv *, jobject, jstring, jlong);
+  (JNIEnv *, jobject, jstring, jstring, jlong);
 
 /*
  * Class:     io_pmem_pmemkv_KVEngine

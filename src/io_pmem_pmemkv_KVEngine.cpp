@@ -36,10 +36,11 @@
 using pmemkv::KVEngine;
 
 extern "C" JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1open
-        (JNIEnv* env, jobject obj, jstring path, jlong size) {
+        (JNIEnv* env, jobject obj, jstring engine, jstring path, jlong size) {
 
+    const char* cengine = env->GetStringUTFChars(engine, NULL);
     const char* cpath = env->GetStringUTFChars(path, NULL);
-    KVEngine* result = pmemkv::kvengine_open(cpath, (size_t) size);
+    KVEngine* result = pmemkv::kvengine_open(cengine, cpath, (size_t) size);
     env->ReleaseStringUTFChars(path, cpath);
     if (result == NULL) {
         env->ThrowNew(env->FindClass("java/lang/IllegalArgumentException"),
