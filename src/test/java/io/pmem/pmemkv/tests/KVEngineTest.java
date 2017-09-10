@@ -296,4 +296,15 @@ public class KVEngineTest {
         kv.close();
     }
 
+    @Test
+    public void usesBlackholeEngineTest() {
+        KVEngine kv = new KVEngine("blackhole", PATH, SIZE);
+        expect(kv.get("key1")).toBeNull();
+        kv.put("key1", "value1");
+        expect(kv.get("key1")).toBeNull();
+        kv.remove("key1");
+        expect(kv.get("key1")).toBeNull();
+        kv.close();
+    }
+
 }
