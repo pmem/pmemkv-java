@@ -47,14 +47,6 @@ JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1put
 JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1remove
   (JNIEnv *, jobject, jlong, jstring);
 
-/*
- * Class:     io_pmem_pmemkv_KVEngine
- * Method:    kvengine_size
- * Signature: (J)J
- */
-JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1size
-  (JNIEnv *, jobject, jlong);
-
 #ifdef __cplusplus
 }
 #endif

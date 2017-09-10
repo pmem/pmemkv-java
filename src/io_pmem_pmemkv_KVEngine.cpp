@@ -97,9 +97,3 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1remove
     const char* ckey = env->GetStringUTFChars(key, NULL);
     pmemkv::kvengine_remove((KVEngine*) pointer, ckey);
 }
-
-extern "C" JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1size
-        (JNIEnv* env, jobject obj, jlong pointer) {
-
-    return pmemkv::kvengine_size((KVEngine*) pointer);
-}
