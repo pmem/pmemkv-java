@@ -61,10 +61,6 @@ public class KVEngine {
         kvengine_remove(pointer, key);
     }
 
-    public long size() {
-        return kvengine_size(pointer);
-    }
-
     private boolean closed;
     private final long pointer;
 
@@ -79,8 +75,6 @@ public class KVEngine {
     private native void kvengine_put(long pointer, String key, String value);
 
     private native void kvengine_remove(long pointer, String key);
-
-    private native long kvengine_size(long pointer);
 
     static {
         System.loadLibrary("pmemkv-jni");

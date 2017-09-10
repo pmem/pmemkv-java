@@ -75,7 +75,6 @@ public class KVEngineTest {
         KVEngine kv = new KVEngine(ENGINE, PATH, size);
         expect(kv).toBeNotNull();
         expect(kv.closed()).toBeFalse();
-        expect(kv.size()).toEqual(size);
         kv.close();
         expect(kv.closed()).toBeTrue();
     }
@@ -87,7 +86,6 @@ public class KVEngineTest {
         kv.close();
         kv = new KVEngine(ENGINE, PATH, 0);
         expect(kv.closed()).toBeFalse();
-        expect(kv.size()).toEqual(size);
         kv.close();
         expect(kv.closed()).toBeTrue();
     }
@@ -96,7 +94,6 @@ public class KVEngineTest {
     public void closesInstanceMultipleTimesTest() {
         KVEngine kv = new KVEngine(ENGINE, PATH, SIZE);
         expect(kv.closed()).toBeFalse();
-        expect(kv.size()).toEqual(SIZE);
         kv.close();
         expect(kv.closed()).toBeTrue();
         kv.close();
