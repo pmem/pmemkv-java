@@ -119,7 +119,10 @@ public class KVEngineTest {
 
     @Test
     public void putsBinaryKeyTest() {
-        // todo finish
+        KVEngine kv = new KVEngine(ENGINE, PATH, SIZE);
+        kv.put("A\0B\0\0C", "value1");
+        expect(kv.get("A\0B\0\0C")).toEqual("value1");
+        kv.close();
     }
 
     @Test
