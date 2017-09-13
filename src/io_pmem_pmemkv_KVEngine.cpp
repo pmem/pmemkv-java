@@ -40,33 +40,41 @@ extern "C" JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1open
 
     const char* cengine = env->GetStringUTFChars(engine, NULL);
     const char* cpath = env->GetStringUTFChars(path, NULL);
+
     KVEngine* result = pmemkv::kvengine_open(cengine, cpath, (size_t) size);
+
+    env->ReleaseStringUTFChars(engine, cengine);
     env->ReleaseStringUTFChars(path, cpath);
     if (result == NULL) {
         env->ThrowNew(env->FindClass("java/lang/IllegalArgumentException"),
                       "unable to open persistent pool");
     }
     return (jlong) result;
+
 }
 
 extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1close
         (JNIEnv* env, jobject obj, jlong pointer) {
 
     pmemkv::kvengine_close((KVEngine*) pointer);
+
 }
 
 extern "C" JNIEXPORT jstring JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1get
         (JNIEnv* env, jobject obj, jlong pointer, jstring key) {
 
-    const jsize limit = 1024;
-    char* cvalue = new char[limit];
-    for (int i = 0; i < limit; i++) cvalue[i] = 0;
-    int32_t cvaluebytes = 0;
-
     const char* ckey = env->GetStringUTFChars(key, NULL);
-    int8_t res = pmemkv::kvengine_get((KVEngine*) pointer, ckey, limit, cvalue, &cvaluebytes);
-    env->ReleaseStringUTFChars(key, ckey);
+    int32_t ckeybytes = env->GetStringUTFLength(key);
 
+    int32_t cvaluebytes = 0;
+    const jsize climit = 1024;                             // todo limit is hardcoded
+    auto cvalue = new char[climit];                        // todo buffer is not reused
+    for (int i = 0; i < climit; i++) cvalue[i] = 0;
+
+    int8_t res = pmemkv::kvengine_get((KVEngine*) pointer, climit, ckeybytes, &cvaluebytes,
+                                      ckey, cvalue);
+
+    env->ReleaseStringUTFChars(key, ckey);
     if (res == 0) {
         return NULL;
     } else if (res > 0) {
@@ -75,25 +83,36 @@ extern "C" JNIEXPORT jstring JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1get
         env->ThrowNew(env->FindClass("java/lang/RuntimeException"), "unable to get value");
         return NULL;
     }
+
 }
 
 extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1put
         (JNIEnv* env, jobject obj, jlong pointer, jstring key, jstring value) {
 
     const char* ckey = env->GetStringUTFChars(key, NULL);
+    int32_t ckeybytes = env->GetStringUTFLength(key);
     const char* cvalue = env->GetStringUTFChars(value, NULL);
     int32_t cvaluebytes = env->GetStringUTFLength(value);
-    int8_t res = pmemkv::kvengine_put((KVEngine*) pointer, ckey, cvalue, &cvaluebytes);
+
+    int8_t res = pmemkv::kvengine_put((KVEngine*) pointer, ckeybytes, &cvaluebytes,
+                                      ckey, cvalue);
+
     env->ReleaseStringUTFChars(key, ckey);
     env->ReleaseStringUTFChars(value, cvalue);
     if (res != 1) {
         env->ThrowNew(env->FindClass("java/lang/RuntimeException"), "unable to put value");
     }
+
 }
 
 extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1remove
         (JNIEnv* env, jobject obj, jlong pointer, jstring key) {
 
     const char* ckey = env->GetStringUTFChars(key, NULL);
-    pmemkv::kvengine_remove((KVEngine*) pointer, ckey);
+    int32_t ckeybytes = env->GetStringUTFLength(key);
+
+    pmemkv::kvengine_remove((KVEngine*) pointer, ckeybytes, ckey);
+
+    env->ReleaseStringUTFChars(key, ckey);
+
 }
