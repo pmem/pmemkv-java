@@ -289,7 +289,7 @@ public class KVEngineTest {
             }
             Assert.fail();
         } catch (RuntimeException re) {
-            expect(re.getMessage()).toEqual("unable to put value");
+            expect(re.getMessage()).toStartWith("unable to put key:");
         } catch (Exception e) {
             Assert.fail();
         }
