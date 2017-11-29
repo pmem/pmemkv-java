@@ -74,13 +74,18 @@ extern "C" JNIEXPORT jstring JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1get
     int8_t res = pmemkv::kvengine_get((KVEngine*) pointer, climit, ckeybytes, &cvaluebytes,
                                       ckey, cvalue);
 
-    env->ReleaseStringUTFChars(key, ckey);
     if (res == 0) {
+        env->ReleaseStringUTFChars(key, ckey);
         return NULL;
     } else if (res > 0) {
+        env->ReleaseStringUTFChars(key, ckey);
         return env->NewStringUTF(cvalue);
     } else {
-        env->ThrowNew(env->FindClass("java/lang/RuntimeException"), "unable to get value");
+        string msg;
+        msg.append("unable to get key: ");
+        msg.append(ckey);
+        env->ReleaseStringUTFChars(key, ckey);
+        env->ThrowNew(env->FindClass("java/lang/RuntimeException"), msg.c_str());
         return NULL;
     }
 
@@ -97,12 +102,17 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1put
     int8_t res = pmemkv::kvengine_put((KVEngine*) pointer, ckeybytes, &cvaluebytes,
                                       ckey, cvalue);
 
-    env->ReleaseStringUTFChars(key, ckey);
-    env->ReleaseStringUTFChars(value, cvalue);
     if (res != 1) {
-        env->ThrowNew(env->FindClass("java/lang/RuntimeException"), "unable to put value");
+        string msg;
+        msg.append("unable to put key: ");
+        msg.append(ckey);
+        env->ReleaseStringUTFChars(key, ckey);
+        env->ReleaseStringUTFChars(value, cvalue);
+        env->ThrowNew(env->FindClass("java/lang/RuntimeException"), msg.c_str());
+    } else {
+        env->ReleaseStringUTFChars(key, ckey);
+        env->ReleaseStringUTFChars(value, cvalue);
     }
-
 }
 
 extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1remove
