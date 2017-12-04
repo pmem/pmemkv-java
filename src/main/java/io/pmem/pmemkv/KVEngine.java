@@ -34,6 +34,10 @@ package io.pmem.pmemkv;
 
 public class KVEngine {
 
+    public KVEngine(String engine, String path) {
+        pointer = kvengine_open(engine, path, 8388608);
+    }
+
     public KVEngine(String engine, String path, long size) {
         pointer = kvengine_open(engine, path, size);
     }

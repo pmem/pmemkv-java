@@ -34,7 +34,7 @@ in this simple example.
 ```
 import io.pmem.pmemkv.KVEngine;
 
-KVEngine kv = new KVEngine("kvtree", "/dev/shm/mykv", 8 * 1024 * 1024);  // 8 MB
+KVEngine kv = new KVEngine("kvtree", "/dev/shm/mykv");
 kv.put("key1", "value1");
 expect(kv.get("key1")).toEqual("value1");
 kv.remove("key1");
