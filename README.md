@@ -8,7 +8,7 @@ are logged as GitHub issues.*
 
 ## Dependencies
 
-* [NVML](https://github.com/pmem/nvml) - native persistent memory libraries
+* [PMDK](https://github.com/pmem/pmdk) - native persistent memory libraries
 * [pmemkv](https://github.com/pmem/pmemkv) - native key/value library
 
 ## Installation
