@@ -9,7 +9,7 @@ are logged as GitHub issues.*
 ## Dependencies
 
 * Java 8 or higher
-* [NVML](https://github.com/pmem/nvml) - native persistent memory libraries
+* [PMDK](https://github.com/pmem/pmdk) - native persistent memory libraries
 * [pmemkv](https://github.com/pmem/pmemkv) - native key/value library
 * [pmemkv-jni](https://github.com/pmem/pmemkv-jni) - JNI integration library
 * Used only for development & testing:
