@@ -53,16 +53,42 @@ public class KVEngine {
         return closed;
     }
 
-    public String get(String key) {
+    public byte[] get(byte[] key) {
         return kvengine_get(pointer, key);
     }
 
-    public void put(String key, String value) {
+    public byte[] get(String key) {
+        return kvengine_get(pointer, key.getBytes());
+    }
+
+    public String getString(byte[] key) {
+        byte[] result = kvengine_get(pointer, key);
+        return result == null ? null : new String(result);
+    }
+
+    public String getString(String key) {
+        byte[] result = kvengine_get(pointer, key.getBytes());
+        return result == null ? null : new String(result);
+    }
+
+    public void put(byte[] key, byte[] value) {
         kvengine_put(pointer, key, value);
     }
 
-    public void remove(String key) {
+    public void put(String key, byte[] value) {
+        kvengine_put(pointer, key.getBytes(), value);
+    }
+
+    public void putString(String key, String value) {
+        kvengine_put(pointer, key.getBytes(), value.getBytes());
+    }
+
+    public void remove(byte[] key) {
         kvengine_remove(pointer, key);
+    }
+
+    public void remove(String key) {
+        kvengine_remove(pointer, key.getBytes());
     }
 
     private boolean closed;
@@ -74,11 +100,11 @@ public class KVEngine {
 
     private native void kvengine_close(long pointer);
 
-    private native String kvengine_get(long pointer, String key);
+    private native byte[] kvengine_get(long pointer, byte[] key);
 
-    private native void kvengine_put(long pointer, String key, String value);
+    private native void kvengine_put(long pointer, byte[] key, byte[] value);
 
-    private native void kvengine_remove(long pointer, String key);
+    private native void kvengine_remove(long pointer, byte[] key);
 
     static {
         System.loadLibrary("pmemkv-jni");

@@ -46,7 +46,7 @@ import static com.mscharhag.oleaster.matcher.Matchers.expect;
 
 public class KVEngineTest {
 
-    private final String ENGINE = "kvtree";
+    private final String ENGINE = "kvtree2";
     private final String PATH = "/dev/shm/pmemkv-java";
     private final long SIZE = 1024 * 1024 * 8;
 
@@ -105,31 +105,35 @@ public class KVEngineTest {
     @Test
     public void getsMissingKeyTest() {
         KVEngine kv = new KVEngine(ENGINE, PATH, SIZE);
-        expect(kv.get("key1")).toBeNull();
+        expect(kv.getString("key1")).toBeNull();
         kv.close();
     }
 
     @Test
     public void putsBasicValueTest() {
         KVEngine kv = new KVEngine(ENGINE, PATH, SIZE);
-        kv.put("key1", "value1");
-        expect(kv.get("key1")).toEqual("value1");
+        kv.putString("key1", "value1");
+        expect(kv.getString("key1")).toEqual("value1");
         kv.close();
     }
 
     @Test
     public void putsBinaryKeyTest() {
         KVEngine kv = new KVEngine(ENGINE, PATH, SIZE);
-        kv.put("A\0B\0\0C", "value1");
-        expect(kv.get("A\0B\0\0C")).toEqual("value1");
+        kv.putString("A\0B\0\0C", "value1");
+        expect(kv.getString("A\0B\0\0C")).toEqual("value1");
+        kv.put("1\02\0\03".getBytes(), "value123!".getBytes());
+        expect(kv.getString("1\02\0\03")).toEqual("value123!");
         kv.close();
     }
 
     @Test
     public void putsBinaryValueTest() {
         KVEngine kv = new KVEngine(ENGINE, PATH, SIZE);
-        kv.put("key1", "A\0B\0\0C");
-        expect(kv.get("key1")).toEqual("A\0B\0\0C");
+        kv.putString("key1", "A\0B\0\0C");
+        expect(kv.getString("key1")).toEqual("A\0B\0\0C");
+        kv.put("key2".getBytes(), "1\02\0\03!".getBytes());
+        expect(kv.getString("key2")).toEqual("1\02\0\03!");
         kv.close();
     }
 
@@ -137,56 +141,56 @@ public class KVEngineTest {
     public void putsComplexValueTest() {
         KVEngine kv = new KVEngine(ENGINE, PATH, SIZE);
         String val = "one\ttwo or <p>three</p>\n {four}   and ^five";
-        kv.put("key1", val);
-        expect(kv.get("key1")).toEqual(val);
+        kv.putString("key1", val);
+        expect(kv.getString("key1")).toEqual(val);
         kv.close();
     }
 
     @Test
     public void putsEmptyKeyTest() {
         KVEngine kv = new KVEngine(ENGINE, PATH, SIZE);
-        kv.put("", "empty");
-        kv.put(" ", "single-space");
-        kv.put("\t\t", "two-tab");
-        expect(kv.get("")).toEqual("empty");
-        expect(kv.get(" ")).toEqual("single-space");
-        expect(kv.get("\t\t")).toEqual("two-tab");
+        kv.putString("", "empty");
+        kv.putString(" ", "single-space");
+        kv.putString("\t\t", "two-tab");
+        expect(kv.getString("")).toEqual("empty");
+        expect(kv.getString(" ")).toEqual("single-space");
+        expect(kv.getString("\t\t")).toEqual("two-tab");
         kv.close();
     }
 
     @Test
     public void putsEmptyValueTest() {
         KVEngine kv = new KVEngine(ENGINE, PATH, SIZE);
-        kv.put("empty", "");
-        kv.put("single-space", " ");
-        kv.put("two-tab", "\t\t");
-        expect(kv.get("empty")).toEqual("");
-        expect(kv.get("single-space")).toEqual(" ");
-        expect(kv.get("two-tab")).toEqual("\t\t");
+        kv.putString("empty", "");
+        kv.putString("single-space", " ");
+        kv.putString("two-tab", "\t\t");
+        expect(kv.getString("empty")).toEqual("");
+        expect(kv.getString("single-space")).toEqual(" ");
+        expect(kv.getString("two-tab")).toEqual("\t\t");
         kv.close();
     }
 
     @Test
     public void putsMultipleValuesTest() {
         KVEngine kv = new KVEngine(ENGINE, PATH, SIZE);
-        kv.put("key1", "value1");
-        kv.put("key2", "value2");
-        kv.put("key3", "value3");
-        expect(kv.get("key1")).toEqual("value1");
-        expect(kv.get("key2")).toEqual("value2");
-        expect(kv.get("key3")).toEqual("value3");
+        kv.putString("key1", "value1");
+        kv.putString("key2", "value2");
+        kv.putString("key3", "value3");
+        expect(kv.getString("key1")).toEqual("value1");
+        expect(kv.getString("key2")).toEqual("value2");
+        expect(kv.getString("key3")).toEqual("value3");
         kv.close();
     }
 
     @Test
     public void putsOverwritingExistingValueTest() {
         KVEngine kv = new KVEngine(ENGINE, PATH, SIZE);
-        kv.put("key1", "value1");
-        expect(kv.get("key1")).toEqual("value1");
-        kv.put("key1", "value123");
-        expect(kv.get("key1")).toEqual("value123");
-        kv.put("key1", "asdf");
-        expect(kv.get("key1")).toEqual("asdf");
+        kv.putString("key1", "value1");
+        expect(kv.getString("key1")).toEqual("value1");
+        kv.putString("key1", "value123");
+        expect(kv.getString("key1")).toEqual("value123");
+        kv.putString("key1", "asdf");
+        expect(kv.getString("key1")).toEqual("asdf");
         kv.close();
     }
 
@@ -194,8 +198,8 @@ public class KVEngineTest {
     public void putsUtf8KeyTest() {
         KVEngine kv = new KVEngine(ENGINE, PATH, SIZE);
         String val = "to remember, note, record";
-        kv.put("记", val);
-        expect(kv.get("记")).toEqual(val);
+        kv.putString("记", val);
+        expect(kv.getString("记")).toEqual(val);
         kv.close();
     }
 
@@ -203,23 +207,49 @@ public class KVEngineTest {
     public void putsUtf8ValueTest() {
         KVEngine kv = new KVEngine(ENGINE, PATH, SIZE);
         String val = "记 means to remember, note, record";
-        kv.put("key1", val);
-        expect(kv.get("key1")).toEqual(val);
+        kv.putString("key1", val);
+        expect(kv.getString("key1")).toEqual(val);
         kv.close();
     }
 
     @Test
     public void putsVeryLargeValueTest() {
-        // todo finish
+        KVEngine kv = new KVEngine(ENGINE, PATH, SIZE);
+        String val = "ABCDEFGHIJLMNOPQRSTUZWXYZabcdefghijklmnopqrstuvwxyz1234567890";
+        kv.putString("key1", val);
+        expect(kv.getString("key1")).toEqual(val);
+        kv.close();
+    }
+
+    @Test
+    public void recoversManyValuesTest() {
+        KVEngine kv = new KVEngine(ENGINE, PATH, SIZE);
+        for (int i = 0; i < 6000; i++) {
+            String s = String.valueOf(i);
+            kv.putString(s, s);
+        }
+        for (int i = 0; i < 6000; i++) {
+            String s = String.valueOf(i);
+            expect(kv.getString(s)).toEqual(s);
+        }
+        kv.putString("test123", "123");
+        kv.close();
+        kv = new KVEngine(ENGINE, PATH, SIZE);
+        for (int i = 0; i < 6000; i++) {
+            String s = String.valueOf(i);
+            expect(kv.getString(s)).toEqual(s);
+        }
+        expect(kv.getString("test123")).toEqual("123");
+        kv.close();
     }
 
     @Test
     public void removesKeyandValueTest() {
         KVEngine kv = new KVEngine(ENGINE, PATH, SIZE);
-        kv.put("key1", "value1");
-        expect(kv.get("key1")).toEqual("value1");
+        kv.putString("key1", "value1");
+        expect(kv.getString("key1")).toEqual("value1");
         kv.remove("key1");
-        expect(kv.get("key1")).toBeNull();
+        expect(kv.getString("key1")).toBeNull();
         kv.close();
     }
 
@@ -285,7 +315,7 @@ public class KVEngineTest {
         try {
             for (int i = 0; i < 100000; i++) {
                 String istr = String.valueOf(i);
-                kv.put(istr, istr);
+                kv.putString(istr, istr);
             }
             Assert.fail();
         } catch (RuntimeException re) {
@@ -299,11 +329,11 @@ public class KVEngineTest {
     @Test
     public void usesBlackholeEngineTest() {
         KVEngine kv = new KVEngine("blackhole", PATH, SIZE);
-        expect(kv.get("key1")).toBeNull();
-        kv.put("key1", "value1");
-        expect(kv.get("key1")).toBeNull();
+        expect(kv.getString("key1")).toBeNull();
+        kv.putString("key1", "value1");
+        expect(kv.getString("key1")).toBeNull();
         kv.remove("key1");
-        expect(kv.get("key1")).toBeNull();
+        expect(kv.getString("key1")).toBeNull();
         kv.close();
     }
 
