@@ -26,26 +26,26 @@ JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1close
 /*
  * Class:     io_pmem_pmemkv_KVEngine
  * Method:    kvengine_get
- * Signature: (JLjava/lang/String;)Ljava/lang/String;
+ * Signature: (J[B)[B
  */
-JNIEXPORT jstring JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1get
-  (JNIEnv *, jobject, jlong, jstring);
+JNIEXPORT jbyteArray JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1get
+  (JNIEnv *, jobject, jlong, jbyteArray);
 
 /*
  * Class:     io_pmem_pmemkv_KVEngine
  * Method:    kvengine_put
- * Signature: (JLjava/lang/String;Ljava/lang/String;)V
+ * Signature: (J[B[B)V
  */
 JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1put
-  (JNIEnv *, jobject, jlong, jstring, jstring);
+  (JNIEnv *, jobject, jlong, jbyteArray, jbyteArray);
 
 /*
- * Class:     io_pmem_pmemkv_KVEngine
+ * Class:     io_pmem_pmemkv_KVEngines
  * Method:    kvengine_remove
- * Signature: (JLjava/lang/String;)V
+ * Signature: (J[B)V
  */
 JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1remove
-  (JNIEnv *, jobject, jlong, jstring);
+  (JNIEnv *, jobject, jlong, jbyteArray);
 
 #ifdef __cplusplus
 }

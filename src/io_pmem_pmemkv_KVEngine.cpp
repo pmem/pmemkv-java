@@ -32,8 +32,12 @@
 
 #include <jni.h>
 #include <libpmemkv.h>
+#include <iostream>
 
 using pmemkv::KVEngine;
+
+#define DO_LOG 0
+#define LOG(msg) if (DO_LOG) std::cout << "[kvengine] " << msg << "\n"
 
 extern "C" JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1open
         (JNIEnv* env, jobject obj, jstring engine, jstring path, jlong size) {
@@ -60,31 +64,47 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1close
 
 }
 
-extern "C" JNIEXPORT jstring JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1get
-        (JNIEnv* env, jobject obj, jlong pointer, jstring key) {
+extern "C" JNIEXPORT jbyteArray JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1get
+        (JNIEnv* env, jobject obj, jlong pointer, jbyteArray key) {
 
-    const char* ckey = env->GetStringUTFChars(key, NULL);
-    int32_t ckeybytes = env->GetStringUTFLength(key);
+    const auto ckey = env->GetByteArrayElements(key, NULL);
+    const auto ckeybytes = env->GetArrayLength(key);
 
+    thread_local jsize cvaluelimit = 64;
+    thread_local auto cvalue = new char[cvaluelimit];
     int32_t cvaluebytes = 0;
-    const jsize climit = 1024;                             // todo limit is hardcoded
-    auto cvalue = new char[climit];                        // todo buffer is not reused
-    for (int i = 0; i < climit; i++) cvalue[i] = 0;
 
-    int8_t res = pmemkv::kvengine_get((KVEngine*) pointer, climit, ckeybytes, &cvaluebytes,
-                                      ckey, cvalue);
+    LOG("Get for key= " << std::string((char*) ckey, ckeybytes)
+                        << ", limit=" << to_string(cvaluelimit));
+    int8_t res = pmemkv::kvengine_get((KVEngine*) pointer, cvaluelimit, ckeybytes, &cvaluebytes,
+                                      (char*) ckey, cvalue);
+
+    if (res < 0) {
+        LOG("   resizing buffer: " << to_string(cvaluelimit)
+                                   << " to " << to_string(cvaluebytes));
+        // todo validate that cvaluebytes is in a safe range?
+        delete cvalue;
+        cvaluelimit = cvaluebytes;
+        cvalue = new char[cvaluelimit];
+        res = pmemkv::kvengine_get((KVEngine*) pointer, cvaluelimit, ckeybytes, &cvaluebytes,
+                                   (char*) ckey, cvalue);
+    }
 
     if (res == 0) {
-        env->ReleaseStringUTFChars(key, ckey);
+        LOG("   could not find key");
+        env->ReleaseByteArrayElements(key, ckey, JNI_ABORT);
         return NULL;
     } else if (res > 0) {
-        env->ReleaseStringUTFChars(key, ckey);
-        return env->NewStringUTF(cvalue);
+        LOG("   found value, copying");
+        env->ReleaseByteArrayElements(key, ckey, JNI_ABORT);
+        jbyteArray result = env->NewByteArray(cvaluebytes);
+        env->SetByteArrayRegion(result, 0, cvaluebytes, (jbyte*) cvalue);
+        return result;
     } else {
         string msg;
         msg.append("unable to get key: ");
-        msg.append(ckey);
-        env->ReleaseStringUTFChars(key, ckey);
+        msg.append(std::string((char*) ckey, ckeybytes));
+        env->ReleaseByteArrayElements(key, ckey, JNI_ABORT);
         env->ThrowNew(env->FindClass("java/lang/RuntimeException"), msg.c_str());
         return NULL;
     }
@@ -92,37 +112,37 @@ extern "C" JNIEXPORT jstring JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1get
 }
 
 extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1put
-        (JNIEnv* env, jobject obj, jlong pointer, jstring key, jstring value) {
+        (JNIEnv* env, jobject obj, jlong pointer, jbyteArray key, jbyteArray value) {
 
-    const char* ckey = env->GetStringUTFChars(key, NULL);
-    int32_t ckeybytes = env->GetStringUTFLength(key);
-    const char* cvalue = env->GetStringUTFChars(value, NULL);
-    int32_t cvaluebytes = env->GetStringUTFLength(value);
+    const auto ckey = env->GetByteArrayElements(key, NULL);
+    const auto ckeybytes = env->GetArrayLength(key);
+    const auto cvalue = env->GetByteArrayElements(value, NULL);
+    auto cvaluebytes = env->GetArrayLength(value);
 
     int8_t res = pmemkv::kvengine_put((KVEngine*) pointer, ckeybytes, &cvaluebytes,
-                                      ckey, cvalue);
+                                      (char*) ckey, (char*) cvalue);
 
+    env->ReleaseByteArrayElements(value, cvalue, JNI_ABORT);
     if (res != 1) {
         string msg;
         msg.append("unable to put key: ");
-        msg.append(ckey);
-        env->ReleaseStringUTFChars(key, ckey);
-        env->ReleaseStringUTFChars(value, cvalue);
+        msg.append(std::string((char*) ckey, ckeybytes));
+        env->ReleaseByteArrayElements(key, ckey, JNI_ABORT);
         env->ThrowNew(env->FindClass("java/lang/RuntimeException"), msg.c_str());
     } else {
-        env->ReleaseStringUTFChars(key, ckey);
-        env->ReleaseStringUTFChars(value, cvalue);
+        env->ReleaseByteArrayElements(key, ckey, JNI_ABORT);
     }
+
 }
 
 extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1remove
-        (JNIEnv* env, jobject obj, jlong pointer, jstring key) {
+        (JNIEnv* env, jobject obj, jlong pointer, jbyteArray key) {
 
-    const char* ckey = env->GetStringUTFChars(key, NULL);
-    int32_t ckeybytes = env->GetStringUTFLength(key);
+    const auto ckey = env->GetByteArrayElements(key, NULL);
+    const auto ckeybytes = env->GetArrayLength(key);
 
-    pmemkv::kvengine_remove((KVEngine*) pointer, ckeybytes, ckey);
+    pmemkv::kvengine_remove((KVEngine*) pointer, ckeybytes, (char*) ckey);
 
-    env->ReleaseStringUTFChars(key, ckey);
+    env->ReleaseByteArrayElements(key, ckey, JNI_ABORT);
 
 }
