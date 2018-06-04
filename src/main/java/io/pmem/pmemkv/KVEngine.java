@@ -57,16 +57,7 @@ public class KVEngine {
         return kvengine_get(pointer, key);
     }
 
-    public byte[] get(String key) {
-        return kvengine_get(pointer, key.getBytes());
-    }
-
-    public String getString(byte[] key) {
-        byte[] result = kvengine_get(pointer, key);
-        return result == null ? null : new String(result);
-    }
-
-    public String getString(String key) {
+    public String get(String key) {
         byte[] result = kvengine_get(pointer, key.getBytes());
         return result == null ? null : new String(result);
     }
@@ -75,11 +66,7 @@ public class KVEngine {
         kvengine_put(pointer, key, value);
     }
 
-    public void put(String key, byte[] value) {
-        kvengine_put(pointer, key.getBytes(), value);
-    }
-
-    public void putString(String key, String value) {
+    public void put(String key, String value) {
         kvengine_put(pointer, key.getBytes(), value.getBytes());
     }
 
