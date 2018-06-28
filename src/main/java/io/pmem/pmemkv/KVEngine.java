@@ -53,6 +53,22 @@ public class KVEngine {
         return closed;
     }
 
+    public void each(KVEachCallback callback) {
+        kvengine_each(pointer, callback);
+    }
+
+    public void eachString(KVEachStringCallback callback) {
+        kvengine_each_string(pointer, callback);
+    }
+
+    public boolean exists(byte[] key) {
+        return kvengine_exists(pointer, key);
+    }
+
+    public boolean exists(String key) {
+        return kvengine_exists(pointer, key.getBytes());
+    }
+
     public byte[] get(byte[] key) {
         return kvengine_get(pointer, key);
     }
@@ -86,6 +102,12 @@ public class KVEngine {
     private native long kvengine_open(String engine, String path, long size);
 
     private native void kvengine_close(long pointer);
+
+    private native void kvengine_each(long pointer, KVEachCallback callback);
+
+    private native void kvengine_each_string(long pointer, KVEachStringCallback callback);
+
+    private native boolean kvengine_exists(long pointer, byte[] key);
 
     private native byte[] kvengine_get(long pointer, byte[] key);
 

@@ -72,10 +72,13 @@ public class KVEngineTest {
     @Test
     public void blackholeTest() {
         KVEngine kv = new KVEngine("blackhole", PATH, SIZE);
+        expect(kv.exists("key1")).toBeFalse();
         expect(kv.get("key1")).toBeNull();
         kv.put("key1", "value1");
+        expect(kv.exists("key1")).toBeFalse();
         expect(kv.get("key1")).toBeNull();
         kv.remove("key1");
+        expect(kv.exists("key1")).toBeFalse();
         expect(kv.get("key1")).toBeNull();
         kv.close();
     }
@@ -116,6 +119,7 @@ public class KVEngineTest {
     @Test
     public void getsMissingKeyTest() {
         KVEngine kv = new KVEngine(ENGINE, PATH, SIZE);
+        expect(kv.exists("key1")).toBeFalse();
         expect(kv.get("key1")).toBeNull();
         kv.close();
     }
@@ -123,7 +127,9 @@ public class KVEngineTest {
     @Test
     public void putsBasicValueTest() {
         KVEngine kv = new KVEngine(ENGINE, PATH, SIZE);
+        expect(kv.exists("key1")).toBeFalse();
         kv.put("key1", "value1");
+        expect(kv.exists("key1")).toBeTrue();
         expect(kv.get("key1")).toEqual("value1");
         kv.close();
     }
@@ -132,8 +138,10 @@ public class KVEngineTest {
     public void putsBinaryKeyTest() {
         KVEngine kv = new KVEngine(ENGINE, PATH, SIZE);
         kv.put("A\0B\0\0C", "value1");
+        expect(kv.exists("A\0B\0\0C")).toBeTrue();
         expect(kv.get("A\0B\0\0C")).toEqual("value1");
         kv.put("1\02\0\03".getBytes(), "value123!".getBytes());
+        expect(kv.exists("1\02\0\03")).toBeTrue();
         expect(kv.get("1\02\0\03")).toEqual("value123!");
         kv.close();
     }
@@ -163,8 +171,11 @@ public class KVEngineTest {
         kv.put("", "empty");
         kv.put(" ", "single-space");
         kv.put("\t\t", "two-tab");
+        expect(kv.exists("")).toBeTrue();
         expect(kv.get("")).toEqual("empty");
+        expect(kv.exists(" ")).toBeTrue();
         expect(kv.get(" ")).toEqual("single-space");
+        expect(kv.exists("\t\t")).toBeTrue();
         expect(kv.get("\t\t")).toEqual("two-tab");
         kv.close();
     }
@@ -187,8 +198,11 @@ public class KVEngineTest {
         kv.put("key1", "value1");
         kv.put("key2", "value2");
         kv.put("key3", "value3");
+        expect(kv.exists("key1")).toBeTrue();
         expect(kv.get("key1")).toEqual("value1");
+        expect(kv.exists("key2")).toBeTrue();
         expect(kv.get("key2")).toEqual("value2");
+        expect(kv.exists("key3")).toBeTrue();
         expect(kv.get("key3")).toEqual("value3");
         kv.close();
     }
@@ -210,6 +224,7 @@ public class KVEngineTest {
         KVEngine kv = new KVEngine(ENGINE, PATH, SIZE);
         String val = "to remember, note, record";
         kv.put("记", val);
+        expect(kv.exists("记")).toBeTrue();
         expect(kv.get("记")).toEqual(val);
         kv.close();
     }
@@ -254,12 +269,13 @@ public class KVEngineTest {
         kv.close();
     }
 
-    @Test
     public void removesKeyandValueTest() {
         KVEngine kv = new KVEngine(ENGINE, PATH, SIZE);
         kv.put("key1", "value1");
+        expect(kv.exists("key1")).toBeTrue();
         expect(kv.get("key1")).toEqual("value1");
         kv.remove("key1");
+        expect(kv.exists("key1")).toBeFalse();
         expect(kv.get("key1")).toBeNull();
         kv.close();
     }
@@ -336,5 +352,29 @@ public class KVEngineTest {
         }
         kv.close();
     }
+
+//    // ENABLE WHEN BTREE ENGINE IS DEFAULT
+//    @Test
+//    public void usesEachTest() {
+//        KVEngine kv = new KVEngine(ENGINE, PATH, SIZE);
+//        kv.put("1".getBytes(), "2".getBytes());
+//        kv.put("RR".getBytes(), "BBB".getBytes());
+//        StringBuilder s = new StringBuilder();
+//        kv.each((k, v) -> s.append("<").append(new String(k)).append(">,<")
+//                .append(new String(v)).append(">|"));
+//        expect(s.toString()).toEqual("<1>,<2>|<RR>,<BBB>|");
+//        kv.close();
+//    }
+//
+//    @Test
+//    public void usesEachStringTest() {
+//        KVEngine kv = new KVEngine(ENGINE, PATH, SIZE);
+//        kv.put("one", "2");
+//        kv.put("red", "记!");
+//        StringBuilder s = new StringBuilder();
+//        kv.eachString((k, v) -> s.append("<").append(k).append(">,<").append(v).append(">|"));
+//        expect(s.toString()).toEqual("<one>,<2>|<red>,<记!>|");
+//        kv.close();
+//    }
 
 }
