@@ -25,6 +25,30 @@ JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1close
 
 /*
  * Class:     io_pmem_pmemkv_KVEngine
+ * Method:    kvengine_each
+ * Signature: (JLio/pmem/pmemkv/KVEachCallback;)V
+ */
+JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1each
+  (JNIEnv *, jobject, jlong, jobject);
+
+/*
+ * Class:     io_pmem_pmemkv_KVEngine
+ * Method:    kvengine_each_string
+ * Signature: (JLio/pmem/pmemkv/KVEachStringCallback;)V
+ */
+JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1each_1string
+  (JNIEnv *, jobject, jlong, jobject);
+
+/*
+ * Class:     io_pmem_pmemkv_KVEngine
+ * Method:    kvengine_exists
+ * Signature: (J[B)Z
+ */
+JNIEXPORT jboolean JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1exists
+  (JNIEnv *, jobject, jlong, jbyteArray);
+
+/*
+ * Class:     io_pmem_pmemkv_KVEngine
  * Method:    kvengine_get
  * Signature: (J[B)[B
  */
@@ -40,7 +64,7 @@ JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1put
   (JNIEnv *, jobject, jlong, jbyteArray, jbyteArray);
 
 /*
- * Class:     io_pmem_pmemkv_KVEngines
+ * Class:     io_pmem_pmemkv_KVEngine
  * Method:    kvengine_remove
  * Signature: (J[B)V
  */
