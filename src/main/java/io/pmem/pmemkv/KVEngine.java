@@ -53,6 +53,10 @@ public class KVEngine {
         return closed;
     }
 
+    public long count() {
+        return kvengine_count(pointer);
+    }
+
     public void each(KVEachCallback callback) {
         kvengine_each(pointer, callback);
     }
@@ -102,6 +106,8 @@ public class KVEngine {
     private native long kvengine_open(String engine, String path, long size);
 
     private native void kvengine_close(long pointer);
+
+    private native long kvengine_count(long pointer);
 
     private native void kvengine_each(long pointer, KVEachCallback callback);
 

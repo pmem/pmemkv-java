@@ -72,9 +72,11 @@ public class KVEngineTest {
     @Test
     public void blackholeTest() {
         KVEngine kv = new KVEngine("blackhole", PATH, SIZE);
+        expect(kv.count()).toEqual(0);
         expect(kv.exists("key1")).toBeFalse();
         expect(kv.get("key1")).toBeNull();
         kv.put("key1", "value1");
+        expect(kv.count()).toEqual(0);
         expect(kv.exists("key1")).toBeFalse();
         expect(kv.get("key1")).toBeNull();
         kv.remove("key1");
@@ -353,28 +355,33 @@ public class KVEngineTest {
         kv.close();
     }
 
-//    // ENABLE WHEN BTREE ENGINE IS DEFAULT
-//    @Test
-//    public void usesEachTest() {
-//        KVEngine kv = new KVEngine(ENGINE, PATH, SIZE);
-//        kv.put("1".getBytes(), "2".getBytes());
-//        kv.put("RR".getBytes(), "BBB".getBytes());
-//        StringBuilder s = new StringBuilder();
-//        kv.each((k, v) -> s.append("<").append(new String(k)).append(">,<")
-//                .append(new String(v)).append(">|"));
-//        expect(s.toString()).toEqual("<1>,<2>|<RR>,<BBB>|");
-//        kv.close();
-//    }
-//
-//    @Test
-//    public void usesEachStringTest() {
-//        KVEngine kv = new KVEngine(ENGINE, PATH, SIZE);
-//        kv.put("one", "2");
-//        kv.put("red", "记!");
-//        StringBuilder s = new StringBuilder();
-//        kv.eachString((k, v) -> s.append("<").append(k).append(">,<").append(v).append(">|"));
-//        expect(s.toString()).toEqual("<one>,<2>|<red>,<记!>|");
-//        kv.close();
-//    }
+    @Test
+    public void usesEachTest() {
+        KVEngine kv = new KVEngine("btree", PATH, SIZE); // todo switch to ENGINE
+        expect(kv.count()).toEqual(0);
+        kv.put("1".getBytes(), "2".getBytes());
+        expect(kv.count()).toEqual(1);
+        kv.put("RR".getBytes(), "BBB".getBytes());
+        expect(kv.count()).toEqual(2);
+        StringBuilder s = new StringBuilder();
+        kv.each((k, v) -> s.append("<").append(new String(k)).append(">,<")
+                .append(new String(v)).append(">|"));
+        expect(s.toString()).toEqual("<1>,<2>|<RR>,<BBB>|");
+        kv.close();
+    }
+
+    @Test
+    public void usesEachStringTest() {
+        KVEngine kv = new KVEngine("btree", PATH, SIZE); // todo switch to ENGINE
+        expect(kv.count()).toEqual(0);
+        kv.put("one", "2");
+        expect(kv.count()).toEqual(1);
+        kv.put("red", "记!");
+        expect(kv.count()).toEqual(2);
+        StringBuilder s = new StringBuilder();
+        kv.eachString((k, v) -> s.append("<").append(k).append(">,<").append(v).append(">|"));
+        expect(s.toString()).toEqual("<one>,<2>|<red>,<记!>|");
+        kv.close();
+    }
 
 }
