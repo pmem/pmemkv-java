@@ -25,6 +25,14 @@ JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1close
 
 /*
  * Class:     io_pmem_pmemkv_KVEngine
+ * Method:    kvengine_count
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1count
+  (JNIEnv *, jobject, jlong);
+
+/*
+ * Class:     io_pmem_pmemkv_KVEngine
  * Method:    kvengine_each
  * Signature: (JLio/pmem/pmemkv/KVEachCallback;)V
  */

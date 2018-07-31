@@ -64,6 +64,13 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1close
 
 }
 
+extern "C" JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1count
+        (JNIEnv* env, jobject obj, jlong pointer) {
+
+    return pmemkv::kvengine_count((KVEngine*) pointer);
+
+}
+
 struct EachCallbackContext {
     JNIEnv* env;
     jobject callback;
