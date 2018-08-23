@@ -71,6 +71,17 @@ extern "C" JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1count
 
 }
 
+extern "C" JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1count_1like
+        (JNIEnv* env, jobject obj, jlong pointer, jbyteArray pattern) {
+
+    const auto cpattern = env->GetByteArrayElements(pattern, NULL);
+    const auto cpatternbytes = env->GetArrayLength(pattern);
+    auto result = pmemkv::kvengine_count_like((KVEngine*) pointer, cpatternbytes, (char*) cpattern);
+    env->ReleaseByteArrayElements(pattern, cpattern, JNI_ABORT);
+    return result;
+
+}
+
 struct EachCallbackContext {
     JNIEnv* env;
     jobject callback;
@@ -99,6 +110,31 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1each
 
 }
 
+extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1each_1like
+        (JNIEnv* env, jobject obj, jlong pointer, jbyteArray pattern, jobject callback) {
+
+    auto cb = [](void* context, int32_t keybytes, int32_t valuebytes,
+                 const char* key, const char* value) {
+        const auto c = ((EachCallbackContext*) context);
+        const auto ckey = c->env->NewByteArray(keybytes);
+        c->env->SetByteArrayRegion(ckey, 0, keybytes, (jbyte*) key);
+        const auto cvalue = c->env->NewByteArray(valuebytes);
+        c->env->SetByteArrayRegion(cvalue, 0, valuebytes, (jbyte*) value);
+        c->env->CallVoidMethod(c->callback, c->mid, ckey, cvalue);
+        c->env->DeleteLocalRef(ckey);
+        c->env->DeleteLocalRef(cvalue);
+    };
+
+    const auto cpattern = env->GetByteArrayElements(pattern, NULL);
+    const auto cpatternbytes = env->GetArrayLength(pattern);
+    const auto cls = env->GetObjectClass(callback);
+    const auto mid = env->GetMethodID(cls, "process", "([B[B)V");
+    EachCallbackContext cxt = {env, callback, mid};
+    pmemkv::kvengine_each_like((KVEngine*) pointer, cpatternbytes, (char*) cpattern, &cxt, cb);
+    env->ReleaseByteArrayElements(pattern, cpattern, JNI_ABORT);
+
+}
+
 extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1each_1string
         (JNIEnv* env, jobject obj, jlong pointer, jobject callback) {
 
@@ -119,6 +155,29 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1each_1s
 
 }
 
+extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1each_1string_1like
+        (JNIEnv* env, jobject obj, jlong pointer, jbyteArray pattern, jobject callback) {
+
+    auto cb = [](void* context, int32_t keybytes, int32_t valuebytes,
+                 const char* key, const char* value) {
+        const auto c = ((EachCallbackContext*) context);
+        const auto ckey = c->env->NewStringUTF(key);
+        const auto cvalue = c->env->NewStringUTF(value);
+        c->env->CallVoidMethod(c->callback, c->mid, ckey, cvalue);
+        c->env->DeleteLocalRef(ckey);
+        c->env->DeleteLocalRef(cvalue);
+    };
+
+    const auto cpattern = env->GetByteArrayElements(pattern, NULL);
+    const auto cpatternbytes = env->GetArrayLength(pattern);
+    const auto cls = env->GetObjectClass(callback);
+    const auto mid = env->GetMethodID(cls, "process", "(Ljava/lang/String;Ljava/lang/String;)V");
+    EachCallbackContext cxt = {env, callback, mid};
+    pmemkv::kvengine_each_like((KVEngine*) pointer, cpatternbytes, (char*) cpattern, &cxt, cb);
+    env->ReleaseByteArrayElements(pattern, cpattern, JNI_ABORT);
+
+}
+
 extern "C" JNIEXPORT jboolean JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1exists
         (JNIEnv* env, jobject obj, jlong pointer, jbyteArray key) {
 
@@ -126,6 +185,17 @@ extern "C" JNIEXPORT jboolean JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1exi
     const auto ckeybytes = env->GetArrayLength(key);
     auto result = pmemkv::kvengine_exists((KVEngine*) pointer, ckeybytes, (char*) ckey);
     env->ReleaseByteArrayElements(key, ckey, JNI_ABORT);
+    return result;
+
+}
+
+extern "C" JNIEXPORT jboolean JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1exists_1like
+        (JNIEnv* env, jobject obj, jlong pointer, jbyteArray pattern) {
+
+    const auto cpattern = env->GetByteArrayElements(pattern, NULL);
+    const auto cpatternbytes = env->GetArrayLength(pattern);
+    auto result = pmemkv::kvengine_exists_like((KVEngine*) pointer, cpatternbytes, (char*) cpattern);
+    env->ReleaseByteArrayElements(pattern, cpattern, JNI_ABORT);
     return result;
 
 }

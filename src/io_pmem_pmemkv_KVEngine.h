@@ -33,11 +33,27 @@ JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1count
 
 /*
  * Class:     io_pmem_pmemkv_KVEngine
+ * Method:    kvengine_count_like
+ * Signature: (J[B)J
+ */
+JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1count_1like
+  (JNIEnv *, jobject, jlong, jbyteArray);
+
+/*
+ * Class:     io_pmem_pmemkv_KVEngine
  * Method:    kvengine_each
  * Signature: (JLio/pmem/pmemkv/KVEachCallback;)V
  */
 JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1each
   (JNIEnv *, jobject, jlong, jobject);
+
+/*
+ * Class:     io_pmem_pmemkv_KVEngine
+ * Method:    kvengine_each_like
+ * Signature: (J[BLio/pmem/pmemkv/KVEachCallback;)V
+ */
+JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1each_1like
+  (JNIEnv *, jobject, jlong, jbyteArray, jobject);
 
 /*
  * Class:     io_pmem_pmemkv_KVEngine
@@ -49,10 +65,26 @@ JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1each_1string
 
 /*
  * Class:     io_pmem_pmemkv_KVEngine
+ * Method:    kvengine_each_string_like
+ * Signature: (J[BLio/pmem/pmemkv/KVEachStringCallback;)V
+ */
+JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1each_1string_1like
+  (JNIEnv *, jobject, jlong, jbyteArray, jobject);
+
+/*
+ * Class:     io_pmem_pmemkv_KVEngine
  * Method:    kvengine_exists
  * Signature: (J[B)Z
  */
 JNIEXPORT jboolean JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1exists
+  (JNIEnv *, jobject, jlong, jbyteArray);
+
+/*
+ * Class:     io_pmem_pmemkv_KVEngine
+ * Method:    kvengine_exists_like
+ * Signature: (J[B)Z
+ */
+JNIEXPORT jboolean JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1exists_1like
   (JNIEnv *, jobject, jlong, jbyteArray);
 
 /*
