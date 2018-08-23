@@ -384,4 +384,95 @@ public class KVEngineTest {
         kv.close();
     }
 
+    @Test
+    public void usesLikeTest() {
+        KVEngine kv = new KVEngine("btree", PATH, SIZE); // todo switch to ENGINE
+        kv.put("10", "10!");
+        kv.put("11", "11!");
+        kv.put("20", "20!");
+        kv.put("21", "21!");
+        kv.put("22", "22!");
+        kv.put("30", "30!");
+
+        expect(kv.existsLike(".*")).toBeTrue();
+        expect(kv.existsLike("A")).toBeFalse();
+        expect(kv.existsLike("10")).toBeTrue();
+        expect(kv.existsLike("100")).toBeFalse();
+        expect(kv.existsLike("1.*")).toBeTrue();
+        expect(kv.existsLike("2.*")).toBeTrue();
+        expect(kv.existsLike(".*1")).toBeTrue();
+
+        expect(kv.countLike(".*")).toEqual(6);
+        expect(kv.countLike("A")).toEqual(0);
+        expect(kv.countLike("10")).toEqual(1);
+        expect(kv.countLike("100")).toEqual(0);
+        expect(kv.countLike("1.*")).toEqual(2);
+        expect(kv.countLike("2.*")).toEqual(3);
+        expect(kv.countLike(".*1")).toEqual(2);
+
+        StringBuilder s = new StringBuilder();
+        kv.eachLike("1.*", (k, v) -> s.append("<").append(new String(k)).append(">,"));
+        expect(s.toString()).toEqual("<10>,<11>,");
+        kv.eachStringLike("3.*", (k, v) -> s.append("<").append(v).append(">,"));
+        expect(s.toString()).toEqual("<10>,<11>,<30!>,");
+
+        kv.close();
+    }
+
+    @Test
+    public void usesLikeWithBadPatternTest() {
+        KVEngine kv = new KVEngine("btree", PATH, SIZE); // todo switch to ENGINE
+        kv.put("10", "10");
+        kv.put("20", "20");
+        kv.put("30", "30");
+
+        expect(kv.existsLike("")).toBeFalse();
+        expect(kv.existsLike("*")).toBeFalse();
+        expect(kv.existsLike("(")).toBeFalse();
+        expect(kv.existsLike(")")).toBeFalse();
+        expect(kv.existsLike("()")).toBeFalse();
+        expect(kv.existsLike(")(")).toBeFalse();
+        expect(kv.existsLike("[")).toBeFalse();
+        expect(kv.existsLike("]")).toBeFalse();
+        expect(kv.existsLike("[]")).toBeFalse();
+        expect(kv.existsLike("][")).toBeFalse();
+
+        expect(kv.countLike("")).toEqual(0);
+        expect(kv.countLike("*")).toEqual(0);
+        expect(kv.countLike("(")).toEqual(0);
+        expect(kv.countLike(")")).toEqual(0);
+        expect(kv.countLike("()")).toEqual(0);
+        expect(kv.countLike(")(")).toEqual(0);
+        expect(kv.countLike("[")).toEqual(0);
+        expect(kv.countLike("]")).toEqual(0);
+        expect(kv.countLike("[]")).toEqual(0);
+        expect(kv.countLike("][")).toEqual(0);
+
+        StringBuilder s = new StringBuilder();
+        kv.eachLike("", (k, v) -> s.append("<").append(new String(k)).append(">,"));
+        kv.eachLike("*", (k, v) -> s.append("<").append(new String(k)).append(">,"));
+        kv.eachLike("(", (k, v) -> s.append("<").append(new String(k)).append(">,"));
+        kv.eachLike(")", (k, v) -> s.append("<").append(new String(k)).append(">,"));
+        kv.eachLike("()", (k, v) -> s.append("<").append(new String(k)).append(">,"));
+        kv.eachLike(")(", (k, v) -> s.append("<").append(new String(k)).append(">,"));
+        kv.eachLike("[", (k, v) -> s.append("<").append(new String(k)).append(">,"));
+        kv.eachLike("]", (k, v) -> s.append("<").append(new String(k)).append(">,"));
+        kv.eachLike("[]", (k, v) -> s.append("<").append(new String(k)).append(">,"));
+        kv.eachLike("][", (k, v) -> s.append("<").append(new String(k)).append(">,"));
+        expect(s.toString()).toEqual("");
+        kv.eachStringLike("", (k, v) -> s.append("<").append(k).append(">,"));
+        kv.eachStringLike("*", (k, v) -> s.append("<").append(k).append(">,"));
+        kv.eachStringLike("(", (k, v) -> s.append("<").append(k).append(">,"));
+        kv.eachStringLike(")", (k, v) -> s.append("<").append(k).append(">,"));
+        kv.eachStringLike("()", (k, v) -> s.append("<").append(k).append(">,"));
+        kv.eachStringLike(")(", (k, v) -> s.append("<").append(k).append(">,"));
+        kv.eachStringLike("[", (k, v) -> s.append("<").append(k).append(">,"));
+        kv.eachStringLike("]", (k, v) -> s.append("<").append(k).append(">,"));
+        kv.eachStringLike("[]", (k, v) -> s.append("<").append(k).append(">,"));
+        kv.eachStringLike("][", (k, v) -> s.append("<").append(k).append(">,"));
+        expect(s.toString()).toEqual("");
+
+        kv.close();
+    }
+
 }
