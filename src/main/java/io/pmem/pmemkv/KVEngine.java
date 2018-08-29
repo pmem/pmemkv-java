@@ -85,10 +85,6 @@ public class KVEngine {
         return kvengine_exists(pointer, key.getBytes());
     }
 
-    public boolean existsLike(String pattern) {
-        return kvengine_exists_like(pointer, pattern.getBytes());
-    }
-
     public byte[] get(byte[] key) {
         return kvengine_get(pointer, key);
     }
@@ -137,8 +133,6 @@ public class KVEngine {
                                                   KVEachStringCallback callback);
 
     private native boolean kvengine_exists(long pointer, byte[] key);
-
-    private native boolean kvengine_exists_like(long pointer, byte[] pattern);
 
     private native byte[] kvengine_get(long pointer, byte[] key);
 

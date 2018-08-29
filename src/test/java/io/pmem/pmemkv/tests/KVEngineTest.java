@@ -46,7 +46,7 @@ import static com.mscharhag.oleaster.matcher.Matchers.expect;
 
 public class KVEngineTest {
 
-    private final String ENGINE = "kvtree2";
+    private final String ENGINE = "kvtree3";
     private final String PATH = "/dev/shm/pmemkv-java";
     private final long SIZE = 1024 * 1024 * 8;
 
@@ -357,11 +357,11 @@ public class KVEngineTest {
 
     @Test
     public void usesEachTest() {
-        KVEngine kv = new KVEngine("btree", PATH, SIZE); // todo switch to ENGINE
+        KVEngine kv = new KVEngine(ENGINE, PATH, SIZE);
         expect(kv.count()).toEqual(0);
-        kv.put("1".getBytes(), "2".getBytes());
-        expect(kv.count()).toEqual(1);
         kv.put("RR".getBytes(), "BBB".getBytes());
+        expect(kv.count()).toEqual(1);
+        kv.put("1".getBytes(), "2".getBytes());
         expect(kv.count()).toEqual(2);
         StringBuilder s = new StringBuilder();
         kv.each((k, v) -> s.append("<").append(new String(k)).append(">,<")
@@ -372,11 +372,11 @@ public class KVEngineTest {
 
     @Test
     public void usesEachStringTest() {
-        KVEngine kv = new KVEngine("btree", PATH, SIZE); // todo switch to ENGINE
+        KVEngine kv = new KVEngine(ENGINE, PATH, SIZE);
         expect(kv.count()).toEqual(0);
-        kv.put("one", "2");
-        expect(kv.count()).toEqual(1);
         kv.put("red", "记!");
+        expect(kv.count()).toEqual(1);
+        kv.put("one", "2");
         expect(kv.count()).toEqual(2);
         StringBuilder s = new StringBuilder();
         kv.eachString((k, v) -> s.append("<").append(k).append(">,<").append(v).append(">|"));
@@ -386,21 +386,13 @@ public class KVEngineTest {
 
     @Test
     public void usesLikeTest() {
-        KVEngine kv = new KVEngine("btree", PATH, SIZE); // todo switch to ENGINE
-        kv.put("10", "10!");
+        KVEngine kv = new KVEngine(ENGINE, PATH, SIZE);
         kv.put("11", "11!");
+        kv.put("10", "10!");
         kv.put("20", "20!");
         kv.put("21", "21!");
         kv.put("22", "22!");
         kv.put("30", "30!");
-
-        expect(kv.existsLike(".*")).toBeTrue();
-        expect(kv.existsLike("A")).toBeFalse();
-        expect(kv.existsLike("10")).toBeTrue();
-        expect(kv.existsLike("100")).toBeFalse();
-        expect(kv.existsLike("1.*")).toBeTrue();
-        expect(kv.existsLike("2.*")).toBeTrue();
-        expect(kv.existsLike(".*1")).toBeTrue();
 
         expect(kv.countLike(".*")).toEqual(6);
         expect(kv.countLike("A")).toEqual(0);
@@ -421,21 +413,10 @@ public class KVEngineTest {
 
     @Test
     public void usesLikeWithBadPatternTest() {
-        KVEngine kv = new KVEngine("btree", PATH, SIZE); // todo switch to ENGINE
+        KVEngine kv = new KVEngine(ENGINE, PATH, SIZE);
         kv.put("10", "10");
         kv.put("20", "20");
         kv.put("30", "30");
-
-        expect(kv.existsLike("")).toBeFalse();
-        expect(kv.existsLike("*")).toBeFalse();
-        expect(kv.existsLike("(")).toBeFalse();
-        expect(kv.existsLike(")")).toBeFalse();
-        expect(kv.existsLike("()")).toBeFalse();
-        expect(kv.existsLike(")(")).toBeFalse();
-        expect(kv.existsLike("[")).toBeFalse();
-        expect(kv.existsLike("]")).toBeFalse();
-        expect(kv.existsLike("[]")).toBeFalse();
-        expect(kv.existsLike("][")).toBeFalse();
 
         expect(kv.countLike("")).toEqual(0);
         expect(kv.countLike("*")).toEqual(0);
