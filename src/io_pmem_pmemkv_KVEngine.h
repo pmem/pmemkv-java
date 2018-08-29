@@ -81,14 +81,6 @@ JNIEXPORT jboolean JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1exists
 
 /*
  * Class:     io_pmem_pmemkv_KVEngine
- * Method:    kvengine_exists_like
- * Signature: (J[B)Z
- */
-JNIEXPORT jboolean JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1exists_1like
-  (JNIEnv *, jobject, jlong, jbyteArray);
-
-/*
- * Class:     io_pmem_pmemkv_KVEngine
  * Method:    kvengine_get
  * Signature: (J[B)[B
  */

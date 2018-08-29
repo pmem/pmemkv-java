@@ -189,17 +189,6 @@ extern "C" JNIEXPORT jboolean JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1exi
 
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1exists_1like
-        (JNIEnv* env, jobject obj, jlong pointer, jbyteArray pattern) {
-
-    const auto cpattern = env->GetByteArrayElements(pattern, NULL);
-    const auto cpatternbytes = env->GetArrayLength(pattern);
-    auto result = pmemkv::kvengine_exists_like((KVEngine*) pointer, cpatternbytes, (char*) cpattern);
-    env->ReleaseByteArrayElements(pattern, cpattern, JNI_ABORT);
-    return result;
-
-}
-
 struct GetCallbackContext {
     JNIEnv* env;
     jbyteArray result;
