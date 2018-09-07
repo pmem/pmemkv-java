@@ -91,8 +91,8 @@ struct EachCallbackContext {
 extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1each
         (JNIEnv* env, jobject obj, jlong pointer, jobject callback) {
 
-    auto cb = [](void* context, int32_t keybytes, int32_t valuebytes,
-                 const char* key, const char* value) {
+    auto cb = [](void* context, int32_t keybytes, const char* key,
+                 int32_t valuebytes, const char* value) {
         const auto c = ((EachCallbackContext*) context);
         const auto ckey = c->env->NewByteArray(keybytes);
         c->env->SetByteArrayRegion(ckey, 0, keybytes, (jbyte*) key);
@@ -113,8 +113,8 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1each
 extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1each_1like
         (JNIEnv* env, jobject obj, jlong pointer, jbyteArray pattern, jobject callback) {
 
-    auto cb = [](void* context, int32_t keybytes, int32_t valuebytes,
-                 const char* key, const char* value) {
+    auto cb = [](void* context, int32_t keybytes, const char* key,
+                 int32_t valuebytes, const char* value) {
         const auto c = ((EachCallbackContext*) context);
         const auto ckey = c->env->NewByteArray(keybytes);
         c->env->SetByteArrayRegion(ckey, 0, keybytes, (jbyte*) key);
@@ -138,8 +138,8 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1each_1l
 extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1each_1string
         (JNIEnv* env, jobject obj, jlong pointer, jobject callback) {
 
-    auto cb = [](void* context, int32_t keybytes, int32_t valuebytes,
-                 const char* key, const char* value) {
+    auto cb = [](void* context, int32_t keybytes, const char* key,
+                 int32_t valuebytes, const char* value) {
         const auto c = ((EachCallbackContext*) context);
         const auto ckey = c->env->NewStringUTF(key);
         const auto cvalue = c->env->NewStringUTF(value);
@@ -158,8 +158,8 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1each_1s
 extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1each_1string_1like
         (JNIEnv* env, jobject obj, jlong pointer, jbyteArray pattern, jobject callback) {
 
-    auto cb = [](void* context, int32_t keybytes, int32_t valuebytes,
-                 const char* key, const char* value) {
+    auto cb = [](void* context, int32_t keybytes, const char* key,
+                 int32_t valuebytes, const char* value) {
         const auto c = ((EachCallbackContext*) context);
         const auto ckey = c->env->NewStringUTF(key);
         const auto cvalue = c->env->NewStringUTF(value);
@@ -220,8 +220,8 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1put
     const auto cvalue = env->GetByteArrayElements(value, NULL);
     auto cvaluebytes = env->GetArrayLength(value);
 
-    int8_t res = pmemkv::kvengine_put((KVEngine*) pointer, ckeybytes, cvaluebytes,
-                                      (char*) ckey, (char*) cvalue);
+    int8_t res = pmemkv::kvengine_put((KVEngine*) pointer, ckeybytes, (char*) ckey,
+                                      cvaluebytes, (char*) cvalue);
 
     env->ReleaseByteArrayElements(value, cvalue, JNI_ABORT);
     if (res != 1) {
