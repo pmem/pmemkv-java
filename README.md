@@ -25,18 +25,38 @@ Next install [pmemkv-jni](https://github.com/pmem/pmemkv-jni).
 
 Finish by installing these bindings:  `mvn install`
 
-## Sample Code
+## Example
 
 We are using `/dev/shm` to
 [emulate persistent memory](http://pmem.io/2016/02/22/pm-emulation.html)
 in this simple example.
 
-```
+```java
 import io.pmem.pmemkv.KVEngine;
 
-KVEngine kv = new KVEngine("kvtree3", "/dev/shm/mykv", 2 * 1024 * 1024 * 1024L); // 2GB pool
-kv.put("key1", "value1");
-expect(kv.get("key1")).toEqual("value1");
-kv.remove("key1");
-kv.close();
+public class Example {
+    public static void main(String[] args) {
+        System.out.println("Opening datastore");
+        KVEngine kv = new KVEngine("kvtree3", "/dev/shm/pmemkv", 1073741824); // 1 GB pool
+
+        System.out.println("Putting new key");
+        kv.put("key1", "value1");
+        assert kv.count() == 1;
+
+        System.out.println("Reading key back");
+        assert kv.get("key1").equals("value1");
+
+        System.out.println("Iterating existing keys");
+        kv.put("key2", "value2");
+        kv.put("key3", "value3");
+        kv.eachString((k, v) -> System.out.println("  visited: " + k));
+
+        System.out.println("Removing existing key");
+        kv.remove("key1");
+        assert !kv.exists("key1");
+
+        System.out.println("Closing datastore");
+        kv.close();
+    }
+}
 ```
