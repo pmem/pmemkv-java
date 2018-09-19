@@ -356,6 +356,34 @@ public class KVEngineTest {
     }
 
     @Test
+    public void usesAllTest() {
+        KVEngine kv = new KVEngine(ENGINE, PATH, SIZE);
+        expect(kv.count()).toEqual(0);
+        kv.put("RR".getBytes(), "BBB".getBytes());
+        expect(kv.count()).toEqual(1);
+        kv.put("1".getBytes(), "2".getBytes());
+        expect(kv.count()).toEqual(2);
+        StringBuilder s = new StringBuilder();
+        kv.all((k) -> s.append("<").append(new String(k)).append(">,"));
+        expect(s.toString()).toEqual("<1>,<RR>,");
+        kv.close();
+    }
+
+    @Test
+    public void usesAllStringsTest() {
+        KVEngine kv = new KVEngine(ENGINE, PATH, SIZE);
+        expect(kv.count()).toEqual(0);
+        kv.put("记!", "RR");
+        expect(kv.count()).toEqual(1);
+        kv.put("2", "one");
+        expect(kv.count()).toEqual(2);
+        StringBuilder s = new StringBuilder();
+        kv.allStrings((k) -> s.append("<").append(k).append(">,"));
+        expect(s.toString()).toEqual("<2>,<记!>,");
+        kv.close();
+    }
+
+    @Test
     public void usesEachTest() {
         KVEngine kv = new KVEngine(ENGINE, PATH, SIZE);
         expect(kv.count()).toEqual(0);
