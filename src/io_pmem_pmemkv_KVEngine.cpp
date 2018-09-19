@@ -64,6 +64,47 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1close
 
 }
 
+struct CallbackContext {
+    JNIEnv* env;
+    jobject callback;
+    jmethodID mid;
+};
+
+extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1all
+        (JNIEnv* env, jobject obj, jlong pointer, jobject callback) {
+
+    auto cb = [](void* context, int32_t keybytes, const char* key) {
+        const auto c = ((CallbackContext*) context);
+        const auto ckey = c->env->NewByteArray(keybytes);
+        c->env->SetByteArrayRegion(ckey, 0, keybytes, (jbyte*) key);
+        c->env->CallVoidMethod(c->callback, c->mid, ckey);
+        c->env->DeleteLocalRef(ckey);
+    };
+
+    const auto cls = env->GetObjectClass(callback);
+    const auto mid = env->GetMethodID(cls, "process", "([B)V");
+    CallbackContext cxt = {env, callback, mid};
+    pmemkv::kvengine_all((KVEngine*) pointer, &cxt, cb);
+
+}
+
+extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1all_1strings
+        (JNIEnv* env, jobject obj, jlong pointer, jobject callback) {
+
+    auto cb = [](void* context, int32_t keybytes, const char* key) {
+        const auto c = ((CallbackContext*) context);
+        const auto ckey = c->env->NewStringUTF(key);
+        c->env->CallVoidMethod(c->callback, c->mid, ckey);
+        c->env->DeleteLocalRef(ckey);
+    };
+
+    const auto cls = env->GetObjectClass(callback);
+    const auto mid = env->GetMethodID(cls, "process", "(Ljava/lang/String;)V");
+    CallbackContext cxt = {env, callback, mid};
+    pmemkv::kvengine_all((KVEngine*) pointer, &cxt, cb);
+
+}
+
 extern "C" JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1count
         (JNIEnv* env, jobject obj, jlong pointer) {
 
@@ -82,18 +123,12 @@ extern "C" JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1count_
 
 }
 
-struct EachCallbackContext {
-    JNIEnv* env;
-    jobject callback;
-    jmethodID mid;
-};
-
 extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1each
         (JNIEnv* env, jobject obj, jlong pointer, jobject callback) {
 
     auto cb = [](void* context, int32_t keybytes, const char* key,
                  int32_t valuebytes, const char* value) {
-        const auto c = ((EachCallbackContext*) context);
+        const auto c = ((CallbackContext*) context);
         const auto ckey = c->env->NewByteArray(keybytes);
         c->env->SetByteArrayRegion(ckey, 0, keybytes, (jbyte*) key);
         const auto cvalue = c->env->NewByteArray(valuebytes);
@@ -105,7 +140,7 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1each
 
     const auto cls = env->GetObjectClass(callback);
     const auto mid = env->GetMethodID(cls, "process", "([B[B)V");
-    EachCallbackContext cxt = {env, callback, mid};
+    CallbackContext cxt = {env, callback, mid};
     pmemkv::kvengine_each((KVEngine*) pointer, &cxt, cb);
 
 }
@@ -115,7 +150,7 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1each_1l
 
     auto cb = [](void* context, int32_t keybytes, const char* key,
                  int32_t valuebytes, const char* value) {
-        const auto c = ((EachCallbackContext*) context);
+        const auto c = ((CallbackContext*) context);
         const auto ckey = c->env->NewByteArray(keybytes);
         c->env->SetByteArrayRegion(ckey, 0, keybytes, (jbyte*) key);
         const auto cvalue = c->env->NewByteArray(valuebytes);
@@ -129,7 +164,7 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1each_1l
     const auto cpatternbytes = env->GetArrayLength(pattern);
     const auto cls = env->GetObjectClass(callback);
     const auto mid = env->GetMethodID(cls, "process", "([B[B)V");
-    EachCallbackContext cxt = {env, callback, mid};
+    CallbackContext cxt = {env, callback, mid};
     pmemkv::kvengine_each_like((KVEngine*) pointer, cpatternbytes, (char*) cpattern, &cxt, cb);
     env->ReleaseByteArrayElements(pattern, cpattern, JNI_ABORT);
 
@@ -140,7 +175,7 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1each_1s
 
     auto cb = [](void* context, int32_t keybytes, const char* key,
                  int32_t valuebytes, const char* value) {
-        const auto c = ((EachCallbackContext*) context);
+        const auto c = ((CallbackContext*) context);
         const auto ckey = c->env->NewStringUTF(key);
         const auto cvalue = c->env->NewStringUTF(value);
         c->env->CallVoidMethod(c->callback, c->mid, ckey, cvalue);
@@ -150,7 +185,7 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1each_1s
 
     const auto cls = env->GetObjectClass(callback);
     const auto mid = env->GetMethodID(cls, "process", "(Ljava/lang/String;Ljava/lang/String;)V");
-    EachCallbackContext cxt = {env, callback, mid};
+    CallbackContext cxt = {env, callback, mid};
     pmemkv::kvengine_each((KVEngine*) pointer, &cxt, cb);
 
 }
@@ -160,7 +195,7 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1each_1s
 
     auto cb = [](void* context, int32_t keybytes, const char* key,
                  int32_t valuebytes, const char* value) {
-        const auto c = ((EachCallbackContext*) context);
+        const auto c = ((CallbackContext*) context);
         const auto ckey = c->env->NewStringUTF(key);
         const auto cvalue = c->env->NewStringUTF(value);
         c->env->CallVoidMethod(c->callback, c->mid, ckey, cvalue);
@@ -172,7 +207,7 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1each_1s
     const auto cpatternbytes = env->GetArrayLength(pattern);
     const auto cls = env->GetObjectClass(callback);
     const auto mid = env->GetMethodID(cls, "process", "(Ljava/lang/String;Ljava/lang/String;)V");
-    EachCallbackContext cxt = {env, callback, mid};
+    CallbackContext cxt = {env, callback, mid};
     pmemkv::kvengine_each_like((KVEngine*) pointer, cpatternbytes, (char*) cpattern, &cxt, cb);
     env->ReleaseByteArrayElements(pattern, cpattern, JNI_ABORT);
 
