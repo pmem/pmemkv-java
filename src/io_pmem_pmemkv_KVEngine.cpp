@@ -44,14 +44,11 @@ extern "C" JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1open
 
     const char* cengine = env->GetStringUTFChars(engine, NULL);
     const char* cpath = env->GetStringUTFChars(path, NULL);
-
-    KVEngine* result = pmemkv::kvengine_open(cengine, cpath, (size_t) size);
-
+    const KVEngine* result = pmemkv::kvengine_open(cengine, cpath, (size_t) size);
     env->ReleaseStringUTFChars(engine, cengine);
     env->ReleaseStringUTFChars(path, cpath);
     if (result == NULL) {
-        env->ThrowNew(env->FindClass("java/lang/IllegalArgumentException"),
-                      "unable to open persistent pool");
+        env->ThrowNew(env->FindClass("java/lang/IllegalArgumentException"), "unable to open persistent pool");
     }
     return (jlong) result;
 
@@ -60,7 +57,8 @@ extern "C" JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1open
 extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1close
         (JNIEnv* env, jobject obj, jlong pointer) {
 
-    pmemkv::kvengine_close((KVEngine*) pointer);
+    const auto engine = (KVEngine*) pointer;
+    pmemkv::kvengine_close(engine);
 
 }
 
@@ -73,7 +71,7 @@ struct CallbackContext {
 extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1all
         (JNIEnv* env, jobject obj, jlong pointer, jobject callback) {
 
-    auto cb = [](void* context, int32_t keybytes, const char* key) {
+    const auto cb = [](void* context, int32_t keybytes, const char* key) {
         const auto c = ((CallbackContext*) context);
         const auto ckey = c->env->NewByteArray(keybytes);
         c->env->SetByteArrayRegion(ckey, 0, keybytes, (jbyte*) key);
@@ -84,14 +82,15 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1all
     const auto cls = env->GetObjectClass(callback);
     const auto mid = env->GetMethodID(cls, "process", "([B)V");
     CallbackContext cxt = {env, callback, mid};
-    pmemkv::kvengine_all((KVEngine*) pointer, &cxt, cb);
+    const auto engine = (KVEngine*) pointer;
+    pmemkv::kvengine_all(engine, &cxt, cb);
 
 }
 
 extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1all_1strings
         (JNIEnv* env, jobject obj, jlong pointer, jobject callback) {
 
-    auto cb = [](void* context, int32_t keybytes, const char* key) {
+    const auto cb = [](void* context, int32_t keybytes, const char* key) {
         const auto c = ((CallbackContext*) context);
         const auto ckey = c->env->NewStringUTF(key);
         c->env->CallVoidMethod(c->callback, c->mid, ckey);
@@ -101,14 +100,16 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1all_1st
     const auto cls = env->GetObjectClass(callback);
     const auto mid = env->GetMethodID(cls, "process", "(Ljava/lang/String;)V");
     CallbackContext cxt = {env, callback, mid};
-    pmemkv::kvengine_all((KVEngine*) pointer, &cxt, cb);
+    const auto engine = (KVEngine*) pointer;
+    pmemkv::kvengine_all(engine, &cxt, cb);
 
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1count
         (JNIEnv* env, jobject obj, jlong pointer) {
 
-    return pmemkv::kvengine_count((KVEngine*) pointer);
+    const auto engine = (KVEngine*) pointer;
+    return pmemkv::kvengine_count(engine);
 
 }
 
@@ -117,7 +118,8 @@ extern "C" JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1count_
 
     const auto cpattern = env->GetByteArrayElements(pattern, NULL);
     const auto cpatternbytes = env->GetArrayLength(pattern);
-    auto result = pmemkv::kvengine_count_like((KVEngine*) pointer, cpatternbytes, (char*) cpattern);
+    const auto engine = (KVEngine*) pointer;
+    const auto result = pmemkv::kvengine_count_like(engine, cpatternbytes, (char*) cpattern);
     env->ReleaseByteArrayElements(pattern, cpattern, JNI_ABORT);
     return result;
 
@@ -126,8 +128,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1count_
 extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1each
         (JNIEnv* env, jobject obj, jlong pointer, jobject callback) {
 
-    auto cb = [](void* context, int32_t keybytes, const char* key,
-                 int32_t valuebytes, const char* value) {
+    const auto cb = [](void* context, int32_t keybytes, const char* key, int32_t valuebytes, const char* value) {
         const auto c = ((CallbackContext*) context);
         const auto ckey = c->env->NewByteArray(keybytes);
         c->env->SetByteArrayRegion(ckey, 0, keybytes, (jbyte*) key);
@@ -141,15 +142,15 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1each
     const auto cls = env->GetObjectClass(callback);
     const auto mid = env->GetMethodID(cls, "process", "([B[B)V");
     CallbackContext cxt = {env, callback, mid};
-    pmemkv::kvengine_each((KVEngine*) pointer, &cxt, cb);
+    const auto engine = (KVEngine*) pointer;
+    pmemkv::kvengine_each(engine, &cxt, cb);
 
 }
 
 extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1each_1like
         (JNIEnv* env, jobject obj, jlong pointer, jbyteArray pattern, jobject callback) {
 
-    auto cb = [](void* context, int32_t keybytes, const char* key,
-                 int32_t valuebytes, const char* value) {
+    const auto cb = [](void* context, int32_t keybytes, const char* key, int32_t valuebytes, const char* value) {
         const auto c = ((CallbackContext*) context);
         const auto ckey = c->env->NewByteArray(keybytes);
         c->env->SetByteArrayRegion(ckey, 0, keybytes, (jbyte*) key);
@@ -165,7 +166,8 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1each_1l
     const auto cls = env->GetObjectClass(callback);
     const auto mid = env->GetMethodID(cls, "process", "([B[B)V");
     CallbackContext cxt = {env, callback, mid};
-    pmemkv::kvengine_each_like((KVEngine*) pointer, cpatternbytes, (char*) cpattern, &cxt, cb);
+    const auto engine = (KVEngine*) pointer;
+    pmemkv::kvengine_each_like(engine, cpatternbytes, (char*) cpattern, &cxt, cb);
     env->ReleaseByteArrayElements(pattern, cpattern, JNI_ABORT);
 
 }
@@ -173,8 +175,7 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1each_1l
 extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1each_1string
         (JNIEnv* env, jobject obj, jlong pointer, jobject callback) {
 
-    auto cb = [](void* context, int32_t keybytes, const char* key,
-                 int32_t valuebytes, const char* value) {
+    const auto cb = [](void* context, int32_t keybytes, const char* key, int32_t valuebytes, const char* value) {
         const auto c = ((CallbackContext*) context);
         const auto ckey = c->env->NewStringUTF(key);
         const auto cvalue = c->env->NewStringUTF(value);
@@ -186,15 +187,15 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1each_1s
     const auto cls = env->GetObjectClass(callback);
     const auto mid = env->GetMethodID(cls, "process", "(Ljava/lang/String;Ljava/lang/String;)V");
     CallbackContext cxt = {env, callback, mid};
-    pmemkv::kvengine_each((KVEngine*) pointer, &cxt, cb);
+    const auto engine = (KVEngine*) pointer;
+    pmemkv::kvengine_each(engine, &cxt, cb);
 
 }
 
 extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1each_1string_1like
         (JNIEnv* env, jobject obj, jlong pointer, jbyteArray pattern, jobject callback) {
 
-    auto cb = [](void* context, int32_t keybytes, const char* key,
-                 int32_t valuebytes, const char* value) {
+    const auto cb = [](void* context, int32_t keybytes, const char* key, int32_t valuebytes, const char* value) {
         const auto c = ((CallbackContext*) context);
         const auto ckey = c->env->NewStringUTF(key);
         const auto cvalue = c->env->NewStringUTF(value);
@@ -208,7 +209,8 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1each_1s
     const auto cls = env->GetObjectClass(callback);
     const auto mid = env->GetMethodID(cls, "process", "(Ljava/lang/String;Ljava/lang/String;)V");
     CallbackContext cxt = {env, callback, mid};
-    pmemkv::kvengine_each_like((KVEngine*) pointer, cpatternbytes, (char*) cpattern, &cxt, cb);
+    const auto engine = (KVEngine*) pointer;
+    pmemkv::kvengine_each_like(engine, cpatternbytes, (char*) cpattern, &cxt, cb);
     env->ReleaseByteArrayElements(pattern, cpattern, JNI_ABORT);
 
 }
@@ -218,7 +220,8 @@ extern "C" JNIEXPORT jboolean JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1exi
 
     const auto ckey = env->GetByteArrayElements(key, NULL);
     const auto ckeybytes = env->GetArrayLength(key);
-    auto result = pmemkv::kvengine_exists((KVEngine*) pointer, ckeybytes, (char*) ckey);
+    const auto engine = (KVEngine*) pointer;
+    const auto result = pmemkv::kvengine_exists(engine, ckeybytes, (char*) ckey);
     env->ReleaseByteArrayElements(key, ckey, JNI_ABORT);
     return result;
 
@@ -232,7 +235,7 @@ struct GetCallbackContext {
 extern "C" JNIEXPORT jbyteArray JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1get
         (JNIEnv* env, jobject obj, jlong pointer, jbyteArray key) {
 
-    auto cb = [](void* context, int32_t valuebytes, const char* value) {
+    const auto cb = [](void* context, int32_t valuebytes, const char* value) {
         const auto c = ((GetCallbackContext*) context);
         c->result = c->env->NewByteArray(valuebytes);
         c->env->SetByteArrayRegion(c->result, 0, valuebytes, (jbyte*) value);
@@ -241,7 +244,8 @@ extern "C" JNIEXPORT jbyteArray JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1g
     const auto ckey = env->GetByteArrayElements(key, NULL);
     const auto ckeybytes = env->GetArrayLength(key);
     GetCallbackContext cxt = {env, NULL};
-    pmemkv::kvengine_get((KVEngine*) pointer, &cxt, ckeybytes, (char*) ckey, cb);
+    const auto engine = (KVEngine*) pointer;
+    pmemkv::kvengine_get(engine, &cxt, ckeybytes, (char*) ckey, cb);
     env->ReleaseByteArrayElements(key, ckey, JNI_ABORT);
     return cxt.result;
 
@@ -253,13 +257,11 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1put
     const auto ckey = env->GetByteArrayElements(key, NULL);
     const auto ckeybytes = env->GetArrayLength(key);
     const auto cvalue = env->GetByteArrayElements(value, NULL);
-    auto cvaluebytes = env->GetArrayLength(value);
-
-    int8_t res = pmemkv::kvengine_put((KVEngine*) pointer, ckeybytes, (char*) ckey,
-                                      cvaluebytes, (char*) cvalue);
-
+    const auto cvaluebytes = env->GetArrayLength(value);
+    const auto engine = (KVEngine*) pointer;
+    const auto result = pmemkv::kvengine_put(engine, ckeybytes, (char*) ckey, cvaluebytes, (char*) cvalue);
     env->ReleaseByteArrayElements(value, cvalue, JNI_ABORT);
-    if (res != 1) {
+    if (result < 0) {
         string msg;
         msg.append("unable to put key: ");
         msg.append(std::string((char*) ckey, ckeybytes));
@@ -271,15 +273,22 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1put
 
 }
 
-extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1remove
+extern "C" JNIEXPORT jboolean JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1remove
         (JNIEnv* env, jobject obj, jlong pointer, jbyteArray key) {
 
     const auto ckey = env->GetByteArrayElements(key, NULL);
     const auto ckeybytes = env->GetArrayLength(key);
-
-    pmemkv::kvengine_remove((KVEngine*) pointer, ckeybytes, (char*) ckey);
-    // todo should be checking return value!
-
-    env->ReleaseByteArrayElements(key, ckey, JNI_ABORT);
+    const auto engine = (KVEngine*) pointer;
+    const auto result = pmemkv::kvengine_remove(engine, ckeybytes, (char*) ckey);
+    if (result < 0) {
+        string msg;
+        msg.append("unable to remove key: ");
+        msg.append(std::string((char*) ckey, ckeybytes));
+        env->ReleaseByteArrayElements(key, ckey, JNI_ABORT);
+        env->ThrowNew(env->FindClass("java/lang/RuntimeException"), msg.c_str());
+    } else {
+        env->ReleaseByteArrayElements(key, ckey, JNI_ABORT);
+    }
+    return result;
 
 }

@@ -114,9 +114,9 @@ JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1put
 /*
  * Class:     io_pmem_pmemkv_KVEngine
  * Method:    kvengine_remove
- * Signature: (J[B)V
+ * Signature: (J[B)Z
  */
-JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1remove
+JNIEXPORT jboolean JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1remove
   (JNIEnv *, jobject, jlong, jbyteArray);
 
 #ifdef __cplusplus
