@@ -110,12 +110,12 @@ public class KVEngine {
         kvengine_put(pointer, key.getBytes(), value.getBytes());
     }
 
-    public void remove(byte[] key) {
-        kvengine_remove(pointer, key);
+    public boolean remove(byte[] key) {
+        return kvengine_remove(pointer, key);
     }
 
-    public void remove(String key) {
-        kvengine_remove(pointer, key.getBytes());
+    public boolean remove(String key) {
+        return kvengine_remove(pointer, key.getBytes());
     }
 
     private boolean closed;
@@ -150,7 +150,7 @@ public class KVEngine {
 
     private native void kvengine_put(long pointer, byte[] key, byte[] value);
 
-    private native void kvengine_remove(long pointer, byte[] key);
+    private native boolean kvengine_remove(long pointer, byte[] key);
 
     static {
         System.loadLibrary("pmemkv-jni");

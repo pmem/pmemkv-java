@@ -79,7 +79,7 @@ public class KVEngineTest {
         expect(kv.count()).toEqual(0);
         expect(kv.exists("key1")).toBeFalse();
         expect(kv.get("key1")).toBeNull();
-        kv.remove("key1");
+        expect(kv.remove("key1")).toBeTrue();
         expect(kv.exists("key1")).toBeFalse();
         expect(kv.get("key1")).toBeNull();
         kv.close();
@@ -276,7 +276,8 @@ public class KVEngineTest {
         kv.put("key1", "value1");
         expect(kv.exists("key1")).toBeTrue();
         expect(kv.get("key1")).toEqual("value1");
-        kv.remove("key1");
+        expect(kv.remove("key1")).toBeTrue();
+        expect(kv.remove("key1")).toBeFalse();
         expect(kv.exists("key1")).toBeFalse();
         expect(kv.get("key1")).toBeNull();
         kv.close();
