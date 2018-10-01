@@ -65,24 +65,12 @@ public class KVEngine {
         return kvengine_count(pointer);
     }
 
-    public long countLike(String pattern) {
-        return kvengine_count_like(pointer, pattern.getBytes());
-    }
-
     public void each(KVEachCallback callback) {
         kvengine_each(pointer, callback);
     }
 
-    public void eachLike(String pattern, KVEachCallback callback) {
-        kvengine_each_like(pointer, pattern.getBytes(), callback);
-    }
-
     public void eachString(KVEachStringCallback callback) {
         kvengine_each_string(pointer, callback);
-    }
-
-    public void eachStringLike(String pattern, KVEachStringCallback callback) {
-        kvengine_each_string_like(pointer, pattern.getBytes(), callback);
     }
 
     public boolean exists(byte[] key) {
@@ -133,16 +121,9 @@ public class KVEngine {
 
     private native long kvengine_count(long pointer);
 
-    private native long kvengine_count_like(long pointer, byte[] pattern);
-
     private native void kvengine_each(long pointer, KVEachCallback callback);
 
-    private native void kvengine_each_like(long pointer, byte[] pattern, KVEachCallback callback);
-
     private native void kvengine_each_string(long pointer, KVEachStringCallback callback);
-
-    private native void kvengine_each_string_like(long pointer, byte[] pattern,
-                                                  KVEachStringCallback callback);
 
     private native boolean kvengine_exists(long pointer, byte[] key);
 
