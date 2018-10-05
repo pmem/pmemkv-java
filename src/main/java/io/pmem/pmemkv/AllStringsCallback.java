@@ -32,8 +32,8 @@
 
 package io.pmem.pmemkv;
 
-public interface KVEachStringCallback {
+public interface AllStringsCallback {
 
-    void process(String key, String value);
+    void process(String key);
 
 }

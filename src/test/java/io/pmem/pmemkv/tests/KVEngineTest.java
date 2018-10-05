@@ -33,16 +33,20 @@
 package io.pmem.pmemkv.tests;
 
 import io.pmem.pmemkv.KVEngine;
+import io.pmem.pmemkv.KVEngineException;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.mscharhag.oleaster.matcher.Matchers.expect;
+import static junit.framework.TestCase.fail;
 
 public class KVEngineTest {
 
@@ -289,8 +293,9 @@ public class KVEngineTest {
         try {
             kv = new KVEngine("nope.nope", PATH, SIZE);
             Assert.fail();
-        } catch (IllegalArgumentException iae) {
-            expect(iae.getMessage()).toEqual("unable to open persistent pool");
+        } catch (KVEngineException kve) {
+            expect(kve.getKey()).toBeNull();
+            expect(kve.getMessage()).toEqual("unable to open engine");
         } catch (Exception e) {
             Assert.fail();
         }
@@ -303,8 +308,9 @@ public class KVEngineTest {
         try {
             kv = new KVEngine(ENGINE, "/tmp/123/234/345/456/567/678/nope.nope", SIZE);
             Assert.fail();
-        } catch (IllegalArgumentException iae) {
-            expect(iae.getMessage()).toEqual("unable to open persistent pool");
+        } catch (KVEngineException kve) {
+            expect(kve.getKey()).toBeNull();
+            expect(kve.getMessage()).toEqual("unable to open engine");
         } catch (Exception e) {
             Assert.fail();
         }
@@ -317,8 +323,9 @@ public class KVEngineTest {
         try {
             kv = new KVEngine(ENGINE, PATH, 9223372036854775807L); // 9.22 exabytes
             Assert.fail();
-        } catch (IllegalArgumentException iae) {
-            expect(iae.getMessage()).toEqual("unable to open persistent pool");
+        } catch (KVEngineException kve) {
+            expect(kve.getKey()).toBeNull();
+            expect(kve.getMessage()).toEqual("unable to open engine");
         } catch (Exception e) {
             Assert.fail();
         }
@@ -331,8 +338,9 @@ public class KVEngineTest {
         try {
             kv = new KVEngine(ENGINE, PATH, SIZE - 1); // too small
             Assert.fail();
-        } catch (IllegalArgumentException iae) {
-            expect(iae.getMessage()).toEqual("unable to open persistent pool");
+        } catch (KVEngineException kve) {
+            expect(kve.getKey()).toBeNull();
+            expect(kve.getMessage()).toEqual("unable to open engine");
         } catch (Exception e) {
             Assert.fail();
         }
@@ -348,8 +356,10 @@ public class KVEngineTest {
                 kv.put(istr, istr);
             }
             Assert.fail();
-        } catch (RuntimeException re) {
-            expect(re.getMessage()).toStartWith("unable to put key:");
+        } catch (KVEngineException kve) {
+            expect(kve.getKey()).toBeNotNull();
+            expect(kve.getKey()).toBeInstanceOf(String.class);
+            expect(kve.getMessage()).toEqual("unable to put key");
         } catch (Exception e) {
             Assert.fail();
         }
@@ -357,7 +367,7 @@ public class KVEngineTest {
     }
 
     @Test
-    public void usesAllTest() {
+    public void usesAllByteArraysTest() {
         KVEngine kv = new KVEngine(ENGINE, PATH, SIZE);
         expect(kv.count()).toEqual(0);
         kv.put("RR".getBytes(), "BBB".getBytes());
@@ -365,7 +375,7 @@ public class KVEngineTest {
         kv.put("1".getBytes(), "2".getBytes());
         expect(kv.count()).toEqual(2);
         StringBuilder s = new StringBuilder();
-        kv.all((k) -> s.append("<").append(new String(k)).append(">,"));
+        kv.all((byte[] k) -> s.append("<").append(new String(k)).append(">,"));
         expect(s.toString()).toEqual("<1>,<RR>,");
         kv.close();
     }
@@ -379,13 +389,13 @@ public class KVEngineTest {
         kv.put("2", "one");
         expect(kv.count()).toEqual(2);
         StringBuilder s = new StringBuilder();
-        kv.allStrings((k) -> s.append("<").append(k).append(">,"));
+        kv.all((String k) -> s.append("<").append(k).append(">,"));
         expect(s.toString()).toEqual("<2>,<记!>,");
         kv.close();
     }
 
     @Test
-    public void usesEachTest() {
+    public void usesEachByteArrayTest() {
         KVEngine kv = new KVEngine(ENGINE, PATH, SIZE);
         expect(kv.count()).toEqual(0);
         kv.put("RR".getBytes(), "BBB".getBytes());
@@ -393,7 +403,7 @@ public class KVEngineTest {
         kv.put("1".getBytes(), "2".getBytes());
         expect(kv.count()).toEqual(2);
         StringBuilder s = new StringBuilder();
-        kv.each((k, v) -> s.append("<").append(new String(k)).append(">,<")
+        kv.each((byte[] k, byte[] v) -> s.append("<").append(new String(k)).append(">,<")
                 .append(new String(v)).append(">|"));
         expect(s.toString()).toEqual("<1>,<2>|<RR>,<BBB>|");
         kv.close();
@@ -408,8 +418,69 @@ public class KVEngineTest {
         kv.put("one", "2");
         expect(kv.count()).toEqual(2);
         StringBuilder s = new StringBuilder();
-        kv.eachString((k, v) -> s.append("<").append(k).append(">,<").append(v).append(">|"));
+        kv.each((String k, String v) -> s.append("<").append(k).append(">,<").append(v).append(">|"));
         expect(s.toString()).toEqual("<one>,<2>|<red>,<记!>|");
+        kv.close();
+    }
+
+    @Test
+    public void usesBuffersTest() {
+        KVEngine kv = new KVEngine(ENGINE, PATH, SIZE);
+
+        ByteBuffer keyb = ByteBuffer.allocateDirect(1000);
+        ByteBuffer valb = ByteBuffer.allocateDirect(1000);
+        keyb.putInt(123);
+        valb.putInt(234);
+        expect(kv.exists(keyb)).toBeFalse();
+        kv.put(keyb, valb);
+        expect(kv.exists(keyb)).toBeTrue();
+        expect(kv.count()).toEqual(1);
+
+        keyb.clear();
+        keyb.putInt(5678);
+        valb.clear();
+        valb.putInt(6789);
+        expect(kv.exists(keyb)).toBeFalse();
+        kv.put(keyb, valb);
+        expect(kv.exists(keyb)).toBeTrue();
+        expect(kv.count()).toEqual(2);
+
+        try {
+            kv.all((ByteBuffer bb) -> {
+                throw new RuntimeException("Blech");
+            });
+            fail();
+        } catch (RuntimeException re) {
+            expect(re.getMessage()).toEqual("Blech");
+        }
+
+        AtomicInteger count = new AtomicInteger(0);
+        kv.all((ByteBuffer kb) -> count.addAndGet(kb.getInt()));
+        expect(count.intValue()).toEqual(5801);
+
+        count.set(0);
+        kv.each((ByteBuffer kb, ByteBuffer vb) -> {
+            count.addAndGet(kb.getInt());
+            count.addAndGet(vb.getInt());
+        });
+        expect(count.intValue()).toEqual(12824);
+
+        valb.clear();
+        valb.putInt(42);
+        valb.putInt(42);
+        valb.putInt(42);
+        valb.putInt(42);
+        expect(valb.position()).toEqual(16);
+        kv.get(keyb, valb);
+        expect(valb.limit()).toEqual(4);
+        expect(valb.position()).toEqual(0);
+        expect(valb.getInt()).toEqual(6789);
+
+        expect(kv.exists(keyb)).toBeTrue();
+        expect(kv.remove(keyb)).toBeTrue();
+        expect(kv.exists(keyb)).toBeFalse();
+        expect(kv.remove(keyb)).toBeFalse();
+
         kv.close();
     }
 

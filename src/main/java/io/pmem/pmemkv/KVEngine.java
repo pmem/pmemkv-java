@@ -32,6 +32,9 @@
 
 package io.pmem.pmemkv;
 
+import java.nio.ByteBuffer;
+import io.pmem.pmemkv.internal.*;
+
 public class KVEngine {
 
     public KVEngine(String engine, String path) {
@@ -53,11 +56,19 @@ public class KVEngine {
         return closed;
     }
 
-    public void all(KVAllCallback callback) {
-        kvengine_all(pointer, callback);
+    public void all(AllBuffersCallback callback) {
+        kvengine_all_buffers(pointer, (int keybytes, ByteBuffer key) -> {
+            key.rewind();
+            key.limit(keybytes);
+            callback.process(key);
+        });
     }
 
-    public void allStrings(KVAllStringsCallback callback) {
+    public void all(AllByteArraysCallback callback) {
+        kvengine_all_bytearrays(pointer, callback);
+    }
+
+    public void all(AllStringsCallback callback) {
         kvengine_all_strings(pointer, callback);
     }
 
@@ -65,45 +76,103 @@ public class KVEngine {
         return kvengine_count(pointer);
     }
 
-    public void each(KVEachCallback callback) {
-        kvengine_each(pointer, callback);
+    public void each(EachBufferCallback callback) {
+        kvengine_each_buffer(pointer, (int keybytes, ByteBuffer key, int valuebytes, ByteBuffer value) -> {
+            key.rewind();
+            key.limit(keybytes);
+            value.rewind();
+            value.limit(valuebytes);
+            callback.process(key, value);
+        });
     }
 
-    public void eachString(KVEachStringCallback callback) {
+    public void each(EachByteArrayCallback callback) {
+        kvengine_each_bytearray(pointer, callback);
+    }
+
+    public void each(EachStringCallback callback) {
         kvengine_each_string(pointer, callback);
     }
 
+    public boolean exists(ByteBuffer key) {
+        return kvengine_exists_buffer(pointer, key.position(), key);
+    }
+
     public boolean exists(byte[] key) {
-        return kvengine_exists(pointer, key);
+        return kvengine_exists_bytes(pointer, key);
     }
 
     public boolean exists(String key) {
-        return kvengine_exists(pointer, key.getBytes());
+        return kvengine_exists_bytes(pointer, key.getBytes());
+    }
+
+    public void get(ByteBuffer key, ByteBuffer value) {
+        int valuebytes = kvengine_get_buffer(pointer, key.position(), key, value.capacity(), value);
+        value.rewind();
+        value.limit(valuebytes);
     }
 
     public byte[] get(byte[] key) {
-        return kvengine_get(pointer, key);
+        return kvengine_get_bytes(pointer, key);
     }
 
     public String get(String key) {
-        byte[] result = kvengine_get(pointer, key.getBytes());
+        byte[] result = kvengine_get_bytes(pointer, key.getBytes());
         return result == null ? null : new String(result);
     }
 
+    public void put(ByteBuffer key, ByteBuffer value) {
+        try {
+            kvengine_put_buffer(pointer, key.position(), key, value.position(), value);
+        } catch (KVEngineException kve) {
+            kve.setKey(key);
+            throw kve;
+        }
+    }
+
     public void put(byte[] key, byte[] value) {
-        kvengine_put(pointer, key, value);
+        try {
+            kvengine_put_bytes(pointer, key, value);
+        } catch (KVEngineException kve) {
+            kve.setKey(key);
+            throw kve;
+        }
     }
 
     public void put(String key, String value) {
-        kvengine_put(pointer, key.getBytes(), value.getBytes());
+        try {
+            kvengine_put_bytes(pointer, key.getBytes(), value.getBytes());
+        } catch (KVEngineException kve) {
+            kve.setKey(key);
+            throw kve;
+        }
+    }
+
+    public boolean remove(ByteBuffer key) {
+        try {
+            return kvengine_remove_buffer(pointer, key.position(), key);
+        } catch (KVEngineException kve) {
+            kve.setKey(key);
+            throw kve;
+        }
     }
 
     public boolean remove(byte[] key) {
-        return kvengine_remove(pointer, key);
+        try {
+            return kvengine_remove_bytes(pointer, key);
+        } catch (KVEngineException kve) {
+            kve.setKey(key);
+            throw kve;
+        }
     }
 
     public boolean remove(String key) {
-        return kvengine_remove(pointer, key.getBytes());
+        try {
+            return kvengine_remove_bytes(pointer, key.getBytes());
+        } catch (KVEngineException kve) {
+            kve.setKey(key);
+            throw kve;
+        }
     }
 
     private boolean closed;
@@ -115,23 +184,35 @@ public class KVEngine {
 
     private native void kvengine_close(long pointer);
 
-    private native void kvengine_all(long pointer, KVAllCallback callback);
+    private native void kvengine_all_buffers(long pointer, AllBuffersJNICallback callback);
 
-    private native void kvengine_all_strings(long pointer, KVAllStringsCallback callback);
+    private native void kvengine_all_bytearrays(long pointer, AllByteArraysCallback callback);
+
+    private native void kvengine_all_strings(long pointer, AllStringsCallback callback);
 
     private native long kvengine_count(long pointer);
 
-    private native void kvengine_each(long pointer, KVEachCallback callback);
+    private native void kvengine_each_buffer(long pointer, EachBufferJNICallback callback);
 
-    private native void kvengine_each_string(long pointer, KVEachStringCallback callback);
+    private native void kvengine_each_bytearray(long pointer, EachByteArrayCallback callback);
 
-    private native boolean kvengine_exists(long pointer, byte[] key);
+    private native void kvengine_each_string(long pointer, EachStringCallback callback);
 
-    private native byte[] kvengine_get(long pointer, byte[] key);
+    private native boolean kvengine_exists_buffer(long pointer, int keybytes, ByteBuffer key);
 
-    private native void kvengine_put(long pointer, byte[] key, byte[] value);
+    private native boolean kvengine_exists_bytes(long pointer, byte[] key);
 
-    private native boolean kvengine_remove(long pointer, byte[] key);
+    private native int kvengine_get_buffer(long pointer, int keybytes, ByteBuffer key, int valbytes, ByteBuffer val);
+
+    private native byte[] kvengine_get_bytes(long pointer, byte[] key);
+
+    private native void kvengine_put_buffer(long pointer, int keybytes, ByteBuffer key, int valbytes, ByteBuffer val);
+
+    private native void kvengine_put_bytes(long pointer, byte[] key, byte[] value);
+
+    private native boolean kvengine_remove_buffer(long pointer, int keybytes, ByteBuffer key);
+
+    private native boolean kvengine_remove_bytes(long pointer, byte[] key);
 
     static {
         System.loadLibrary("pmemkv-jni");

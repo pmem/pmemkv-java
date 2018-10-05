@@ -32,8 +32,20 @@
 
 package io.pmem.pmemkv;
 
-public interface KVEachCallback {
+public class KVEngineException extends RuntimeException {
 
-    void process(byte[] key, byte[] value);
+    public KVEngineException(String message) {
+        super(message);
+    }
+
+    public Object getKey() {
+        return key;
+    }
+
+    public void setKey(Object key) {
+        this.key = key;
+    }
+
+    private Object key;
 
 }

@@ -49,7 +49,7 @@ public class Example {
         System.out.println("Iterating existing keys");
         kv.put("key2", "value2");
         kv.put("key3", "value3");
-        kv.allStrings((k) -> System.out.println("  visited: " + k));
+        kv.all((String k) -> System.out.println("  visited: " + k));
 
         System.out.println("Removing existing key");
         kv.remove("key1");

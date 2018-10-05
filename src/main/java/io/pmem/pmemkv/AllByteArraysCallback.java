@@ -32,8 +32,8 @@
 
 package io.pmem.pmemkv;
 
-public interface KVAllStringsCallback {
+public interface AllByteArraysCallback {
 
-    void process(String key);
+    void process(byte[] key);
 
 }
