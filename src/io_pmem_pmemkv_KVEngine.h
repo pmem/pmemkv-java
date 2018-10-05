@@ -25,16 +25,24 @@ JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1close
 
 /*
  * Class:     io_pmem_pmemkv_KVEngine
- * Method:    kvengine_all
- * Signature: (JLio/pmem/pmemkv/KVAllCallback;)V
+ * Method:    kvengine_all_buffers
+ * Signature: (JLio/pmem/pmemkv/internal/AllBuffersJNICallback;)V
  */
-JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1all
+JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1all_1buffers
+  (JNIEnv *, jobject, jlong, jobject);
+
+/*
+ * Class:     io_pmem_pmemkv_KVEngine
+ * Method:    kvengine_all_bytearrays
+ * Signature: (JLio/pmem/pmemkv/AllByteArraysCallback;)V
+ */
+JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1all_1bytearrays
   (JNIEnv *, jobject, jlong, jobject);
 
 /*
  * Class:     io_pmem_pmemkv_KVEngine
  * Method:    kvengine_all_strings
- * Signature: (JLio/pmem/pmemkv/KVAllStringsCallback;)V
+ * Signature: (JLio/pmem/pmemkv/AllStringsCallback;)V
  */
 JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1all_1strings
   (JNIEnv *, jobject, jlong, jobject);
@@ -49,50 +57,90 @@ JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1count
 
 /*
  * Class:     io_pmem_pmemkv_KVEngine
- * Method:    kvengine_each
- * Signature: (JLio/pmem/pmemkv/KVEachCallback;)V
+ * Method:    kvengine_each_buffer
+ * Signature: (JLio/pmem/pmemkv/internal/EachBufferJNICallback;)V
  */
-JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1each
+JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1each_1buffer
+  (JNIEnv *, jobject, jlong, jobject);
+
+/*
+ * Class:     io_pmem_pmemkv_KVEngine
+ * Method:    kvengine_each_bytearray
+ * Signature: (JLio/pmem/pmemkv/EachByteArrayCallback;)V
+ */
+JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1each_1bytearray
   (JNIEnv *, jobject, jlong, jobject);
 
 /*
  * Class:     io_pmem_pmemkv_KVEngine
  * Method:    kvengine_each_string
- * Signature: (JLio/pmem/pmemkv/KVEachStringCallback;)V
+ * Signature: (JLio/pmem/pmemkv/EachStringCallback;)V
  */
 JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1each_1string
   (JNIEnv *, jobject, jlong, jobject);
 
 /*
  * Class:     io_pmem_pmemkv_KVEngine
- * Method:    kvengine_exists
+ * Method:    kvengine_exists_buffer
+ * Signature: (JILjava/nio/ByteBuffer;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1exists_1buffer
+  (JNIEnv *, jobject, jlong, jint, jobject);
+
+/*
+ * Class:     io_pmem_pmemkv_KVEngine
+ * Method:    kvengine_exists_bytes
  * Signature: (J[B)Z
  */
-JNIEXPORT jboolean JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1exists
+JNIEXPORT jboolean JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1exists_1bytes
   (JNIEnv *, jobject, jlong, jbyteArray);
 
 /*
  * Class:     io_pmem_pmemkv_KVEngine
- * Method:    kvengine_get
+ * Method:    kvengine_get_buffer
+ * Signature: (JILjava/nio/ByteBuffer;ILjava/nio/ByteBuffer;)I
+ */
+JNIEXPORT jint JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1get_1buffer
+  (JNIEnv *, jobject, jlong, jint, jobject, jint, jobject);
+
+/*
+ * Class:     io_pmem_pmemkv_KVEngine
+ * Method:    kvengine_get_bytes
  * Signature: (J[B)[B
  */
-JNIEXPORT jbyteArray JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1get
+JNIEXPORT jbyteArray JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1get_1bytes
   (JNIEnv *, jobject, jlong, jbyteArray);
 
 /*
  * Class:     io_pmem_pmemkv_KVEngine
- * Method:    kvengine_put
+ * Method:    kvengine_put_buffer
+ * Signature: (JILjava/nio/ByteBuffer;ILjava/nio/ByteBuffer;)V
+ */
+JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1put_1buffer
+  (JNIEnv *, jobject, jlong, jint, jobject, jint, jobject);
+
+/*
+ * Class:     io_pmem_pmemkv_KVEngine
+ * Method:    kvengine_put_bytes
  * Signature: (J[B[B)V
  */
-JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1put
+JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1put_1bytes
   (JNIEnv *, jobject, jlong, jbyteArray, jbyteArray);
 
 /*
  * Class:     io_pmem_pmemkv_KVEngine
- * Method:    kvengine_remove
+ * Method:    kvengine_remove_buffer
+ * Signature: (JILjava/nio/ByteBuffer;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1remove_1buffer
+  (JNIEnv *, jobject, jlong, jint, jobject);
+
+/*
+ * Class:     io_pmem_pmemkv_KVEngine
+ * Method:    kvengine_remove_bytes
  * Signature: (J[B)Z
  */
-JNIEXPORT jboolean JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1remove
+JNIEXPORT jboolean JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1remove_1bytes
   (JNIEnv *, jobject, jlong, jbyteArray);
 
 #ifdef __cplusplus
