@@ -37,23 +37,19 @@ import io.pmem.pmemkv.internal.*;
 
 public class KVEngine {
 
-    public KVEngine(String engine, String path) {
-        pointer = kvengine_open(engine, path, 8388608);
+    public KVEngine(String engine, String config) {
+        pointer = kvengine_start(engine, config);
     }
 
-    public KVEngine(String engine, String path, long size) {
-        pointer = kvengine_open(engine, path, size);
-    }
-
-    public void close() {
-        if (!closed) {
-            closed = true;
-            kvengine_close(pointer);
+    public void stop() {
+        if (!stopped) {
+            stopped = true;
+            kvengine_stop(pointer);
         }
     }
 
-    public boolean closed() {
-        return closed;
+    public boolean stopped() {
+        return stopped;
     }
 
     public void all(AllBuffersCallback callback) {
@@ -175,14 +171,14 @@ public class KVEngine {
         }
     }
 
-    private boolean closed;
     private final long pointer;
+    private boolean stopped;
 
     // JNI METHODS --------------------------------------------------------------------------------
 
-    private native long kvengine_open(String engine, String path, long size);
+    private native long kvengine_start(String engine, String config);
 
-    private native void kvengine_close(long pointer);
+    private native void kvengine_stop(long pointer);
 
     private native void kvengine_all_buffers(long pointer, AllBuffersJNICallback callback);
 

@@ -36,8 +36,8 @@ import io.pmem.pmemkv.KVEngine;
 
 public class Example {
     public static void main(String[] args) {
-        System.out.println("Opening datastore");
-        KVEngine kv = new KVEngine("kvtree3", "/dev/shm/pmemkv", 1073741824); // 1 GB pool
+        System.out.println("Starting engine");
+        KVEngine kv = new KVEngine("kvtree3", "{\"path\":\"/dev/shm/pmemkv\"}");
 
         System.out.println("Putting new key");
         kv.put("key1", "value1");
@@ -55,8 +55,8 @@ public class Example {
         kv.remove("key1");
         assert !kv.exists("key1");
 
-        System.out.println("Closing datastore");
-        kv.close();
+        System.out.println("Stopping engine");
+        kv.stop();
     }
 }
 ```
