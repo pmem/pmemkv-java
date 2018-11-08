@@ -9,18 +9,18 @@ extern "C" {
 #endif
 /*
  * Class:     io_pmem_pmemkv_KVEngine
- * Method:    kvengine_open
- * Signature: (Ljava/lang/String;Ljava/lang/String;J)J
+ * Method:    kvengine_start
+ * Signature: (Ljava/lang/String;Ljava/lang/String;)J
  */
-JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1open
-  (JNIEnv *, jobject, jstring, jstring, jlong);
+JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1start
+  (JNIEnv *, jobject, jstring, jstring);
 
 /*
  * Class:     io_pmem_pmemkv_KVEngine
- * Method:    kvengine_close
+ * Method:    kvengine_stop
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1close
+JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1stop
   (JNIEnv *, jobject, jlong);
 
 /*

@@ -41,24 +41,24 @@ using pmemkv::KVEngine;
 
 #define EXCEPTION_CLASS "io/pmem/pmemkv/KVEngineException"
 
-extern "C" JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1open
-        (JNIEnv* env, jobject obj, jstring engine, jstring path, jlong size) {
+extern "C" JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1start
+        (JNIEnv* env, jobject obj, jstring engine, jstring config) {
 
     const char* cengine = env->GetStringUTFChars(engine, NULL);
-    const char* cpath = env->GetStringUTFChars(path, NULL);
-    const KVEngine* result = pmemkv::kvengine_open(cengine, cpath, (size_t) size);
+    const char* cconfig = env->GetStringUTFChars(config, NULL);
+    const KVEngine* result = pmemkv::kvengine_start(cengine, cconfig);
     env->ReleaseStringUTFChars(engine, cengine);
-    env->ReleaseStringUTFChars(path, cpath);
-    if (result == NULL) env->ThrowNew(env->FindClass(EXCEPTION_CLASS), "unable to open engine");
+    env->ReleaseStringUTFChars(config, cconfig);
+    if (result == NULL) env->ThrowNew(env->FindClass(EXCEPTION_CLASS), "unable to start engine");
     return (jlong) result;
 
 }
 
-extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1close
+extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1stop
         (JNIEnv* env, jobject obj, jlong pointer) {
 
     const auto engine = (KVEngine*) pointer;
-    pmemkv::kvengine_close(engine);
+    pmemkv::kvengine_stop(engine);
 
 }
 
