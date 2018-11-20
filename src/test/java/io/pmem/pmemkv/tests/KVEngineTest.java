@@ -289,6 +289,36 @@ public class KVEngineTest {
     }
 
     @Test
+    public void throwsExceptionOnStartWhenConfigIsEmptyTest() {
+        KVEngine kv = null;
+        try {
+            kv = new KVEngine(ENGINE, "{}");
+            Assert.fail();
+        } catch (KVEngineException kve) {
+            expect(kve.getKey()).toBeNull();
+            expect(kve.getMessage()).toEqual("unable to start engine");
+        } catch (Exception e) {
+            Assert.fail();
+        }
+        expect(kv).toBeNull();
+    }
+
+    @Test
+    public void throwsExceptionOnStartWhenConfigIsMalformedTest() {
+        KVEngine kv = null;
+        try {
+            kv = new KVEngine(ENGINE, "{");
+            Assert.fail();
+        } catch (KVEngineException kve) {
+            expect(kve.getKey()).toBeNull();
+            expect(kve.getMessage()).toEqual("unable to start engine");
+        } catch (Exception e) {
+            Assert.fail();
+        }
+        expect(kv).toBeNull();
+    }
+
+    @Test
     public void throwsExceptionOnStartWhenEngineIsInvalidTest() {
         KVEngine kv = null;
         try {
@@ -308,6 +338,51 @@ public class KVEngineTest {
         KVEngine kv = null;
         try {
             kv = new KVEngine(ENGINE, "{\"path\":\"/tmp/123/234/345/456/567/678/nope.nope\",\"size\":" + SIZE + "}");
+            Assert.fail();
+        } catch (KVEngineException kve) {
+            expect(kve.getKey()).toBeNull();
+            expect(kve.getMessage()).toEqual("unable to start engine");
+        } catch (Exception e) {
+            Assert.fail();
+        }
+        expect(kv).toBeNull();
+    }
+
+    @Test
+    public void throwsExceptionOnStartWhenPathIsMissingTest() {
+        KVEngine kv = null;
+        try {
+            kv = new KVEngine(ENGINE, "{\"size\":" + SIZE + "}");
+            Assert.fail();
+        } catch (KVEngineException kve) {
+            expect(kve.getKey()).toBeNull();
+            expect(kve.getMessage()).toEqual("unable to start engine");
+        } catch (Exception e) {
+            Assert.fail();
+        }
+        expect(kv).toBeNull();
+    }
+
+    @Test
+    public void throwsExceptionOnStartWhenPathIsWrongTypeTest() {
+        KVEngine kv = null;
+        try {
+            kv = new KVEngine(ENGINE, "{\"path\":1234}");
+            Assert.fail();
+        } catch (KVEngineException kve) {
+            expect(kve.getKey()).toBeNull();
+            expect(kve.getMessage()).toEqual("unable to start engine");
+        } catch (Exception e) {
+            Assert.fail();
+        }
+        expect(kv).toBeNull();
+    }
+
+    @Test
+    public void throwsExceptionOnStartWhenSizeIsWrongTypeTest() {
+        KVEngine kv = null;
+        try {
+            kv = new KVEngine(ENGINE, "{\"path\":\"" + PATH + "\",\"size\":\"" + SIZE + "\"}");
             Assert.fail();
         } catch (KVEngineException kve) {
             expect(kve.getKey()).toBeNull();
