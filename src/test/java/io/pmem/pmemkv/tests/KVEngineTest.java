@@ -435,7 +435,7 @@ public class KVEngineTest {
         } catch (KVEngineException kve) {
             expect(kve.getKey()).toBeNotNull();
             expect(kve.getKey()).toBeInstanceOf(String.class);
-            expect(kve.getMessage()).toEqual("unable to put key");
+            expect(kve.getMessage()).toEqual("Unable to put key");
         } catch (Exception e) {
             Assert.fail();
         }
