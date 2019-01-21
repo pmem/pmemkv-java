@@ -313,7 +313,7 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1put_1bu
     const char* cvalue = (char*) env->GetDirectBufferAddress(value);
     const auto engine = (KVEngine*) pointer;
     const auto result = pmemkv::kvengine_put(engine, keybytes, ckey, valuebytes, cvalue);
-    if (result < 0) env->ThrowNew(env->FindClass(EXCEPTION_CLASS), "unable to put key");
+    if (result < 0) env->ThrowNew(env->FindClass(EXCEPTION_CLASS), "Unable to put key");
 
 }
 
@@ -328,7 +328,7 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1put_1by
     const auto result = pmemkv::kvengine_put(engine, ckeybytes, (char*) ckey, cvaluebytes, (char*) cvalue);
     env->ReleaseByteArrayElements(key, ckey, JNI_ABORT);
     env->ReleaseByteArrayElements(value, cvalue, JNI_ABORT);
-    if (result < 0) env->ThrowNew(env->FindClass(EXCEPTION_CLASS), "unable to put key");
+    if (result < 0) env->ThrowNew(env->FindClass(EXCEPTION_CLASS), "Unable to put key");
 
 }
 
@@ -338,7 +338,7 @@ extern "C" JNIEXPORT jboolean JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1rem
     const char* ckey = (char*) env->GetDirectBufferAddress(key);
     const auto engine = (KVEngine*) pointer;
     const auto result = pmemkv::kvengine_remove(engine, keybytes, ckey);
-    if (result < 0) env->ThrowNew(env->FindClass(EXCEPTION_CLASS), "unable to remove key");
+    if (result < 0) env->ThrowNew(env->FindClass(EXCEPTION_CLASS), "Unable to remove key");
     return result;
 
 }
@@ -351,7 +351,7 @@ extern "C" JNIEXPORT jboolean JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1rem
     const auto engine = (KVEngine*) pointer;
     const auto result = pmemkv::kvengine_remove(engine, ckeybytes, (char*) ckey);
     env->ReleaseByteArrayElements(key, ckey, JNI_ABORT);
-    if (result < 0) env->ThrowNew(env->FindClass(EXCEPTION_CLASS), "unable to remove key");
+    if (result < 0) env->ThrowNew(env->FindClass(EXCEPTION_CLASS), "Unable to remove key");
     return result;
 
 }
