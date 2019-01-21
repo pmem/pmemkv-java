@@ -41,15 +41,25 @@ using pmemkv::KVEngine;
 
 #define EXCEPTION_CLASS "io/pmem/pmemkv/KVEngineException"
 
+struct StartFailureCallbackContext {
+    string msg;
+};
+
 extern "C" JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1start
         (JNIEnv* env, jobject obj, jstring engine, jstring config) {
 
+    const auto cb = [](void* context, const char* engine, const char* config, const char* msg) {
+        const auto c = ((StartFailureCallbackContext*) context);
+        c->msg.append(msg);
+    };
+
     const char* cengine = env->GetStringUTFChars(engine, NULL);
     const char* cconfig = env->GetStringUTFChars(config, NULL);
-    const KVEngine* result = pmemkv::kvengine_start(cengine, cconfig);
+    StartFailureCallbackContext cxt = {""};
+    const KVEngine* result = pmemkv::kvengine_start(&cxt, cengine, cconfig, cb);
     env->ReleaseStringUTFChars(engine, cengine);
     env->ReleaseStringUTFChars(config, cconfig);
-    if (result == NULL) env->ThrowNew(env->FindClass(EXCEPTION_CLASS), "unable to start engine");
+    if (result == NULL) env->ThrowNew(env->FindClass(EXCEPTION_CLASS), cxt.msg.c_str());
     return (jlong) result;
 
 }
