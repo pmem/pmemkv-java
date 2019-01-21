@@ -296,7 +296,7 @@ public class KVEngineTest {
             Assert.fail();
         } catch (KVEngineException kve) {
             expect(kve.getKey()).toBeNull();
-            expect(kve.getMessage()).toEqual("unable to start engine");
+            expect(kve.getMessage()).toEqual("Config does not include valid path string");
         } catch (Exception e) {
             Assert.fail();
         }
@@ -311,7 +311,7 @@ public class KVEngineTest {
             Assert.fail();
         } catch (KVEngineException kve) {
             expect(kve.getKey()).toBeNull();
-            expect(kve.getMessage()).toEqual("unable to start engine");
+            expect(kve.getMessage()).toEqual("Config could not be parsed as JSON");
         } catch (Exception e) {
             Assert.fail();
         }
@@ -326,7 +326,7 @@ public class KVEngineTest {
             Assert.fail();
         } catch (KVEngineException kve) {
             expect(kve.getKey()).toBeNull();
-            expect(kve.getMessage()).toEqual("unable to start engine");
+            expect(kve.getMessage()).toEqual("Unknown engine name");
         } catch (Exception e) {
             Assert.fail();
         }
@@ -341,7 +341,7 @@ public class KVEngineTest {
             Assert.fail();
         } catch (KVEngineException kve) {
             expect(kve.getKey()).toBeNull();
-            expect(kve.getMessage()).toEqual("unable to start engine");
+            expect(kve.getMessage()).toEqual("Failed creating pool");
         } catch (Exception e) {
             Assert.fail();
         }
@@ -356,7 +356,7 @@ public class KVEngineTest {
             Assert.fail();
         } catch (KVEngineException kve) {
             expect(kve.getKey()).toBeNull();
-            expect(kve.getMessage()).toEqual("unable to start engine");
+            expect(kve.getMessage()).toEqual("Config does not include valid path string");
         } catch (Exception e) {
             Assert.fail();
         }
@@ -371,7 +371,7 @@ public class KVEngineTest {
             Assert.fail();
         } catch (KVEngineException kve) {
             expect(kve.getKey()).toBeNull();
-            expect(kve.getMessage()).toEqual("unable to start engine");
+            expect(kve.getMessage()).toEqual("Config does not include valid path string");
         } catch (Exception e) {
             Assert.fail();
         }
@@ -386,7 +386,7 @@ public class KVEngineTest {
             Assert.fail();
         } catch (KVEngineException kve) {
             expect(kve.getKey()).toBeNull();
-            expect(kve.getMessage()).toEqual("unable to start engine");
+            expect(kve.getMessage()).toEqual("Config does not include valid size integer");
         } catch (Exception e) {
             Assert.fail();
         }
@@ -401,7 +401,7 @@ public class KVEngineTest {
             Assert.fail();
         } catch (KVEngineException kve) {
             expect(kve.getKey()).toBeNull();
-            expect(kve.getMessage()).toEqual("unable to start engine");
+            expect(kve.getMessage()).toEqual("Failed creating pool");
         } catch (Exception e) {
             Assert.fail();
         }
@@ -416,7 +416,7 @@ public class KVEngineTest {
             Assert.fail();
         } catch (KVEngineException kve) {
             expect(kve.getKey()).toBeNull();
-            expect(kve.getMessage()).toEqual("unable to start engine");
+            expect(kve.getMessage()).toEqual("Failed creating pool");
         } catch (Exception e) {
             Assert.fail();
         }
