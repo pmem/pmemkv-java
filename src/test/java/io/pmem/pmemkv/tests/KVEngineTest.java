@@ -34,15 +34,10 @@ package io.pmem.pmemkv.tests;
 
 import io.pmem.pmemkv.KVEngine;
 import io.pmem.pmemkv.KVEngineException;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.mscharhag.oleaster.matcher.Matchers.expect;
@@ -50,29 +45,8 @@ import static junit.framework.TestCase.fail;
 
 public class KVEngineTest {
 
-    private final String ENGINE = "kvtree3";
-    private final String PATH = "/dev/shm/pmemkv-java";
-    private final long SIZE = 1024 * 1024 * 8;
-    private final String CONFIG = "{\"path\":\"" + PATH + "\",\"size\":" + SIZE + "}";
-
-    private void clean() {
-        try {
-            Files.deleteIfExists(Paths.get(PATH));
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
-            System.exit(-42);
-        }
-    }
-
-    @Before
-    public void setUp() {
-        clean();
-    }
-
-    @After
-    public void tearDown() {
-        clean();
-    }
+    private final String ENGINE = "vmap";
+    private final String CONFIG = "{\"path\":\"/dev/shm\"}";
 
     @Test
     public void blackholeTest() {
@@ -92,20 +66,8 @@ public class KVEngineTest {
 
     @Test
     public void startEngineTest() {
-        long size = 1024 * 1024 * 11;
         KVEngine kv = new KVEngine(ENGINE, CONFIG);
         expect(kv).toBeNotNull();
-        expect(kv.stopped()).toBeFalse();
-        kv.stop();
-        expect(kv.stopped()).toBeTrue();
-    }
-
-    @Test
-    public void startEngineWithExistingPoolTest() {
-        long size = 1024 * 1024 * 13;
-        KVEngine kv = new KVEngine(ENGINE, CONFIG);
-        kv.stop();
-        kv = new KVEngine(ENGINE, CONFIG);
         expect(kv.stopped()).toBeFalse();
         kv.stop();
         expect(kv.stopped()).toBeTrue();
@@ -245,37 +207,6 @@ public class KVEngineTest {
         kv.stop();
     }
 
-    @Test
-    public void putsVeryLargeValueTest() {
-        KVEngine kv = new KVEngine(ENGINE, CONFIG);
-        String val = "ABCDEFGHIJLMNOPQRSTUZWXYZabcdefghijklmnopqrstuvwxyz1234567890";
-        kv.put("key1", val);
-        expect(kv.get("key1")).toEqual(val);
-        kv.stop();
-    }
-
-    @Test
-    public void recoversManyValuesTest() {
-        KVEngine kv = new KVEngine(ENGINE, CONFIG);
-        for (int i = 0; i < 6000; i++) {
-            String s = String.valueOf(i);
-            kv.put(s, s);
-        }
-        for (int i = 0; i < 6000; i++) {
-            String s = String.valueOf(i);
-            expect(kv.get(s)).toEqual(s);
-        }
-        kv.put("test123", "123");
-        kv.stop();
-        kv = new KVEngine(ENGINE, CONFIG);
-        for (int i = 0; i < 6000; i++) {
-            String s = String.valueOf(i);
-            expect(kv.get(s)).toEqual(s);
-        }
-        expect(kv.get("test123")).toEqual("123");
-        kv.stop();
-    }
-
     public void removesKeyandValueTest() {
         KVEngine kv = new KVEngine(ENGINE, CONFIG);
         kv.put("key1", "value1");
@@ -337,26 +268,11 @@ public class KVEngineTest {
     public void throwsExceptionOnStartWhenPathIsInvalidTest() {
         KVEngine kv = null;
         try {
-            kv = new KVEngine(ENGINE, "{\"path\":\"/tmp/123/234/345/456/567/678/nope.nope\",\"size\":" + SIZE + "}");
+            kv = new KVEngine(ENGINE, "{\"path\":\"/tmp/123/234/345/456/567/678/nope.nope\"}");
             Assert.fail();
         } catch (KVEngineException kve) {
             expect(kve.getKey()).toBeNull();
-            expect(kve.getMessage()).toEqual("Failed creating pool");
-        } catch (Exception e) {
-            Assert.fail();
-        }
-        expect(kv).toBeNull();
-    }
-
-    @Test
-    public void throwsExceptionOnStartWhenPathIsMissingTest() {
-        KVEngine kv = null;
-        try {
-            kv = new KVEngine(ENGINE, "{\"size\":" + SIZE + "}");
-            Assert.fail();
-        } catch (KVEngineException kve) {
-            expect(kve.getKey()).toBeNull();
-            expect(kve.getMessage()).toEqual("Config does not include valid path string");
+            expect(kve.getMessage()).toEqual("Config path is not an existing directory");
         } catch (Exception e) {
             Assert.fail();
         }
@@ -376,70 +292,6 @@ public class KVEngineTest {
             Assert.fail();
         }
         expect(kv).toBeNull();
-    }
-
-    @Test
-    public void throwsExceptionOnStartWhenSizeIsWrongTypeTest() {
-        KVEngine kv = null;
-        try {
-            kv = new KVEngine(ENGINE, "{\"path\":\"" + PATH + "\",\"size\":\"" + SIZE + "\"}");
-            Assert.fail();
-        } catch (KVEngineException kve) {
-            expect(kve.getKey()).toBeNull();
-            expect(kve.getMessage()).toEqual("Config does not include valid size integer");
-        } catch (Exception e) {
-            Assert.fail();
-        }
-        expect(kv).toBeNull();
-    }
-
-    @Test
-    public void throwsExceptionOnStartWithHugeSizeTest() {
-        KVEngine kv = null;
-        try {
-            kv = new KVEngine(ENGINE, "{\"path\":\"" + PATH + "\",\"size\":9223372036854775807}"); // 9.22 exabytes
-            Assert.fail();
-        } catch (KVEngineException kve) {
-            expect(kve.getKey()).toBeNull();
-            expect(kve.getMessage()).toEqual("Failed creating pool");
-        } catch (Exception e) {
-            Assert.fail();
-        }
-        expect(kv).toBeNull();
-    }
-
-    @Test
-    public void throwsExceptionOnStartWithTinySizeTest() {
-        KVEngine kv = null;
-        try {
-            kv = new KVEngine(ENGINE, "{\"path\":\"" + PATH + "\",\"size\":" + (SIZE - 1) + "}"); // too small
-            Assert.fail();
-        } catch (KVEngineException kve) {
-            expect(kve.getKey()).toBeNull();
-            expect(kve.getMessage()).toEqual("Failed creating pool");
-        } catch (Exception e) {
-            Assert.fail();
-        }
-        expect(kv).toBeNull();
-    }
-
-    @Test
-    public void throwsExceptionOnPutWhenOutOfSpaceTest() {
-        KVEngine kv = new KVEngine(ENGINE, CONFIG);
-        try {
-            for (int i = 0; i < 100000; i++) {
-                String istr = String.valueOf(i);
-                kv.put(istr, istr);
-            }
-            Assert.fail();
-        } catch (KVEngineException kve) {
-            expect(kve.getKey()).toBeNotNull();
-            expect(kve.getKey()).toBeInstanceOf(String.class);
-            expect(kve.getMessage()).toEqual("Unable to put key");
-        } catch (Exception e) {
-            Assert.fail();
-        }
-        kv.stop();
     }
 
     @Test
