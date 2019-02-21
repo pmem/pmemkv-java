@@ -37,7 +37,7 @@ import io.pmem.pmemkv.KVEngine;
 public class Example {
     public static void main(String[] args) {
         System.out.println("Starting engine");
-        KVEngine kv = new KVEngine("kvtree3", "{\"path\":\"/dev/shm/pmemkv\"}");
+        KVEngine kv = new KVEngine("vmap", "{\"path\":\"/dev/shm/\"}");
 
         System.out.println("Putting new key");
         kv.put("key1", "value1");
