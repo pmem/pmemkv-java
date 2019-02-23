@@ -32,8 +32,10 @@
 
 package io.pmem.pmemkv;
 
+import io.pmem.pmemkv.internal.AllBuffersJNICallback;
+import io.pmem.pmemkv.internal.EachBufferJNICallback;
+
 import java.nio.ByteBuffer;
-import io.pmem.pmemkv.internal.*;
 
 public class KVEngine {
 
@@ -53,41 +55,147 @@ public class KVEngine {
     }
 
     public void all(AllBuffersCallback callback) {
-        kvengine_all_buffers(pointer, (int keybytes, ByteBuffer key) -> {
-            key.rewind();
-            key.limit(keybytes);
-            callback.process(key);
-        });
+        kvengine_all_buffer(pointer, (int kb, ByteBuffer k)
+                -> callback.process((ByteBuffer) k.rewind().limit(kb)));
     }
 
     public void all(AllByteArraysCallback callback) {
-        kvengine_all_bytearrays(pointer, callback);
+        kvengine_all_bytes(pointer, callback);
     }
 
     public void all(AllStringsCallback callback) {
-        kvengine_all_strings(pointer, callback);
+        kvengine_all_string(pointer, callback);
+    }
+
+    public void allAbove(ByteBuffer key, AllBuffersCallback callback) {
+        kvengine_all_above_buffer(pointer, key.position(), key, (int kb, ByteBuffer k)
+                -> callback.process((ByteBuffer) k.rewind().limit(kb)));
+    }
+
+    public void allAbove(byte[] key, AllByteArraysCallback callback) {
+        kvengine_all_above_bytes(pointer, key, callback);
+    }
+
+    public void allAbove(String key, AllStringsCallback callback) {
+        kvengine_all_above_string(pointer, key.getBytes(), callback);
+    }
+
+    public void allBelow(ByteBuffer key, AllBuffersCallback callback) {
+        kvengine_all_below_buffer(pointer, key.position(), key, (int kb, ByteBuffer k)
+                -> callback.process((ByteBuffer) k.rewind().limit(kb)));
+    }
+
+    public void allBelow(byte[] key, AllByteArraysCallback callback) {
+        kvengine_all_below_bytes(pointer, key, callback);
+    }
+
+    public void allBelow(String key, AllStringsCallback callback) {
+        kvengine_all_below_string(pointer, key.getBytes(), callback);
+    }
+
+    public void allBetween(ByteBuffer key1, ByteBuffer key2, AllBuffersCallback callback) {
+        kvengine_all_between_buffer(pointer, key1.position(), key1, key2.position(), key2, (int kb, ByteBuffer k)
+                -> callback.process((ByteBuffer) k.rewind().limit(kb)));
+    }
+
+    public void allBetween(byte[] key1, byte[] key2, AllByteArraysCallback callback) {
+        kvengine_all_between_bytes(pointer, key1, key2, callback);
+    }
+
+    public void allBetween(String key1, String key2, AllStringsCallback callback) {
+        kvengine_all_between_string(pointer, key1.getBytes(), key2.getBytes(), callback);
     }
 
     public long count() {
         return kvengine_count(pointer);
     }
 
+    public long countAbove(ByteBuffer key) {
+        return kvengine_count_above_buffer(pointer, key.position(), key);
+    }
+
+    public long countAbove(byte[] key) {
+        return kvengine_count_above_bytes(pointer, key);
+    }
+
+    public long countAbove(String key) {
+        return kvengine_count_above_bytes(pointer, key.getBytes());
+    }
+
+    public long countBelow(ByteBuffer key) {
+        return kvengine_count_below_buffer(pointer, key.position(), key);
+    }
+
+    public long countBelow(byte[] key) {
+        return kvengine_count_below_bytes(pointer, key);
+    }
+
+    public long countBelow(String key) {
+        return kvengine_count_below_bytes(pointer, key.getBytes());
+    }
+
+    public long countBetween(ByteBuffer key1, ByteBuffer key2) {
+        return kvengine_count_between_buffer(pointer, key1.position(), key1, key2.position(), key2);
+    }
+
+    public long countBetween(byte[] key1, byte[] key2) {
+        return kvengine_count_between_bytes(pointer, key1, key2);
+    }
+
+    public long countBetween(String key1, String key2) {
+        return kvengine_count_between_bytes(pointer, key1.getBytes(), key2.getBytes());
+    }
+
     public void each(EachBufferCallback callback) {
-        kvengine_each_buffer(pointer, (int keybytes, ByteBuffer key, int valuebytes, ByteBuffer value) -> {
-            key.rewind();
-            key.limit(keybytes);
-            value.rewind();
-            value.limit(valuebytes);
-            callback.process(key, value);
-        });
+        kvengine_each_buffer(pointer, (int kb, ByteBuffer k, int vb, ByteBuffer v)
+                -> callback.process((ByteBuffer) k.rewind().limit(kb), (ByteBuffer) v.rewind().limit(vb)));
     }
 
     public void each(EachByteArrayCallback callback) {
-        kvengine_each_bytearray(pointer, callback);
+        kvengine_each_bytes(pointer, callback);
     }
 
     public void each(EachStringCallback callback) {
         kvengine_each_string(pointer, callback);
+    }
+
+    public void eachAbove(ByteBuffer key, EachBufferCallback callback) {
+        kvengine_each_above_buffer(pointer, key.position(), key, (int kb, ByteBuffer k, int vb, ByteBuffer v)
+                -> callback.process((ByteBuffer) k.rewind().limit(kb), (ByteBuffer) v.rewind().limit(vb)));
+    }
+
+    public void eachAbove(byte[] key, EachByteArrayCallback callback) {
+        kvengine_each_above_bytes(pointer, key, callback);
+    }
+
+    public void eachAbove(String key, EachStringCallback callback) {
+        kvengine_each_above_string(pointer, key.getBytes(), callback);
+    }
+
+    public void eachBelow(ByteBuffer key, EachBufferCallback callback) {
+        kvengine_each_below_buffer(pointer, key.position(), key, (int kb, ByteBuffer k, int vb, ByteBuffer v)
+                -> callback.process((ByteBuffer) k.rewind().limit(kb), (ByteBuffer) v.rewind().limit(vb)));
+    }
+
+    public void eachBelow(byte[] key, EachByteArrayCallback callback) {
+        kvengine_each_below_bytes(pointer, key, callback);
+    }
+
+    public void eachBelow(String key, EachStringCallback callback) {
+        kvengine_each_below_string(pointer, key.getBytes(), callback);
+    }
+
+    public void eachBetween(ByteBuffer key1, ByteBuffer key2, EachBufferCallback callback) {
+        kvengine_each_between_buffer(pointer, key1.position(), key1, key2.position(), key2, (int kb, ByteBuffer k, int vb, ByteBuffer v)
+                -> callback.process((ByteBuffer) k.rewind().limit(kb), (ByteBuffer) v.rewind().limit(vb)));
+    }
+
+    public void eachBetween(byte[] key1, byte[] key2, EachByteArrayCallback callback) {
+        kvengine_each_between_bytes(pointer, key1, key2, callback);
+    }
+
+    public void eachBetween(String key1, String key2, EachStringCallback callback) {
+        kvengine_each_between_string(pointer, key1.getBytes(), key2.getBytes(), callback);
     }
 
     public boolean exists(ByteBuffer key) {
@@ -177,38 +285,46 @@ public class KVEngine {
     // JNI METHODS --------------------------------------------------------------------------------
 
     private native long kvengine_start(String engine, String config);
-
-    private native void kvengine_stop(long pointer);
-
-    private native void kvengine_all_buffers(long pointer, AllBuffersJNICallback callback);
-
-    private native void kvengine_all_bytearrays(long pointer, AllByteArraysCallback callback);
-
-    private native void kvengine_all_strings(long pointer, AllStringsCallback callback);
-
-    private native long kvengine_count(long pointer);
-
-    private native void kvengine_each_buffer(long pointer, EachBufferJNICallback callback);
-
-    private native void kvengine_each_bytearray(long pointer, EachByteArrayCallback callback);
-
-    private native void kvengine_each_string(long pointer, EachStringCallback callback);
-
-    private native boolean kvengine_exists_buffer(long pointer, int keybytes, ByteBuffer key);
-
-    private native boolean kvengine_exists_bytes(long pointer, byte[] key);
-
-    private native int kvengine_get_buffer(long pointer, int keybytes, ByteBuffer key, int valbytes, ByteBuffer val);
-
-    private native byte[] kvengine_get_bytes(long pointer, byte[] key);
-
-    private native void kvengine_put_buffer(long pointer, int keybytes, ByteBuffer key, int valbytes, ByteBuffer val);
-
-    private native void kvengine_put_bytes(long pointer, byte[] key, byte[] value);
-
-    private native boolean kvengine_remove_buffer(long pointer, int keybytes, ByteBuffer key);
-
-    private native boolean kvengine_remove_bytes(long pointer, byte[] key);
+    private native void kvengine_stop(long ptr);
+    private native void kvengine_all_buffer(long ptr, AllBuffersJNICallback cb);
+    private native void kvengine_all_bytes(long ptr, AllByteArraysCallback cb);
+    private native void kvengine_all_string(long ptr, AllStringsCallback cb);
+    private native void kvengine_all_above_buffer(long ptr, int kb, ByteBuffer k, AllBuffersJNICallback cb);
+    private native void kvengine_all_above_bytes(long ptr, byte[] k, AllByteArraysCallback cb);
+    private native void kvengine_all_above_string(long ptr, byte[] k, AllStringsCallback cb);
+    private native void kvengine_all_below_buffer(long ptr, int kb, ByteBuffer k, AllBuffersJNICallback cb);
+    private native void kvengine_all_below_bytes(long ptr, byte[] k, AllByteArraysCallback cb);
+    private native void kvengine_all_below_string(long ptr, byte[] k, AllStringsCallback cb);
+    private native void kvengine_all_between_buffer(long ptr, int kb1, ByteBuffer k1, int kb2, ByteBuffer k2, AllBuffersJNICallback cb);
+    private native void kvengine_all_between_bytes(long ptr, byte[] k1, byte[] k2, AllByteArraysCallback cb);
+    private native void kvengine_all_between_string(long ptr, byte[] k1, byte[] k2, AllStringsCallback cb);
+    private native long kvengine_count(long ptr);
+    private native long kvengine_count_above_buffer(long ptr, int kb, ByteBuffer k);
+    private native long kvengine_count_above_bytes(long ptr, byte[] k);
+    private native long kvengine_count_below_buffer(long ptr, int kb, ByteBuffer k);
+    private native long kvengine_count_below_bytes(long ptr, byte[] k);
+    private native long kvengine_count_between_buffer(long ptr, int kb1, ByteBuffer k1, int kb2, ByteBuffer k2);
+    private native long kvengine_count_between_bytes(long ptr, byte[] k1, byte[] k2);
+    private native void kvengine_each_buffer(long ptr, EachBufferJNICallback cb);
+    private native void kvengine_each_bytes(long ptr, EachByteArrayCallback cb);
+    private native void kvengine_each_string(long ptr, EachStringCallback cb);
+    private native void kvengine_each_above_buffer(long ptr, int kb, ByteBuffer k, EachBufferJNICallback cb);
+    private native void kvengine_each_above_bytes(long ptr, byte[] k, EachByteArrayCallback cb);
+    private native void kvengine_each_above_string(long ptr, byte[] k, EachStringCallback cb);
+    private native void kvengine_each_below_buffer(long ptr, int kb, ByteBuffer k, EachBufferJNICallback cb);
+    private native void kvengine_each_below_bytes(long ptr, byte[] k, EachByteArrayCallback cb);
+    private native void kvengine_each_below_string(long ptr, byte[] k, EachStringCallback cb);
+    private native void kvengine_each_between_buffer(long ptr, int kb1, ByteBuffer k1, int kb2, ByteBuffer k2, EachBufferJNICallback cb);
+    private native void kvengine_each_between_bytes(long ptr, byte[] k1, byte[] k2, EachByteArrayCallback cb);
+    private native void kvengine_each_between_string(long ptr, byte[] k1, byte[] k2, EachStringCallback cb);
+    private native boolean kvengine_exists_buffer(long ptr, int kb, ByteBuffer k);
+    private native boolean kvengine_exists_bytes(long ptr, byte[] k);
+    private native int kvengine_get_buffer(long ptr, int kb, ByteBuffer k, int vb, ByteBuffer v);
+    private native byte[] kvengine_get_bytes(long ptr, byte[] k);
+    private native void kvengine_put_buffer(long ptr, int kb, ByteBuffer k, int vb, ByteBuffer v);
+    private native void kvengine_put_bytes(long ptr, byte[] k, byte[] v);
+    private native boolean kvengine_remove_buffer(long ptr, int kb, ByteBuffer k);
+    private native boolean kvengine_remove_bytes(long ptr, byte[] k);
 
     static {
         System.loadLibrary("pmemkv-jni");

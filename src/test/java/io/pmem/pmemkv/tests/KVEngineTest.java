@@ -41,6 +41,7 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.mscharhag.oleaster.matcher.Matchers.expect;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static junit.framework.TestCase.fail;
 
 public class KVEngineTest {
@@ -209,6 +210,7 @@ public class KVEngineTest {
 
     public void removesKeyandValueTest() {
         KVEngine kv = new KVEngine(ENGINE, CONFIG);
+
         kv.put("key1", "value1");
         expect(kv.exists("key1")).toBeTrue();
         expect(kv.get("key1")).toEqual("value1");
@@ -216,6 +218,14 @@ public class KVEngineTest {
         expect(kv.remove("key1")).toBeFalse();
         expect(kv.exists("key1")).toBeFalse();
         expect(kv.get("key1")).toBeNull();
+
+        kv.put("key1", "value1");
+        expect(kv.exists("key1".getBytes())).toBeTrue();
+        expect(kv.get("key1".getBytes())).toEqual("value1");
+        expect(kv.remove("key1".getBytes())).toBeTrue();
+        expect(kv.remove("key1".getBytes())).toBeFalse();
+        expect(kv.exists("key1".getBytes())).toBeFalse();
+        expect(kv.get("key1".getBytes())).toBeNull();
         kv.stop();
     }
 
@@ -295,59 +305,291 @@ public class KVEngineTest {
     }
 
     @Test
-    public void usesAllByteArraysTest() {
+    public void usesAllTest() {
         KVEngine kv = new KVEngine(ENGINE, CONFIG);
-        expect(kv.count()).toEqual(0);
-        kv.put("RR".getBytes(), "BBB".getBytes());
-        expect(kv.count()).toEqual(1);
-        kv.put("1".getBytes(), "2".getBytes());
-        expect(kv.count()).toEqual(2);
-        StringBuilder s = new StringBuilder();
-        kv.all((byte[] k) -> s.append("<").append(new String(k)).append(">,"));
-        expect(s.toString()).toEqual("<1>,<RR>,");
-        kv.stop();
-    }
-
-    @Test
-    public void usesAllStringsTest() {
-        KVEngine kv = new KVEngine(ENGINE, CONFIG);
-        expect(kv.count()).toEqual(0);
+        kv.put("1", "one");
+        kv.put("2", "two");
         kv.put("记!", "RR");
-        expect(kv.count()).toEqual(1);
-        kv.put("2", "one");
-        expect(kv.count()).toEqual(2);
-        StringBuilder s = new StringBuilder();
-        kv.all((String k) -> s.append("<").append(k).append(">,"));
-        expect(s.toString()).toEqual("<2>,<记!>,");
+
+        StringBuilder x = new StringBuilder();
+        kv.all((String k) -> x.append("<").append(k).append(">,"));
+        expect(x.toString()).toEqual("<1>,<2>,<记!>,");
+
+        StringBuilder x2 = new StringBuilder();
+        kv.all((byte[] k) -> x2.append("<").append(new String(k)).append(">,"));
+        expect(x2.toString()).toEqual("<1>,<2>,<记!>,");
+
+        StringBuilder x3 = new StringBuilder();
+        kv.all((ByteBuffer k) -> x3.append("<").append(UTF_8.decode(k).toString()).append(">,"));
+        expect(x3.toString()).toEqual("<1>,<2>,<记!>,");
+
         kv.stop();
     }
 
     @Test
-    public void usesEachByteArrayTest() {
+    public void usesAllAboveTest() {
         KVEngine kv = new KVEngine(ENGINE, CONFIG);
-        expect(kv.count()).toEqual(0);
-        kv.put("RR".getBytes(), "BBB".getBytes());
-        expect(kv.count()).toEqual(1);
-        kv.put("1".getBytes(), "2".getBytes());
-        expect(kv.count()).toEqual(2);
-        StringBuilder s = new StringBuilder();
-        kv.each((byte[] k, byte[] v) -> s.append("<").append(new String(k)).append(">,<")
+        kv.put("A", "1");
+        kv.put("AB", "2");
+        kv.put("AC", "3");
+        kv.put("B", "4");
+        kv.put("BB", "5");
+        kv.put("BC", "6");
+        kv.put("记!", "RR");
+
+        StringBuilder x = new StringBuilder();
+        kv.allAbove("B", (String k) -> x.append(k).append(","));
+        expect(x.toString()).toEqual("BB,BC,记!,");
+
+        StringBuilder x2 = new StringBuilder();
+        kv.allAbove("".getBytes(), (byte[] k) -> x2.append(new String(k)).append(","));
+        expect(x2.toString()).toEqual("A,AB,AC,B,BB,BC,记!,");
+
+        StringBuilder x3 = new StringBuilder();
+        ByteBuffer keyb = ByteBuffer.allocateDirect(1000);
+        keyb.put("B".getBytes());
+        kv.allAbove(keyb, (ByteBuffer k) -> x3.append(UTF_8.decode(k).toString()).append(","));
+        expect(x3.toString()).toEqual("BB,BC,记!,");
+
+        kv.stop();
+    }
+
+    @Test
+    public void usesAllBelowTest() {
+        KVEngine kv = new KVEngine(ENGINE, CONFIG);
+        kv.put("A", "1");
+        kv.put("AB", "2");
+        kv.put("AC", "3");
+        kv.put("B", "4");
+        kv.put("BB", "5");
+        kv.put("BC", "6");
+        kv.put("记!", "RR");
+
+        StringBuilder x = new StringBuilder();
+        kv.allBelow("B", (String k) -> x.append(k).append(","));
+        expect(x.toString()).toEqual("A,AB,AC,");
+
+        StringBuilder x2 = new StringBuilder();
+        kv.allBelow("\uFFFF".getBytes(), (byte[] k) -> x2.append(new String(k)).append(","));
+        expect(x2.toString()).toEqual("A,AB,AC,B,BB,BC,记!,");
+
+        StringBuilder x3 = new StringBuilder();
+        ByteBuffer keyb = ByteBuffer.allocateDirect(1000);
+        keyb.put("\uFFFF".getBytes());
+        kv.allBelow(keyb, (ByteBuffer k) -> x3.append(UTF_8.decode(k).toString()).append(","));
+        expect(x3.toString()).toEqual("A,AB,AC,B,BB,BC,记!,");
+
+        kv.stop();
+    }
+
+    @Test
+    public void usesAllBetweenTest() {
+        KVEngine kv = new KVEngine(ENGINE, CONFIG);
+        kv.put("A", "1");
+        kv.put("AB", "2");
+        kv.put("AC", "3");
+        kv.put("B", "4");
+        kv.put("BB", "5");
+        kv.put("BC", "6");
+        kv.put("记!", "RR");
+
+        StringBuilder x = new StringBuilder();
+        kv.allBetween("A", "B", (String k) -> x.append(k).append(","));
+        expect(x.toString()).toEqual("AB,AC,");
+
+        StringBuilder x2 = new StringBuilder();
+        kv.allBetween("B".getBytes(), "\uFFFF".getBytes(), (byte[] k) -> x2.append(new String(k)).append(","));
+        expect(x2.toString()).toEqual("BB,BC,记!,");
+
+        StringBuilder x3 = new StringBuilder();
+        ByteBuffer key1b = ByteBuffer.allocateDirect(1000);
+        key1b.put("B".getBytes());
+        ByteBuffer key2b = ByteBuffer.allocateDirect(1000);
+        key2b.put("\uFFFF".getBytes());
+        kv.allBetween(key1b, key2b, (ByteBuffer k) -> x3.append(UTF_8.decode(k).toString()).append(","));
+        expect(x3.toString()).toEqual("BB,BC,记!,");
+
+        StringBuilder x4 = new StringBuilder();
+        kv.allBetween("", "", (String k) -> x4.append(k).append(","));
+        kv.allBetween("A", "A", (String k) -> x4.append(k).append(","));
+        kv.allBetween("B", "A", (String k) -> x4.append(k).append(","));
+        expect(x4.toString()).toEqual("");
+
+        kv.stop();
+    }
+
+    @Test
+    public void usesCountTest() {
+        KVEngine kv = new KVEngine(ENGINE, CONFIG);
+        kv.put("A", "1");
+        kv.put("AB", "2");
+        kv.put("AC", "3");
+        kv.put("B", "4");
+        kv.put("BB", "5");
+        kv.put("BC", "6");
+        kv.put("BD", "7");
+        expect(kv.count()).toEqual(7);
+
+        expect(kv.countAbove("")).toEqual(7);
+        expect(kv.countAbove("A")).toEqual(6);
+        expect(kv.countAbove("B")).toEqual(3);
+        expect(kv.countAbove("BC")).toEqual(1);
+        expect(kv.countAbove("BD")).toEqual(0);
+        expect(kv.countAbove("Z")).toEqual(0);
+
+        expect(kv.countBelow("")).toEqual(0);
+        expect(kv.countBelow("A")).toEqual(0);
+        expect(kv.countBelow("B")).toEqual(3);
+        expect(kv.countBelow("BD")).toEqual(6);
+        expect(kv.countBelow("ZZZZZ")).toEqual(7);
+
+        expect(kv.countBetween("", "ZZZZ")).toEqual(7);
+        expect(kv.countBetween("", "A")).toEqual(0);
+        expect(kv.countBetween("", "B")).toEqual(3);
+        expect(kv.countBetween("A", "B")).toEqual(2);
+        expect(kv.countBetween("B", "ZZZZ")).toEqual(3);
+
+        expect(kv.countBetween("", "")).toEqual(0);
+        expect(kv.countBetween("A", "A")).toEqual(0);
+        expect(kv.countBetween("AC", "A")).toEqual(0);
+        expect(kv.countBetween("B", "A")).toEqual(0);
+        expect(kv.countBetween("BD", "A")).toEqual(0);
+        expect(kv.countBetween("ZZZ", "B")).toEqual(0);
+
+        expect(kv.countAbove("A".getBytes())).toEqual(6);
+        expect(kv.countBelow("B".getBytes())).toEqual(3);
+        expect(kv.countBetween("".getBytes(), "B".getBytes())).toEqual(3);
+
+        ByteBuffer key1b = ByteBuffer.allocateDirect(1000);
+        key1b.put("B".getBytes());
+        ByteBuffer key2b = ByteBuffer.allocateDirect(1000);
+        key2b.put("BD".getBytes());
+        expect(kv.countAbove(key1b)).toEqual(3);
+        expect(kv.countBelow(key2b)).toEqual(6);
+        expect(kv.countBetween(key1b, key2b)).toEqual(2);
+
+        kv.stop();
+    }
+
+    @Test
+    public void usesEachTest() {
+        KVEngine kv = new KVEngine(ENGINE, CONFIG);
+        kv.put("1", "one");
+        kv.put("2", "two");
+        kv.put("记!", "RR");
+
+        StringBuilder x = new StringBuilder();
+        kv.each((String k, String v) -> x.append("<").append(k).append(">,<").append(v).append(">|"));
+        expect(x.toString()).toEqual("<1>,<one>|<2>,<two>|<记!>,<RR>|");
+
+        StringBuilder x2 = new StringBuilder();
+        kv.each((byte[] k, byte[] v) -> x2.append("<").append(new String(k)).append(">,<")
                 .append(new String(v)).append(">|"));
-        expect(s.toString()).toEqual("<1>,<2>|<RR>,<BBB>|");
+        expect(x2.toString()).toEqual("<1>,<one>|<2>,<two>|<记!>,<RR>|");
+
+        StringBuilder x3 = new StringBuilder();
+        kv.each((ByteBuffer k, ByteBuffer v) -> x3.append("<").append(UTF_8.decode(k).toString()).append(">,<")
+                .append(UTF_8.decode(v).toString()).append(">|"));
+        expect(x3.toString()).toEqual("<1>,<one>|<2>,<two>|<记!>,<RR>|");
+
         kv.stop();
     }
 
     @Test
-    public void usesEachStringTest() {
+    public void usesEachAboveTest() {
         KVEngine kv = new KVEngine(ENGINE, CONFIG);
-        expect(kv.count()).toEqual(0);
-        kv.put("red", "记!");
-        expect(kv.count()).toEqual(1);
-        kv.put("one", "2");
-        expect(kv.count()).toEqual(2);
-        StringBuilder s = new StringBuilder();
-        kv.each((String k, String v) -> s.append("<").append(k).append(">,<").append(v).append(">|"));
-        expect(s.toString()).toEqual("<one>,<2>|<red>,<记!>|");
+        kv.put("A", "1");
+        kv.put("AB", "2");
+        kv.put("AC", "3");
+        kv.put("B", "4");
+        kv.put("BB", "5");
+        kv.put("BC", "6");
+        kv.put("记!", "RR");
+
+        StringBuilder x = new StringBuilder();
+        kv.eachAbove("B", (String k, String v) -> x.append(k).append(",").append(v).append("|"));
+        expect(x.toString()).toEqual("BB,5|BC,6|记!,RR|");
+
+        StringBuilder x2 = new StringBuilder();
+        kv.eachAbove("".getBytes(), (byte[] k, byte[] v) -> x2.append(new String(k)).append(",")
+                .append(new String(v)).append("|"));
+        expect(x2.toString()).toEqual("A,1|AB,2|AC,3|B,4|BB,5|BC,6|记!,RR|");
+
+        StringBuilder x3 = new StringBuilder();
+        ByteBuffer keyb = ByteBuffer.allocateDirect(1000);
+        keyb.put("B".getBytes());
+        kv.eachAbove(keyb, (ByteBuffer k, ByteBuffer v) -> x3.append(UTF_8.decode(k).toString()).append(",")
+                .append(UTF_8.decode(v).toString()).append("|"));
+        expect(x3.toString()).toEqual("BB,5|BC,6|记!,RR|");
+
+        kv.stop();
+    }
+
+    @Test
+    public void usesEachBelowTest() {
+        KVEngine kv = new KVEngine(ENGINE, CONFIG);
+        kv.put("A", "1");
+        kv.put("AB", "2");
+        kv.put("AC", "3");
+        kv.put("B", "4");
+        kv.put("BB", "5");
+        kv.put("BC", "6");
+        kv.put("记!", "RR");
+
+        StringBuilder x = new StringBuilder();
+        kv.eachBelow("AC", (String k, String v) -> x.append(k).append(",").append(v).append("|"));
+        expect(x.toString()).toEqual("A,1|AB,2|");
+
+        StringBuilder x2 = new StringBuilder();
+        kv.eachBelow("\uFFFF".getBytes(), (byte[] k, byte[] v) -> x2.append(new String(k)).append(",")
+                .append(new String(v)).append("|"));
+        expect(x2.toString()).toEqual("A,1|AB,2|AC,3|B,4|BB,5|BC,6|记!,RR|");
+
+        StringBuilder x3 = new StringBuilder();
+        ByteBuffer keyb = ByteBuffer.allocateDirect(1000);
+        keyb.put("\uFFFF".getBytes());
+        kv.eachBelow(keyb, (ByteBuffer k, ByteBuffer v) -> x3.append(UTF_8.decode(k).toString()).append(",")
+                .append(UTF_8.decode(v).toString()).append("|"));
+        expect(x3.toString()).toEqual("A,1|AB,2|AC,3|B,4|BB,5|BC,6|记!,RR|");
+
+        kv.stop();
+    }
+
+    @Test
+    public void usesEachBetweenTest() {
+        KVEngine kv = new KVEngine(ENGINE, CONFIG);
+        kv.put("A", "1");
+        kv.put("AB", "2");
+        kv.put("AC", "3");
+        kv.put("B", "4");
+        kv.put("BB", "5");
+        kv.put("BC", "6");
+        kv.put("记!", "RR");
+
+        StringBuilder x = new StringBuilder();
+        kv.eachBetween("A", "B", (String k, String v) -> x.append(k).append(",").append(v).append("|"));
+        expect(x.toString()).toEqual("AB,2|AC,3|");
+
+        StringBuilder x2 = new StringBuilder();
+        kv.eachBetween("B".getBytes(), "\uFFFF".getBytes(), (byte[] k, byte[] v) -> x2.append(new String(k)).append(",")
+                .append(new String(v)).append("|"));
+        expect(x2.toString()).toEqual("BB,5|BC,6|记!,RR|");
+
+        StringBuilder x3 = new StringBuilder();
+        ByteBuffer key1b = ByteBuffer.allocateDirect(1000);
+        key1b.put("B".getBytes());
+        ByteBuffer key2b = ByteBuffer.allocateDirect(1000);
+        key2b.put("\uFFFF".getBytes());
+        kv.eachBetween(key1b, key2b, (ByteBuffer k, ByteBuffer v) -> x3.append(UTF_8.decode(k).toString()).append(",")
+                .append(UTF_8.decode(v).toString()).append("|"));
+        expect(x3.toString()).toEqual("BB,5|BC,6|记!,RR|");
+
+        StringBuilder x4 = new StringBuilder();
+        kv.eachBetween("", "", (String k, String v) -> x4.append(k).append(","));
+        kv.eachBetween("A", "A", (String k, String v) -> x4.append(k).append(","));
+        kv.eachBetween("B", "A", (String k, String v) -> x4.append(k).append(","));
+        expect(x4.toString()).toEqual("");
+
         kv.stop();
     }
 
