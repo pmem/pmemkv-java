@@ -46,7 +46,7 @@ import static junit.framework.TestCase.fail;
 
 public class KVEngineTest {
 
-    private final String ENGINE = "vmap";
+    private final String ENGINE = "vsmap";
     private final String CONFIG = "{\"path\":\"/dev/shm\"}";
 
     @Test
