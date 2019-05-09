@@ -23,7 +23,19 @@ Start by installing [pmemkv](https://github.com/pmem/pmemkv/blob/master/INSTALLI
 
 Next install [pmemkv-jni](https://github.com/pmem/pmemkv-jni).
 
-Finish by installing these bindings:  `mvn install`
+Finish by installing these bindings:
+
+```
+mvn install
+```
+
+## Testing
+
+This library includes a set of automated tests that exercise all functionality.
+
+```
+mvn test
+```
 
 ## Example
 
