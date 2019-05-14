@@ -30,6 +30,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <cstring>
 #include <jni.h>
 #include <libpmemkv.h>
 #include <iostream>
@@ -101,7 +102,7 @@ const auto CALLBACK_ALL_BUFFER = [](void* context, int32_t kb, const char* k) {
         c->key = new char[kb];
         c->keybuf = c->env->NewDirectByteBuffer(c->key, kb);
     }
-    memcpy(c->key, k, kb);
+    std::memcpy(c->key, k, kb);
     c->env->CallVoidMethod(c->callback, c->mid, kb, c->keybuf);
 };
 
@@ -349,8 +350,8 @@ const auto CALLBACK_EACH_BUFFER = [](void* context, int32_t kb, const char* k, i
         c->value = new char[vb];
         c->valuebuf = c->env->NewDirectByteBuffer(c->value, vb);
     }
-    memcpy(c->key, k, kb);
-    memcpy(c->value, v, vb);
+    std::memcpy(c->key, k, kb);
+    std::memcpy(c->value, v, vb);
     c->env->CallVoidMethod(c->callback, c->mid, kb, c->keybuf, vb, c->valuebuf);
 };
 
@@ -550,7 +551,7 @@ const auto CALLBACK_GET_BUFFER = [](void* context, int32_t vb, const char* v) {
         c->env->ThrowNew(c->env->FindClass(EXCEPTION_CLASS), "ByteBuffer is too small");
     } else {
         char* cvalue = (char*) c->env->GetDirectBufferAddress(c->value);
-        memcpy(cvalue, v, vb);
+        std::memcpy(cvalue, v, vb);
         c->result = vb;
     }
 };
