@@ -23,6 +23,8 @@ Start by installing [pmemkv](https://github.com/pmem/pmemkv/blob/master/INSTALLI
 
 Next install [pmemkv-jni](https://github.com/pmem/pmemkv-jni).
 
+It may be necessary to [configure a proxy](https://maven.apache.org/guides/mini/guide-proxies.html).
+
 Finish by installing these bindings:
 
 ```
