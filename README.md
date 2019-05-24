@@ -23,10 +23,17 @@ Start by installing [pmemkv](https://github.com/pmem/pmemkv/blob/master/INSTALLI
 
 Next install [pmemkv-jni](https://github.com/pmem/pmemkv-jni).
 
+It may be necessary to [configure a proxy](https://maven.apache.org/guides/mini/guide-proxies.html) and set `JAVA_HOME`, `JAVA_TOOL_OPTIONS`:
+
+```
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+export JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8
+```
+
 Finish by installing these bindings:
 
 ```
-mvn install
+LD_LIBRARY_PATH=/usr/local/lib/:/opt/tbb/lib/intel64/gcc4.7/ mvn install
 ```
 
 ## Testing
@@ -34,7 +41,7 @@ mvn install
 This library includes a set of automated tests that exercise all functionality.
 
 ```
-mvn test
+LD_LIBRARY_PATH=/usr/local/lib/:/opt/tbb/lib/intel64/gcc4.7/ mvn test
 ```
 
 ## Example
