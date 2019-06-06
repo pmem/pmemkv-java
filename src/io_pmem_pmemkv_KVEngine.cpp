@@ -31,6 +31,7 @@
  */
 
 #include <cstring>
+#include <string>
 #include <jni.h>
 #include <libpmemkv.h>
 #include <iostream>
@@ -43,7 +44,7 @@ using pmemkv::KVEngine;
 #define EXCEPTION_CLASS "io/pmem/pmemkv/KVEngineException"
 
 struct ContextStartFailure {
-    string msg;
+    std::string msg;
 };
 
 extern "C" JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1start
