@@ -237,7 +237,7 @@ public class KVEngineTest {
             Assert.fail();
         } catch (KVEngineException kve) {
             expect(kve.getKey()).toBeNull();
-            expect(kve.getMessage()).toEqual("Config does not include valid path string");
+            expect(kve.getMessage()).toEqual("JSON does not contain a valid path string");
         } catch (Exception e) {
             Assert.fail();
         }
@@ -252,7 +252,7 @@ public class KVEngineTest {
             Assert.fail();
         } catch (KVEngineException kve) {
             expect(kve.getKey()).toBeNull();
-            expect(kve.getMessage()).toEqual("Config could not be parsed as JSON");
+            expect(kve.getMessage()).toEqual("JSON does not contain a valid path string");
         } catch (Exception e) {
             Assert.fail();
         }
@@ -297,7 +297,7 @@ public class KVEngineTest {
             Assert.fail();
         } catch (KVEngineException kve) {
             expect(kve.getKey()).toBeNull();
-            expect(kve.getMessage()).toEqual("Config does not include valid path string");
+            expect(kve.getMessage()).toEqual("JSON does not contain a valid path string");
         } catch (Exception e) {
             Assert.fail();
         }
