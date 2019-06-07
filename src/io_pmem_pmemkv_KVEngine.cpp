@@ -51,12 +51,18 @@ extern "C" JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_KVEngine_kvengine_1start
         (JNIEnv* env, jobject obj, jstring engine, jstring config) {
     const char* cengine = env->GetStringUTFChars(engine, NULL);
     const char* cconfig = env->GetStringUTFChars(config, NULL);
+
+    pmemkv_config *cfg = pmemkv::pmemkv_config_new();
+    int rv = pmemkv::pmemkv_config_from_json(cfg, cconfig);
+    if (rv != 0) env->ThrowNew(env->FindClass(EXCEPTION_CLASS), "Creating a pmemkv config from JSON string failed");
+
     ContextStartFailure cxt = {""};
-    const auto cb = [](void* context, const char* engine, const char* config, const char* msg) {
+    const auto cb = [](void* context, const char* engine, pmemkv_config *cfg, const char* msg) {
         const auto c = ((ContextStartFailure*) context);
         c->msg.append(msg);
     };
-    const KVEngine* result = pmemkv::kvengine_start(&cxt, cengine, cconfig, cb);
+    const KVEngine* result = pmemkv::kvengine_start(&cxt, cengine, cfg, cb);
+    pmemkv::pmemkv_config_delete(cfg);
     env->ReleaseStringUTFChars(engine, cengine);
     env->ReleaseStringUTFChars(config, cconfig);
     if (result == NULL) env->ThrowNew(env->FindClass(EXCEPTION_CLASS), cxt.msg.c_str());
