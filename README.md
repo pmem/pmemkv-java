@@ -15,11 +15,18 @@ are logged as GitHub issues.*
 
 Start by installing [pmemkv](https://github.com/pmem/pmemkv/blob/master/INSTALLING.md) on your system.
 
+Clone the pmemkv-jni tree:
+
+```
+git clone https://github.com/pmem/pmemkv-jni.git
+cd pmemkv-jni
+```
+
 Finish by installing this library:
 
 ```
 make
-sudo make install
+make install
 ```
 
 ## Usage
