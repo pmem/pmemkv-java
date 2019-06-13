@@ -36,6 +36,6 @@ import java.nio.ByteBuffer;
 
 public interface EachBufferJNICallback {
 
-    void process(int keybytes, ByteBuffer key, int valuebytes, ByteBuffer value);
+    void process(ByteBuffer key, int keybytes, ByteBuffer value, int valuebytes);
 
 }
