@@ -32,9 +32,9 @@
 
 package io.pmem.pmemkv;
 
-public class KVEngineException extends RuntimeException {
+public class DatabaseException extends RuntimeException {
 
-    public KVEngineException(String message) {
+    public DatabaseException(String message) {
         super(message);
     }
 

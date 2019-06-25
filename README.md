@@ -51,12 +51,12 @@ We are using `/dev/shm` to
 in this simple example.
 
 ```java
-import io.pmem.pmemkv.KVEngine;
+import io.pmem.pmemkv.Database;
 
 public class Example {
     public static void main(String[] args) {
         System.out.println("Starting engine");
-        KVEngine kv = new KVEngine("vsmap", "{\"path\":\"/dev/shm/\"}");
+        Database kv = new Database("vsmap", "{\"path\":\"/dev/shm/\"}");
 
         System.out.println("Putting new key");
         kv.put("key1", "value1");
