@@ -32,8 +32,8 @@
 
 package io.pmem.pmemkv.tests;
 
-import io.pmem.pmemkv.KVEngine;
-import io.pmem.pmemkv.KVEngineException;
+import io.pmem.pmemkv.Database;
+import io.pmem.pmemkv.DatabaseException;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -44,14 +44,14 @@ import static com.mscharhag.oleaster.matcher.Matchers.expect;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static junit.framework.TestCase.fail;
 
-public class KVEngineTest {
+public class DatabaseTest {
 
     private final String ENGINE = "vsmap";
-    private final String CONFIG = "{\"path\":\"/dev/shm\"}";
+    private final String CONFIG = "{\"path\":\"/dev/shm\", \"size\":1073741824}";
 
     @Test
     public void blackholeTest() {
-        KVEngine kv = new KVEngine("blackhole", CONFIG);
+        Database kv = new Database("blackhole", CONFIG);
         expect(kv.count()).toEqual(0);
         expect(kv.exists("key1")).toBeFalse();
         expect(kv.get("key1")).toBeNull();
@@ -67,7 +67,7 @@ public class KVEngineTest {
 
     @Test
     public void startEngineTest() {
-        KVEngine kv = new KVEngine(ENGINE, CONFIG);
+        Database kv = new Database(ENGINE, CONFIG);
         expect(kv).toBeNotNull();
         expect(kv.stopped()).toBeFalse();
         kv.stop();
@@ -76,7 +76,7 @@ public class KVEngineTest {
 
     @Test
     public void stopsEngineMultipleTimesTest() {
-        KVEngine kv = new KVEngine(ENGINE, CONFIG);
+        Database kv = new Database(ENGINE, CONFIG);
         expect(kv.stopped()).toBeFalse();
         kv.stop();
         expect(kv.stopped()).toBeTrue();
@@ -88,7 +88,7 @@ public class KVEngineTest {
 
     @Test
     public void getsMissingKeyTest() {
-        KVEngine kv = new KVEngine(ENGINE, CONFIG);
+        Database kv = new Database(ENGINE, CONFIG);
         expect(kv.exists("key1")).toBeFalse();
         expect(kv.get("key1")).toBeNull();
         kv.stop();
@@ -96,7 +96,7 @@ public class KVEngineTest {
 
     @Test
     public void putsBasicValueTest() {
-        KVEngine kv = new KVEngine(ENGINE, CONFIG);
+        Database kv = new Database(ENGINE, CONFIG);
         expect(kv.exists("key1")).toBeFalse();
         kv.put("key1", "value1");
         expect(kv.exists("key1")).toBeTrue();
@@ -106,7 +106,7 @@ public class KVEngineTest {
 
     @Test
     public void putsBinaryKeyTest() {
-        KVEngine kv = new KVEngine(ENGINE, CONFIG);
+        Database kv = new Database(ENGINE, CONFIG);
         kv.put("A\0B\0\0C", "value1");
         expect(kv.exists("A\0B\0\0C")).toBeTrue();
         expect(kv.get("A\0B\0\0C")).toEqual("value1");
@@ -118,7 +118,7 @@ public class KVEngineTest {
 
     @Test
     public void putsBinaryValueTest() {
-        KVEngine kv = new KVEngine(ENGINE, CONFIG);
+        Database kv = new Database(ENGINE, CONFIG);
         kv.put("key1", "A\0B\0\0C");
         expect(kv.get("key1")).toEqual("A\0B\0\0C");
         kv.put("key2".getBytes(), "1\02\0\03!".getBytes());
@@ -128,7 +128,7 @@ public class KVEngineTest {
 
     @Test
     public void putsComplexValueTest() {
-        KVEngine kv = new KVEngine(ENGINE, CONFIG);
+        Database kv = new Database(ENGINE, CONFIG);
         String val = "one\ttwo or <p>three</p>\n {four}   and ^five";
         kv.put("key1", val);
         expect(kv.get("key1")).toEqual(val);
@@ -137,7 +137,7 @@ public class KVEngineTest {
 
     @Test
     public void putsEmptyKeyTest() {
-        KVEngine kv = new KVEngine(ENGINE, CONFIG);
+        Database kv = new Database(ENGINE, CONFIG);
         kv.put("", "empty");
         kv.put(" ", "single-space");
         kv.put("\t\t", "two-tab");
@@ -152,7 +152,7 @@ public class KVEngineTest {
 
     @Test
     public void putsEmptyValueTest() {
-        KVEngine kv = new KVEngine(ENGINE, CONFIG);
+        Database kv = new Database(ENGINE, CONFIG);
         kv.put("empty", "");
         kv.put("single-space", " ");
         kv.put("two-tab", "\t\t");
@@ -164,7 +164,7 @@ public class KVEngineTest {
 
     @Test
     public void putsMultipleValuesTest() {
-        KVEngine kv = new KVEngine(ENGINE, CONFIG);
+        Database kv = new Database(ENGINE, CONFIG);
         kv.put("key1", "value1");
         kv.put("key2", "value2");
         kv.put("key3", "value3");
@@ -179,7 +179,7 @@ public class KVEngineTest {
 
     @Test
     public void putsOverwritingExistingValueTest() {
-        KVEngine kv = new KVEngine(ENGINE, CONFIG);
+        Database kv = new Database(ENGINE, CONFIG);
         kv.put("key1", "value1");
         expect(kv.get("key1")).toEqual("value1");
         kv.put("key1", "value123");
@@ -191,7 +191,7 @@ public class KVEngineTest {
 
     @Test
     public void putsUtf8KeyTest() {
-        KVEngine kv = new KVEngine(ENGINE, CONFIG);
+        Database kv = new Database(ENGINE, CONFIG);
         String val = "to remember, note, record";
         kv.put("记", val);
         expect(kv.exists("记")).toBeTrue();
@@ -201,7 +201,7 @@ public class KVEngineTest {
 
     @Test
     public void putsUtf8ValueTest() {
-        KVEngine kv = new KVEngine(ENGINE, CONFIG);
+        Database kv = new Database(ENGINE, CONFIG);
         String val = "记 means to remember, note, record";
         kv.put("key1", val);
         expect(kv.get("key1")).toEqual(val);
@@ -209,7 +209,7 @@ public class KVEngineTest {
     }
 
     public void removesKeyandValueTest() {
-        KVEngine kv = new KVEngine(ENGINE, CONFIG);
+        Database kv = new Database(ENGINE, CONFIG);
 
         kv.put("key1", "value1");
         expect(kv.exists("key1")).toBeTrue();
@@ -231,13 +231,13 @@ public class KVEngineTest {
 
     @Test
     public void throwsExceptionOnStartWhenConfigIsEmptyTest() {
-        KVEngine kv = null;
+        Database kv = null;
         try {
-            kv = new KVEngine(ENGINE, "{}");
+            kv = new Database(ENGINE, "{}");
             Assert.fail();
-        } catch (KVEngineException kve) {
+        } catch (DatabaseException kve) {
             expect(kve.getKey()).toBeNull();
-            expect(kve.getMessage()).toEqual("JSON does not contain a valid path string");
+            expect(kve.getMessage()).toEqual("Failed to open pmemkv"); // XXX
         } catch (Exception e) {
             Assert.fail();
         }
@@ -246,13 +246,13 @@ public class KVEngineTest {
 
     @Test
     public void throwsExceptionOnStartWhenConfigIsMalformedTest() {
-        KVEngine kv = null;
+        Database kv = null;
         try {
-            kv = new KVEngine(ENGINE, "{");
+            kv = new Database(ENGINE, "{");
             Assert.fail();
-        } catch (KVEngineException kve) {
+        } catch (DatabaseException kve) {
             expect(kve.getKey()).toBeNull();
-            expect(kve.getMessage()).toEqual("JSON does not contain a valid path string");
+            expect(kve.getMessage()).toEqual("JSON parsing error"); // XXX
         } catch (Exception e) {
             Assert.fail();
         }
@@ -261,13 +261,13 @@ public class KVEngineTest {
 
     @Test
     public void throwsExceptionOnStartWhenEngineIsInvalidTest() {
-        KVEngine kv = null;
+        Database kv = null;
         try {
-            kv = new KVEngine("nope.nope", CONFIG);
+            kv = new Database("nope.nope", CONFIG);
             Assert.fail();
-        } catch (KVEngineException kve) {
+        } catch (DatabaseException kve) {
             expect(kve.getKey()).toBeNull();
-            expect(kve.getMessage()).toEqual("Unknown engine name");
+            expect(kve.getMessage()).toEqual("Failed to open pmemkv"); // XXX
         } catch (Exception e) {
             Assert.fail();
         }
@@ -276,13 +276,13 @@ public class KVEngineTest {
 
     @Test
     public void throwsExceptionOnStartWhenPathIsInvalidTest() {
-        KVEngine kv = null;
+        Database kv = null;
         try {
-            kv = new KVEngine(ENGINE, "{\"path\":\"/tmp/123/234/345/456/567/678/nope.nope\"}");
+            kv = new Database(ENGINE, "{\"path\":\"/tmp/123/234/345/456/567/678/nope.nope\"}");
             Assert.fail();
-        } catch (KVEngineException kve) {
+        } catch (DatabaseException kve) {
             expect(kve.getKey()).toBeNull();
-            expect(kve.getMessage()).toEqual("Config path is not an existing directory");
+            expect(kve.getMessage()).toEqual("Failed to open pmemkv"); // XXX
         } catch (Exception e) {
             Assert.fail();
         }
@@ -291,13 +291,13 @@ public class KVEngineTest {
 
     @Test
     public void throwsExceptionOnStartWhenPathIsWrongTypeTest() {
-        KVEngine kv = null;
+        Database kv = null;
         try {
-            kv = new KVEngine(ENGINE, "{\"path\":1234}");
+            kv = new Database(ENGINE, "{\"path\":1234}");
             Assert.fail();
-        } catch (KVEngineException kve) {
+        } catch (DatabaseException kve) {
             expect(kve.getKey()).toBeNull();
-            expect(kve.getMessage()).toEqual("JSON does not contain a valid path string");
+            expect(kve.getMessage()).toEqual("JSON parsing error"); // XXX
         } catch (Exception e) {
             Assert.fail();
         }
@@ -306,7 +306,7 @@ public class KVEngineTest {
 
     @Test
     public void usesAllTest() {
-        KVEngine kv = new KVEngine(ENGINE, CONFIG);
+        Database kv = new Database(ENGINE, CONFIG);
         kv.put("1", "one");
         kv.put("2", "two");
         kv.put("记!", "RR");
@@ -328,7 +328,7 @@ public class KVEngineTest {
 
     @Test
     public void usesAllAboveTest() {
-        KVEngine kv = new KVEngine(ENGINE, CONFIG);
+        Database kv = new Database(ENGINE, CONFIG);
         kv.put("A", "1");
         kv.put("AB", "2");
         kv.put("AC", "3");
@@ -356,7 +356,7 @@ public class KVEngineTest {
 
     @Test
     public void usesAllBelowTest() {
-        KVEngine kv = new KVEngine(ENGINE, CONFIG);
+        Database kv = new Database(ENGINE, CONFIG);
         kv.put("A", "1");
         kv.put("AB", "2");
         kv.put("AC", "3");
@@ -384,7 +384,7 @@ public class KVEngineTest {
 
     @Test
     public void usesAllBetweenTest() {
-        KVEngine kv = new KVEngine(ENGINE, CONFIG);
+        Database kv = new Database(ENGINE, CONFIG);
         kv.put("A", "1");
         kv.put("AB", "2");
         kv.put("AC", "3");
@@ -420,7 +420,7 @@ public class KVEngineTest {
 
     @Test
     public void usesCountTest() {
-        KVEngine kv = new KVEngine(ENGINE, CONFIG);
+        Database kv = new Database(ENGINE, CONFIG);
         kv.put("A", "1");
         kv.put("AB", "2");
         kv.put("AC", "3");
@@ -473,7 +473,7 @@ public class KVEngineTest {
 
     @Test
     public void usesEachTest() {
-        KVEngine kv = new KVEngine(ENGINE, CONFIG);
+        Database kv = new Database(ENGINE, CONFIG);
         kv.put("1", "one");
         kv.put("2", "two");
         kv.put("记!", "RR");
@@ -497,7 +497,7 @@ public class KVEngineTest {
 
     @Test
     public void usesEachAboveTest() {
-        KVEngine kv = new KVEngine(ENGINE, CONFIG);
+        Database kv = new Database(ENGINE, CONFIG);
         kv.put("A", "1");
         kv.put("AB", "2");
         kv.put("AC", "3");
@@ -527,7 +527,7 @@ public class KVEngineTest {
 
     @Test
     public void usesEachBelowTest() {
-        KVEngine kv = new KVEngine(ENGINE, CONFIG);
+        Database kv = new Database(ENGINE, CONFIG);
         kv.put("A", "1");
         kv.put("AB", "2");
         kv.put("AC", "3");
@@ -557,7 +557,7 @@ public class KVEngineTest {
 
     @Test
     public void usesEachBetweenTest() {
-        KVEngine kv = new KVEngine(ENGINE, CONFIG);
+        Database kv = new Database(ENGINE, CONFIG);
         kv.put("A", "1");
         kv.put("AB", "2");
         kv.put("AC", "3");
@@ -595,7 +595,7 @@ public class KVEngineTest {
 
     @Test
     public void usesBuffersTest() {
-        KVEngine kv = new KVEngine(ENGINE, CONFIG);
+        Database kv = new Database(ENGINE, CONFIG);
 
         ByteBuffer keyb = ByteBuffer.allocateDirect(1000);
         ByteBuffer valb = ByteBuffer.allocateDirect(1000);
