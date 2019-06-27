@@ -52,11 +52,11 @@ public class DatabaseTest {
     @Test
     public void blackholeTest() {
         Database kv = new Database("blackhole", CONFIG);
-        expect(kv.count()).toEqual(0);
+        expect(kv.countAll()).toEqual(0);
         expect(kv.exists("key1")).toBeFalse();
         expect(kv.get("key1")).toBeNull();
         kv.put("key1", "value1");
-        expect(kv.count()).toEqual(0);
+        expect(kv.countAll()).toEqual(0);
         expect(kv.exists("key1")).toBeFalse();
         expect(kv.get("key1")).toBeNull();
         expect(kv.remove("key1")).toBeTrue();
@@ -305,120 +305,6 @@ public class DatabaseTest {
     }
 
     @Test
-    public void usesAllTest() {
-        Database kv = new Database(ENGINE, CONFIG);
-        kv.put("1", "one");
-        kv.put("2", "two");
-        kv.put("记!", "RR");
-
-        StringBuilder x = new StringBuilder();
-        kv.all((String k) -> x.append("<").append(k).append(">,"));
-        expect(x.toString()).toEqual("<1>,<2>,<记!>,");
-
-        StringBuilder x2 = new StringBuilder();
-        kv.all((byte[] k) -> x2.append("<").append(new String(k)).append(">,"));
-        expect(x2.toString()).toEqual("<1>,<2>,<记!>,");
-
-        StringBuilder x3 = new StringBuilder();
-        kv.all((ByteBuffer k) -> x3.append("<").append(UTF_8.decode(k).toString()).append(">,"));
-        expect(x3.toString()).toEqual("<1>,<2>,<记!>,");
-
-        kv.stop();
-    }
-
-    @Test
-    public void usesAllAboveTest() {
-        Database kv = new Database(ENGINE, CONFIG);
-        kv.put("A", "1");
-        kv.put("AB", "2");
-        kv.put("AC", "3");
-        kv.put("B", "4");
-        kv.put("BB", "5");
-        kv.put("BC", "6");
-        kv.put("记!", "RR");
-
-        StringBuilder x = new StringBuilder();
-        kv.allAbove("B", (String k) -> x.append(k).append(","));
-        expect(x.toString()).toEqual("BB,BC,记!,");
-
-        StringBuilder x2 = new StringBuilder();
-        kv.allAbove("".getBytes(), (byte[] k) -> x2.append(new String(k)).append(","));
-        expect(x2.toString()).toEqual("A,AB,AC,B,BB,BC,记!,");
-
-        StringBuilder x3 = new StringBuilder();
-        ByteBuffer keyb = ByteBuffer.allocateDirect(1000);
-        keyb.put("B".getBytes());
-        kv.allAbove(keyb, (ByteBuffer k) -> x3.append(UTF_8.decode(k).toString()).append(","));
-        expect(x3.toString()).toEqual("BB,BC,记!,");
-
-        kv.stop();
-    }
-
-    @Test
-    public void usesAllBelowTest() {
-        Database kv = new Database(ENGINE, CONFIG);
-        kv.put("A", "1");
-        kv.put("AB", "2");
-        kv.put("AC", "3");
-        kv.put("B", "4");
-        kv.put("BB", "5");
-        kv.put("BC", "6");
-        kv.put("记!", "RR");
-
-        StringBuilder x = new StringBuilder();
-        kv.allBelow("B", (String k) -> x.append(k).append(","));
-        expect(x.toString()).toEqual("A,AB,AC,");
-
-        StringBuilder x2 = new StringBuilder();
-        kv.allBelow("\uFFFF".getBytes(), (byte[] k) -> x2.append(new String(k)).append(","));
-        expect(x2.toString()).toEqual("A,AB,AC,B,BB,BC,记!,");
-
-        StringBuilder x3 = new StringBuilder();
-        ByteBuffer keyb = ByteBuffer.allocateDirect(1000);
-        keyb.put("\uFFFF".getBytes());
-        kv.allBelow(keyb, (ByteBuffer k) -> x3.append(UTF_8.decode(k).toString()).append(","));
-        expect(x3.toString()).toEqual("A,AB,AC,B,BB,BC,记!,");
-
-        kv.stop();
-    }
-
-    @Test
-    public void usesAllBetweenTest() {
-        Database kv = new Database(ENGINE, CONFIG);
-        kv.put("A", "1");
-        kv.put("AB", "2");
-        kv.put("AC", "3");
-        kv.put("B", "4");
-        kv.put("BB", "5");
-        kv.put("BC", "6");
-        kv.put("记!", "RR");
-
-        StringBuilder x = new StringBuilder();
-        kv.allBetween("A", "B", (String k) -> x.append(k).append(","));
-        expect(x.toString()).toEqual("AB,AC,");
-
-        StringBuilder x2 = new StringBuilder();
-        kv.allBetween("B".getBytes(), "\uFFFF".getBytes(), (byte[] k) -> x2.append(new String(k)).append(","));
-        expect(x2.toString()).toEqual("BB,BC,记!,");
-
-        StringBuilder x3 = new StringBuilder();
-        ByteBuffer key1b = ByteBuffer.allocateDirect(1000);
-        key1b.put("B".getBytes());
-        ByteBuffer key2b = ByteBuffer.allocateDirect(1000);
-        key2b.put("\uFFFF".getBytes());
-        kv.allBetween(key1b, key2b, (ByteBuffer k) -> x3.append(UTF_8.decode(k).toString()).append(","));
-        expect(x3.toString()).toEqual("BB,BC,记!,");
-
-        StringBuilder x4 = new StringBuilder();
-        kv.allBetween("", "", (String k) -> x4.append(k).append(","));
-        kv.allBetween("A", "A", (String k) -> x4.append(k).append(","));
-        kv.allBetween("B", "A", (String k) -> x4.append(k).append(","));
-        expect(x4.toString()).toEqual("");
-
-        kv.stop();
-    }
-
-    @Test
     public void usesCountTest() {
         Database kv = new Database(ENGINE, CONFIG);
         kv.put("A", "1");
@@ -428,7 +314,7 @@ public class DatabaseTest {
         kv.put("BB", "5");
         kv.put("BC", "6");
         kv.put("BD", "7");
-        expect(kv.count()).toEqual(7);
+        expect(kv.countAll()).toEqual(7);
 
         expect(kv.countAbove("")).toEqual(7);
         expect(kv.countAbove("A")).toEqual(6);
@@ -472,23 +358,23 @@ public class DatabaseTest {
     }
 
     @Test
-    public void usesEachTest() {
+    public void usesGetAllTest() {
         Database kv = new Database(ENGINE, CONFIG);
         kv.put("1", "one");
         kv.put("2", "two");
         kv.put("记!", "RR");
 
         StringBuilder x = new StringBuilder();
-        kv.each((String k, String v) -> x.append("<").append(k).append(">,<").append(v).append(">|"));
+        kv.get_all((String k, String v) -> x.append("<").append(k).append(">,<").append(v).append(">|"));
         expect(x.toString()).toEqual("<1>,<one>|<2>,<two>|<记!>,<RR>|");
 
         StringBuilder x2 = new StringBuilder();
-        kv.each((byte[] k, byte[] v) -> x2.append("<").append(new String(k)).append(">,<")
+        kv.get_all((byte[] k, byte[] v) -> x2.append("<").append(new String(k)).append(">,<")
                 .append(new String(v)).append(">|"));
         expect(x2.toString()).toEqual("<1>,<one>|<2>,<two>|<记!>,<RR>|");
 
         StringBuilder x3 = new StringBuilder();
-        kv.each((ByteBuffer k, ByteBuffer v) -> x3.append("<").append(UTF_8.decode(k).toString()).append(">,<")
+        kv.get_all((ByteBuffer k, ByteBuffer v) -> x3.append("<").append(UTF_8.decode(k).toString()).append(">,<")
                 .append(UTF_8.decode(v).toString()).append(">|"));
         expect(x3.toString()).toEqual("<1>,<one>|<2>,<two>|<记!>,<RR>|");
 
@@ -496,7 +382,7 @@ public class DatabaseTest {
     }
 
     @Test
-    public void usesEachAboveTest() {
+    public void usesGetAllAboveTest() {
         Database kv = new Database(ENGINE, CONFIG);
         kv.put("A", "1");
         kv.put("AB", "2");
@@ -507,18 +393,18 @@ public class DatabaseTest {
         kv.put("记!", "RR");
 
         StringBuilder x = new StringBuilder();
-        kv.eachAbove("B", (String k, String v) -> x.append(k).append(",").append(v).append("|"));
+        kv.get_above("B", (String k, String v) -> x.append(k).append(",").append(v).append("|"));
         expect(x.toString()).toEqual("BB,5|BC,6|记!,RR|");
 
         StringBuilder x2 = new StringBuilder();
-        kv.eachAbove("".getBytes(), (byte[] k, byte[] v) -> x2.append(new String(k)).append(",")
+        kv.get_above("".getBytes(), (byte[] k, byte[] v) -> x2.append(new String(k)).append(",")
                 .append(new String(v)).append("|"));
         expect(x2.toString()).toEqual("A,1|AB,2|AC,3|B,4|BB,5|BC,6|记!,RR|");
 
         StringBuilder x3 = new StringBuilder();
         ByteBuffer keyb = ByteBuffer.allocateDirect(1000);
         keyb.put("B".getBytes());
-        kv.eachAbove(keyb, (ByteBuffer k, ByteBuffer v) -> x3.append(UTF_8.decode(k).toString()).append(",")
+        kv.get_above(keyb, (ByteBuffer k, ByteBuffer v) -> x3.append(UTF_8.decode(k).toString()).append(",")
                 .append(UTF_8.decode(v).toString()).append("|"));
         expect(x3.toString()).toEqual("BB,5|BC,6|记!,RR|");
 
@@ -526,7 +412,7 @@ public class DatabaseTest {
     }
 
     @Test
-    public void usesEachBelowTest() {
+    public void usesGetAllBelowTest() {
         Database kv = new Database(ENGINE, CONFIG);
         kv.put("A", "1");
         kv.put("AB", "2");
@@ -537,18 +423,18 @@ public class DatabaseTest {
         kv.put("记!", "RR");
 
         StringBuilder x = new StringBuilder();
-        kv.eachBelow("AC", (String k, String v) -> x.append(k).append(",").append(v).append("|"));
+        kv.get_below("AC", (String k, String v) -> x.append(k).append(",").append(v).append("|"));
         expect(x.toString()).toEqual("A,1|AB,2|");
 
         StringBuilder x2 = new StringBuilder();
-        kv.eachBelow("\uFFFF".getBytes(), (byte[] k, byte[] v) -> x2.append(new String(k)).append(",")
+        kv.get_below("\uFFFF".getBytes(), (byte[] k, byte[] v) -> x2.append(new String(k)).append(",")
                 .append(new String(v)).append("|"));
         expect(x2.toString()).toEqual("A,1|AB,2|AC,3|B,4|BB,5|BC,6|记!,RR|");
 
         StringBuilder x3 = new StringBuilder();
         ByteBuffer keyb = ByteBuffer.allocateDirect(1000);
         keyb.put("\uFFFF".getBytes());
-        kv.eachBelow(keyb, (ByteBuffer k, ByteBuffer v) -> x3.append(UTF_8.decode(k).toString()).append(",")
+        kv.get_below(keyb, (ByteBuffer k, ByteBuffer v) -> x3.append(UTF_8.decode(k).toString()).append(",")
                 .append(UTF_8.decode(v).toString()).append("|"));
         expect(x3.toString()).toEqual("A,1|AB,2|AC,3|B,4|BB,5|BC,6|记!,RR|");
 
@@ -556,7 +442,7 @@ public class DatabaseTest {
     }
 
     @Test
-    public void usesEachBetweenTest() {
+    public void usesGetAllBetweenTest() {
         Database kv = new Database(ENGINE, CONFIG);
         kv.put("A", "1");
         kv.put("AB", "2");
@@ -567,11 +453,11 @@ public class DatabaseTest {
         kv.put("记!", "RR");
 
         StringBuilder x = new StringBuilder();
-        kv.eachBetween("A", "B", (String k, String v) -> x.append(k).append(",").append(v).append("|"));
+        kv.get_between("A", "B", (String k, String v) -> x.append(k).append(",").append(v).append("|"));
         expect(x.toString()).toEqual("AB,2|AC,3|");
 
         StringBuilder x2 = new StringBuilder();
-        kv.eachBetween("B".getBytes(), "\uFFFF".getBytes(), (byte[] k, byte[] v) -> x2.append(new String(k)).append(",")
+        kv.get_between("B".getBytes(), "\uFFFF".getBytes(), (byte[] k, byte[] v) -> x2.append(new String(k)).append(",")
                 .append(new String(v)).append("|"));
         expect(x2.toString()).toEqual("BB,5|BC,6|记!,RR|");
 
@@ -580,14 +466,14 @@ public class DatabaseTest {
         key1b.put("B".getBytes());
         ByteBuffer key2b = ByteBuffer.allocateDirect(1000);
         key2b.put("\uFFFF".getBytes());
-        kv.eachBetween(key1b, key2b, (ByteBuffer k, ByteBuffer v) -> x3.append(UTF_8.decode(k).toString()).append(",")
+        kv.get_between(key1b, key2b, (ByteBuffer k, ByteBuffer v) -> x3.append(UTF_8.decode(k).toString()).append(",")
                 .append(UTF_8.decode(v).toString()).append("|"));
         expect(x3.toString()).toEqual("BB,5|BC,6|记!,RR|");
 
         StringBuilder x4 = new StringBuilder();
-        kv.eachBetween("", "", (String k, String v) -> x4.append(k).append(","));
-        kv.eachBetween("A", "A", (String k, String v) -> x4.append(k).append(","));
-        kv.eachBetween("B", "A", (String k, String v) -> x4.append(k).append(","));
+        kv.get_between("", "", (String k, String v) -> x4.append(k).append(","));
+        kv.get_between("A", "A", (String k, String v) -> x4.append(k).append(","));
+        kv.get_between("B", "A", (String k, String v) -> x4.append(k).append(","));
         expect(x4.toString()).toEqual("");
 
         kv.stop();
@@ -604,7 +490,7 @@ public class DatabaseTest {
         expect(kv.exists(keyb)).toBeFalse();
         kv.put(keyb, valb);
         expect(kv.exists(keyb)).toBeTrue();
-        expect(kv.count()).toEqual(1);
+        expect(kv.countAll()).toEqual(1);
 
         keyb.clear();
         keyb.putInt(5678);
@@ -613,23 +499,10 @@ public class DatabaseTest {
         expect(kv.exists(keyb)).toBeFalse();
         kv.put(keyb, valb);
         expect(kv.exists(keyb)).toBeTrue();
-        expect(kv.count()).toEqual(2);
-
-        try {
-            kv.all((ByteBuffer bb) -> {
-                throw new RuntimeException("Blech");
-            });
-            fail();
-        } catch (RuntimeException re) {
-            expect(re.getMessage()).toEqual("Blech");
-        }
+        expect(kv.countAll()).toEqual(2);
 
         AtomicInteger count = new AtomicInteger(0);
-        kv.all((ByteBuffer kb) -> count.addAndGet(kb.getInt()));
-        expect(count.intValue()).toEqual(5801);
-
-        count.set(0);
-        kv.each((ByteBuffer kb, ByteBuffer vb) -> {
+        kv.get_all((ByteBuffer kb, ByteBuffer vb) -> {
             count.addAndGet(kb.getInt());
             count.addAndGet(vb.getInt());
         });

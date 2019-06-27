@@ -30,12 +30,12 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package io.pmem.pmemkv.internal;
+package io.pmem.pmemkv;
 
 import java.nio.ByteBuffer;
 
-public interface EachBufferJNICallback {
+public interface GetAllBufferCallback {
 
-    void process(int keybytes, ByteBuffer key, int valuebytes, ByteBuffer value);
+    void process(ByteBuffer key, ByteBuffer value);
 
 }
