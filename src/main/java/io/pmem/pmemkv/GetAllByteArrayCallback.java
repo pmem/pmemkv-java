@@ -32,7 +32,7 @@
 
 package io.pmem.pmemkv;
 
-public interface EachByteArrayCallback {
+public interface GetAllByteArrayCallback {
 
     void process(byte[] key, byte[] value);
 
