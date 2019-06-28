@@ -1,10 +1,9 @@
 # pmemkv-java
 Java bindings for pmemkv
 
-*This is experimental pre-release software and should not be used in
-production systems. APIs and file formats may change at any time without
-preserving backwards compatibility. All known issues and limitations
-are logged as GitHub issues.*
+The current API is simplified and not functionally equal to its native C/C++ counterpart.
+In the future existing API may be extended in idiomatic way without preserving backward compatibility.
+All known issues and limitations are logged as GitHub issues.
 
 ## Dependencies
 
