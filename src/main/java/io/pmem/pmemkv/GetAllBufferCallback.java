@@ -32,8 +32,10 @@
 
 package io.pmem.pmemkv;
 
-public interface AllByteArraysCallback {
+import java.nio.ByteBuffer;
 
-    void process(byte[] key);
+public interface GetAllBufferCallback {
+
+    void process(ByteBuffer key, ByteBuffer value);
 
 }
