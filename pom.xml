@@ -6,7 +6,7 @@
 
     <groupId>io.pmem</groupId>
     <artifactId>pmemkv</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.8</version>
     <name>pmemkv</name>
     <description>Java bindings for pmemkv</description>
     <url>https://github.com/pmem/pmemkv-java</url>
@@ -65,20 +65,16 @@
 
     <developers>
         <developer>
-            <id>RobDickinson</id>
-            <name>Rob Dickinson</name>
-            <email>robert.a.dickinson@intel.com</email>
-            <url>https://github.com/RobDickinson</url>
+            <id>szyrom</id>
+            <name>Szymon Romik</name>
+            <email>szymon.romik@intel.com</email>
+            <url>https://github.com/szyrom</url>
             <organization>Intel</organization>
             <organizationUrl>http://intel.com</organizationUrl>
             <roles>
                 <role>architect</role>
                 <role>developer</role>
             </roles>
-            <timezone>America/Denver</timezone>
-            <properties>
-                <picUrl>http://resurface.io/headshot_rob_128.jpg</picUrl>
-            </properties>
         </developer>
     </developers>
 
