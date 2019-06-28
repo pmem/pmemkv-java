@@ -63,26 +63,26 @@ import io.pmem.pmemkv.Database;
 public class Example {
     public static void main(String[] args) {
         System.out.println("Starting engine");
-        Database kv = new Database("vsmap", "{\"path\":\"/dev/shm/\"}");
+        Database db = new Database("vsmap", "{\"path\":\"/dev/shm\", \"size\":1073741824}");
 
         System.out.println("Putting new key");
-        kv.put("key1", "value1");
-        assert kv.count() == 1;
+        db.put("key1", "value1");
+        assert db.countAll() == 1;
 
         System.out.println("Reading key back");
-        assert kv.get("key1").equals("value1");
+        assert db.get("key1").equals("value1");
 
         System.out.println("Iterating existing keys");
-        kv.put("key2", "value2");
-        kv.put("key3", "value3");
-        kv.all((String k) -> System.out.println("  visited: " + k));
+        db.put("key2", "value2");
+        db.put("key3", "value3");
+        db.getKeys((String k) -> System.out.println("  visited: " + k));
 
         System.out.println("Removing existing key");
-        kv.remove("key1");
-        assert !kv.exists("key1");
+        db.remove("key1");
+        assert !db.exists("key1");
 
         System.out.println("Stopping engine");
-        kv.stop();
+        db.stop();
     }
 }
 ```
