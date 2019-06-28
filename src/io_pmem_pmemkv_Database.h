@@ -28,7 +28,7 @@ JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1stop
  * Method:    database_all_buffer
  * Signature: (JLio/pmem/pmemkv/internal/AllBuffersJNICallback;)V
  */
-JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1all_1buffer
+JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1keys_1buffer
   (JNIEnv *, jobject, jlong, jobject);
 
 /*
@@ -36,7 +36,7 @@ JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1all_1buffer
  * Method:    database_all_bytes
  * Signature: (JLio/pmem/pmemkv/AllByteArraysCallback;)V
  */
-JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1all_1bytes
+JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1keys_1bytes
   (JNIEnv *, jobject, jlong, jobject);
 
 /*
@@ -44,7 +44,7 @@ JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1all_1bytes
  * Method:    database_all_string
  * Signature: (JLio/pmem/pmemkv/AllStringsCallback;)V
  */
-JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1all_1string
+JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1keys_1string
   (JNIEnv *, jobject, jlong, jobject);
 
 /*
@@ -52,7 +52,7 @@ JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1all_1string
  * Method:    database_all_above_buffer
  * Signature: (JILjava/nio/ByteBuffer;Lio/pmem/pmemkv/internal/AllBuffersJNICallback;)V
  */
-JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1all_1above_1buffer
+JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1keys_1above_1buffer
   (JNIEnv *, jobject, jlong, jint, jobject, jobject);
 
 /*
@@ -60,7 +60,7 @@ JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1all_1above_1buffer
  * Method:    database_all_above_bytes
  * Signature: (J[BLio/pmem/pmemkv/AllByteArraysCallback;)V
  */
-JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1all_1above_1bytes
+JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1keys_1above_1bytes
   (JNIEnv *, jobject, jlong, jbyteArray, jobject);
 
 /*
@@ -68,7 +68,7 @@ JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1all_1above_1bytes
  * Method:    database_all_above_string
  * Signature: (J[BLio/pmem/pmemkv/AllStringsCallback;)V
  */
-JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1all_1above_1string
+JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1keys_1above_1string
   (JNIEnv *, jobject, jlong, jbyteArray, jobject);
 
 /*
@@ -76,7 +76,7 @@ JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1all_1above_1string
  * Method:    database_all_below_buffer
  * Signature: (JILjava/nio/ByteBuffer;Lio/pmem/pmemkv/internal/AllBuffersJNICallback;)V
  */
-JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1all_1below_1buffer
+JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1keys_1below_1buffer
   (JNIEnv *, jobject, jlong, jint, jobject, jobject);
 
 /*
@@ -84,7 +84,7 @@ JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1all_1below_1buffer
  * Method:    database_all_below_bytes
  * Signature: (J[BLio/pmem/pmemkv/AllByteArraysCallback;)V
  */
-JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1all_1below_1bytes
+JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1keys_1below_1bytes
   (JNIEnv *, jobject, jlong, jbyteArray, jobject);
 
 /*
@@ -92,7 +92,7 @@ JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1all_1below_1bytes
  * Method:    database_all_below_string
  * Signature: (J[BLio/pmem/pmemkv/AllStringsCallback;)V
  */
-JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1all_1below_1string
+JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1keys_1below_1string
   (JNIEnv *, jobject, jlong, jbyteArray, jobject);
 
 /*
@@ -100,7 +100,7 @@ JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1all_1below_1string
  * Method:    database_all_between_buffer
  * Signature: (JILjava/nio/ByteBuffer;ILjava/nio/ByteBuffer;Lio/pmem/pmemkv/internal/AllBuffersJNICallback;)V
  */
-JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1all_1between_1buffer
+JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1keys_1between_1buffer
   (JNIEnv *, jobject, jlong, jint, jobject, jint, jobject, jobject);
 
 /*
@@ -108,7 +108,7 @@ JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1all_1between_1buff
  * Method:    database_all_between_bytes
  * Signature: (J[B[BLio/pmem/pmemkv/AllByteArraysCallback;)V
  */
-JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1all_1between_1bytes
+JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1keys_1between_1bytes
   (JNIEnv *, jobject, jlong, jbyteArray, jbyteArray, jobject);
 
 /*
@@ -116,7 +116,7 @@ JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1all_1between_1byte
  * Method:    database_all_between_string
  * Signature: (J[B[BLio/pmem/pmemkv/AllStringsCallback;)V
  */
-JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1all_1between_1string
+JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1keys_1between_1string
   (JNIEnv *, jobject, jlong, jbyteArray, jbyteArray, jobject);
 
 /*
@@ -124,7 +124,7 @@ JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1all_1between_1stri
  * Method:    database_count
  * Signature: (J)J
  */
-JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_Database_database_1count
+JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_Database_database_1count_1all
   (JNIEnv *, jobject, jlong);
 
 /*
@@ -177,98 +177,98 @@ JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_Database_database_1count_1between_1b
 
 /*
  * Class:     io_pmem_pmemkv_Database
- * Method:    database_each_buffer
- * Signature: (JLio/pmem/pmemkv/internal/EachBufferJNICallback;)V
+ * Method:    database_get_all_buffer
+ * Signature: (JLio/pmem/pmemkv/internal/GetAllBufferJNICallback;)V
  */
-JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1each_1buffer
+JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1all_1buffer
   (JNIEnv *, jobject, jlong, jobject);
 
 /*
  * Class:     io_pmem_pmemkv_Database
- * Method:    database_each_bytes
- * Signature: (JLio/pmem/pmemkv/EachByteArrayCallback;)V
+ * Method:    database_get_all_bytes
+ * Signature: (JLio/pmem/pmemkv/GetAllByteArrayCallback;)V
  */
-JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1each_1bytes
+JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1all_1bytes
   (JNIEnv *, jobject, jlong, jobject);
 
 /*
  * Class:     io_pmem_pmemkv_Database
- * Method:    database_each_string
- * Signature: (JLio/pmem/pmemkv/EachStringCallback;)V
+ * Method:    database_get_all_string
+ * Signature: (JLio/pmem/pmemkv/GetAllStringCallback;)V
  */
-JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1each_1string
+JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1all_1string
   (JNIEnv *, jobject, jlong, jobject);
 
 /*
  * Class:     io_pmem_pmemkv_Database
- * Method:    database_each_above_buffer
- * Signature: (JILjava/nio/ByteBuffer;Lio/pmem/pmemkv/internal/EachBufferJNICallback;)V
+ * Method:    database_get_above_buffer
+ * Signature: (JILjava/nio/ByteBuffer;Lio/pmem/pmemkv/internal/GetAllBufferJNICallback;)V
  */
-JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1each_1above_1buffer
+JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1above_1buffer
   (JNIEnv *, jobject, jlong, jint, jobject, jobject);
 
 /*
  * Class:     io_pmem_pmemkv_Database
- * Method:    database_each_above_bytes
- * Signature: (J[BLio/pmem/pmemkv/EachByteArrayCallback;)V
+ * Method:    database_get_above_bytes
+ * Signature: (J[BLio/pmem/pmemkv/GetAllByteArrayCallback;)V
  */
-JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1each_1above_1bytes
+JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1above_1bytes
   (JNIEnv *, jobject, jlong, jbyteArray, jobject);
 
 /*
  * Class:     io_pmem_pmemkv_Database
- * Method:    database_each_above_string
- * Signature: (J[BLio/pmem/pmemkv/EachStringCallback;)V
+ * Method:    database_get_above_string
+ * Signature: (J[BLio/pmem/pmemkv/GetAllStringCallback;)V
  */
-JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1each_1above_1string
+JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1above_1string
   (JNIEnv *, jobject, jlong, jbyteArray, jobject);
 
 /*
  * Class:     io_pmem_pmemkv_Database
- * Method:    database_each_below_buffer
- * Signature: (JILjava/nio/ByteBuffer;Lio/pmem/pmemkv/internal/EachBufferJNICallback;)V
+ * Method:    database_get_below_buffer
+ * Signature: (JILjava/nio/ByteBuffer;Lio/pmem/pmemkv/internal/GetAllBufferJNICallback;)V
  */
-JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1each_1below_1buffer
+JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1below_1buffer
   (JNIEnv *, jobject, jlong, jint, jobject, jobject);
 
 /*
  * Class:     io_pmem_pmemkv_Database
- * Method:    database_each_below_bytes
- * Signature: (J[BLio/pmem/pmemkv/EachByteArrayCallback;)V
+ * Method:    database_get_below_bytes
+ * Signature: (J[BLio/pmem/pmemkv/GetAllByteArrayCallback;)V
  */
-JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1each_1below_1bytes
+JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1below_1bytes
   (JNIEnv *, jobject, jlong, jbyteArray, jobject);
 
 /*
  * Class:     io_pmem_pmemkv_Database
- * Method:    database_each_below_string
- * Signature: (J[BLio/pmem/pmemkv/EachStringCallback;)V
+ * Method:    database_get_below_string
+ * Signature: (J[BLio/pmem/pmemkv/GetAllStringCallback;)V
  */
-JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1each_1below_1string
+JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1below_1string
   (JNIEnv *, jobject, jlong, jbyteArray, jobject);
 
 /*
  * Class:     io_pmem_pmemkv_Database
- * Method:    database_each_between_buffer
- * Signature: (JILjava/nio/ByteBuffer;ILjava/nio/ByteBuffer;Lio/pmem/pmemkv/internal/EachBufferJNICallback;)V
+ * Method:    database_get_between_buffer
+ * Signature: (JILjava/nio/ByteBuffer;ILjava/nio/ByteBuffer;Lio/pmem/pmemkv/internal/GetAllBufferJNICallback;)V
  */
-JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1each_1between_1buffer
+JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1between_1buffer
   (JNIEnv *, jobject, jlong, jint, jobject, jint, jobject, jobject);
 
 /*
  * Class:     io_pmem_pmemkv_Database
- * Method:    database_each_between_bytes
- * Signature: (J[B[BLio/pmem/pmemkv/EachByteArrayCallback;)V
+ * Method:    database_get_between_bytes
+ * Signature: (J[B[BLio/pmem/pmemkv/GetAllByteArrayCallback;)V
  */
-JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1each_1between_1bytes
+JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1between_1bytes
   (JNIEnv *, jobject, jlong, jbyteArray, jbyteArray, jobject);
 
 /*
  * Class:     io_pmem_pmemkv_Database
- * Method:    database_each_between_string
- * Signature: (J[B[BLio/pmem/pmemkv/EachStringCallback;)V
+ * Method:    database_get_between_string
+ * Signature: (J[B[BLio/pmem/pmemkv/GetAllStringCallback;)V
  */
-JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1each_1between_1string
+JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1between_1string
   (JNIEnv *, jobject, jlong, jbyteArray, jbyteArray, jobject);
 
 /*
