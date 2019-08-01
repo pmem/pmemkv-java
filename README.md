@@ -54,34 +54,12 @@ LD_LIBRARY_PATH=path_to_your_libs mvn test
 
 We are using `/dev/shm` to
 [emulate persistent memory](http://pmem.io/2016/02/22/pm-emulation.html)
-in this simple example.
+in example.
 
-```java
-import io.pmem.pmemkv.Database;
-
-public class Example {
-    public static void main(String[] args) {
-        System.out.println("Starting engine");
-        Database db = new Database("vsmap", "{\"path\":\"/dev/shm\", \"size\":1073741824}");
-
-        System.out.println("Putting new key");
-        db.put("key1", "value1");
-        assert db.countAll() == 1;
-
-        System.out.println("Reading key back");
-        assert db.get("key1").equals("value1");
-
-        System.out.println("Iterating existing keys");
-        db.put("key2", "value2");
-        db.put("key3", "value3");
-        db.getKeys((String k) -> System.out.println("  visited: " + k));
-
-        System.out.println("Removing existing key");
-        db.remove("key1");
-        assert !db.exists("key1");
-
-        System.out.println("Stopping engine");
-        db.stop();
-    }
-}
+Example can be found within this repository in [examples directory](https://github.com/pmem/pmemkv-java/tree/master/examples).
+To execute the example:
 ```
+javac -cp ../target/*.jar BasicExample.java
+PMEM_IS_PMEM_FORCE=1 java -ea -Xms1G -cp .:`find ../target -name *.jar` -Djava.library.path=/usr/local/lib BasicExample
+```
+
