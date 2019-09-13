@@ -66,7 +66,7 @@ include_directories(${JNI_INCLUDE_DIRS})
 link_directories(${JNI_LIBRARIES})
 
 add_library(pmemkv-jni SHARED ${SOURCE_FILES})
-target_link_libraries(pmemkv-jni pmemkv)
+target_link_libraries(pmemkv-jni pmemkv pmemkv_json_config)
 
 add_executable(pmemkv-jni_test src/pmemkv-jni_test.cc)
 target_link_libraries(pmemkv-jni_test pmemkv libgtest)
