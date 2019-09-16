@@ -34,6 +34,7 @@
 #include <string>
 #include <jni.h>
 #include <libpmemkv.h>
+#include <libpmemkv_json_config.h>
 #include <iostream>
 
 #define DO_LOG 0
