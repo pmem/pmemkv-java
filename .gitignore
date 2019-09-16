@@ -1,4 +1,7 @@
 .*
+!.gitignore
+!.gitattributes
+!.travis.yml
 *.d
 bin/
 cmake-build-debug/
