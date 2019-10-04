@@ -1,3 +1,9 @@
+Fri Oct 04 2019 Szymon Romik <szymon.romik@intel.com>
+
+	* Version 0.9
+
+	This release adjusts pmemkv-jni to work with pmemkv 1.0.
+
 Fri Jun 28 2019 Szymon Romik <szymon.romik@intel.com>
 
 	* Version 0.8
