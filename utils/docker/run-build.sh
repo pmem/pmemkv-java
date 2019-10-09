@@ -31,13 +31,26 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #
-# run-build.sh - checks bindings' building and installation with pmemkv
-# 0.8 or current master
+# run-build.sh - checks bindings' building and installation
+#                with given version of pmemkv
 #
 
 PREFIX=/usr
 
 set -e
+
+case $1 in
+	master)
+		PMEMKV_VERSION="1.0.1-rc1"
+		;;
+	stable-1.0)
+		PMEMKV_VERSION="stable-1.0"
+		;;
+	*)
+		echo "Error: incorrect version of pmemkv: $1 (available: master, stable-1.0)"
+		exit 1
+		;;
+esac
 
 export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 export JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8
@@ -46,7 +59,7 @@ export JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8
 cd ~
 git clone https://github.com/pmem/pmemkv.git
 cd pmemkv
-git checkout $1
+git checkout $PMEMKV_VERSION
 mkdir build
 cd build
 cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo \
@@ -55,15 +68,9 @@ make -j2
 echo $USERPASS | sudo -S make install
 
 echo
-echo "#########################################################################"
-echo "### Verifying building and installing of the pmemkv-jni and java bindings"
-echo "#########################################################################"
-cd ~
-git clone https://github.com/pmem/pmemkv-jni.git
-cd pmemkv-jni
-make test
-echo $USERPASS | sudo -S make install prefix=$PREFIX
-
+echo "###########################################################"
+echo "### Verifying building and installing of the java bindings "
+echo "###########################################################"
 cd ~
 git clone https://github.com/pmem/pmemkv-java.git
 cd pmemkv-java
