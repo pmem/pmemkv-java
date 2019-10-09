@@ -1,23 +1,23 @@
 prefix=/usr/local
 
-all: clean test
+all: test
 
 clean:
-	rm -rf ./bin googletest-*.zip
+	rm -rf ./build googletest-*.zip
 
 configure:
-	mkdir -p ./bin
-	cd ./bin && cmake .. -DCMAKE_BUILD_TYPE=Release
+	mkdir -p ./build
+	cd ./build && cmake .. -DCMAKE_BUILD_TYPE=Release
 
 sharedlib: configure
-	cd ./bin && make pmemkv-jni
+	cd ./build && make pmemkv-jni
 
 install:
-	cp ./bin/libpmemkv-jni.so $(prefix)/lib
+	cp ./build/libpmemkv-jni.so $(prefix)/lib
 
 uninstall:
 	rm -rf $(prefix)/lib/libpmemkv-jni.so
 
 test: sharedlib
-	cd ./bin && make pmemkv-jni_test
-	PMEM_IS_PMEM_FORCE=1 ./bin/pmemkv-jni_test
+	cd ./build && make pmemkv-jni_test
+	PMEM_IS_PMEM_FORCE=1 ./build/pmemkv-jni_test
