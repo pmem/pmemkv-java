@@ -31,49 +31,81 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #
-# run-build.sh - checks bindings' building and installation
-#                with given version of pmemkv
+# install-dependencies.sh - install Java dependencies
+#                           so that it can be built offline
 #
-
-PREFIX=/usr
 
 set -e
 
-case $1 in
-	master)
-		PMEMKV_VERSION="1.0.1-rc1"
-		;;
-	stable-1.0)
-		PMEMKV_VERSION="stable-1.0"
-		;;
-	*)
-		echo "Error: incorrect version of pmemkv: $1 (available: master, stable-1.0)"
-		exit 1
-		;;
-esac
+# Version 1.0.1-rc1, 21.10.2019
+PMEMKV_VERSION="1.0.1-rc1"
 
-export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
-export JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8
+# Add ChangeLog 0.9, 4.10.2019
+JNI_VERSION="0.9"
 
-# build and install pmemkv
-cd ~
+# add ChangeLog 0.9, 4.10.2019
+JAVA_VERSION="0.9"
+
+PREFIX=/usr
+
+WORKDIR=$(pwd)
+
+#
+# 1) Build and install PMEMKV
+#
 git clone https://github.com/pmem/pmemkv.git
 cd pmemkv
 git checkout $PMEMKV_VERSION
 mkdir build
 cd build
-cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-	-DCMAKE_INSTALL_PREFIX=$PREFIX
-make -j2
-echo $USERPASS | sudo -S make install
+# only VSMAP engine is enabled, because Java tests need it
 
-echo
-echo "###########################################################"
-echo "### Verifying building and installing of the java bindings "
-echo "###########################################################"
-cd ~
+cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+	-DCMAKE_INSTALL_PREFIX=$PREFIX \
+	-DENGINE_VSMAP=ON \
+	-DENGINE_CMAP=OFF \
+	-DENGINE_VCMAP=OFF \
+	-DENGINE_CACHING=OFF \
+	-DENGINE_STREE=OFF \
+	-DBUILD_EXAMPLES=OFF \
+	-DENGINE_TREE3=OFF
+make -j$(nproc)
+make -j$(nproc) install
+
+#
+# 2) Build and install JNI
+#
+cd $WORKDIR
+git clone https://github.com/pmem/pmemkv-jni.git
+cd pmemkv-jni
+git checkout $JNI_VERSION
+make test
+echo $USERPASS | sudo -S make install prefix=$PREFIX
+
+#
+# 3) JAVA dependencies - all of the dependencies needed to run
+#                        pmemkv-java will be saved
+#                        in the /opt/java directory
+cd $WORKDIR
+mkdir /opt/java/
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+export JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8
+
 git clone https://github.com/pmem/pmemkv-java.git
 cd pmemkv-java
-mkdir -p ~/.m2/repository
-cp -r /opt/java/repository ~/.m2/
-mvn --offline install
+git checkout $JAVA_VERSION
+mvn dependency:go-offline
+mvn install
+mv -v ~/.m2/repository /opt/java/
+
+#
+# Uninstall all unneeded stuff
+#
+cd $WORKDIR/pmemkv/build
+make uninstall
+
+cd $WORKDIR
+rm -r pmemkv pmemkv-jni pmemkv-java
+
+# make the /opt/java directory world-readable
+chmod -R a+r /opt/java
