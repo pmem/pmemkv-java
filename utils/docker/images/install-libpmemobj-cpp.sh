@@ -40,8 +40,8 @@ set -e
 git clone https://github.com/pmem/libpmemobj-cpp
 cd libpmemobj-cpp
 
-# Merge pull request #418 from karczex/template_locks, 24.09.2019
-git checkout a030153939a18becfd60d34a99a8a53be2963f8f
+# stable 1.8: Merge pull request #502 from ldorau/Fix-installing-libpmem-.rpm, 29.10.2019
+git checkout 50d59fcc64d22b9e50e34c65b2c406a0040b15b3
 
 mkdir build
 cd build
