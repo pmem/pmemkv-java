@@ -31,19 +31,28 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #
-# run-build.sh - checks bindings' building and installation
-#                with given version of pmemkv
+# install-dependencies.sh - install Java dependencies
+#                           so that it can be built offline
 #
-
-PREFIX=/usr
 
 set -e
 
-export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
-export JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8
+OS=$1
+pmemkv_version=stable-1.0
 
-# install pmemkv
-pmemkv_version=$1
+# Merge pull request #30 from ldorau/Fixes-after-review, 30.10.2019
+JNI_VERSION="41499c7f3bdc16459bf73d458049f81084d64001"
+
+# add ChangeLog 0.9, 4.10.2019
+JAVA_VERSION="0.9"
+
+PREFIX=/usr
+
+WORKDIR=$(pwd)
+
+#
+# 1) Install PMEMKV
+#
 cd /opt/pmemkv-$pmemkv_version/
 if [ "${OS}" = "ubuntu" ]; then
 	echo $USERPASS | sudo -S dpkg -i libpmemkv*.deb
@@ -51,13 +60,43 @@ elif [ "${OS}" = "fedora" ]; then
 	echo $USERPASS | sudo -S rpm -i libpmemkv*.rpm
 fi
 
-echo
-echo "###########################################################"
-echo "### Verifying building and installing of the java bindings "
-echo "###########################################################"
-cd ~
+#
+# 2) Build and install JNI
+#
+cd $WORKDIR
+git clone https://github.com/pmem/pmemkv-jni.git
+cd pmemkv-jni
+git checkout $JNI_VERSION
+make test
+echo $USERPASS | sudo -S make install prefix=$PREFIX
+
+#
+# 3) JAVA dependencies - all of the dependencies needed to run
+#                        pmemkv-java will be saved
+#                        in the /opt/java directory
+cd $WORKDIR
+mkdir /opt/java/
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+export JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8
+
 git clone https://github.com/pmem/pmemkv-java.git
 cd pmemkv-java
-mkdir -p ~/.m2/repository
-cp -r /opt/java/repository ~/.m2/
-mvn --offline install
+git checkout $JAVA_VERSION
+mvn dependency:go-offline
+mvn install
+mv -v ~/.m2/repository /opt/java/
+
+#
+# Uninstall all unneeded stuff
+#
+if [ "${OS}" = "ubuntu" ]; then
+	echo $USERPASS | sudo -S dpkg -r $(apt list --installed | grep -e libpmemkv | cut -d'/' -f1)
+elif [ "${OS}" = "fedora" ]; then
+	echo $USERPASS | sudo -S rpm -e $(rpm -qa | grep -e libpmemkv)
+fi
+
+cd $WORKDIR
+rm -r pmemkv-jni pmemkv-java
+
+# make the /opt/java directory world-readable
+chmod -R a+r /opt/java
