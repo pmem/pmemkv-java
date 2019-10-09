@@ -9,7 +9,8 @@ services:
 env:
   matrix:
           - TYPE=pmemkv-master OS=ubuntu OS_VER=19.04
-          - TYPE=pmemkv-0.8 OS=ubuntu OS_VER=19.04
+          - TYPE=pmemkv-stable-1.0 OS=ubuntu OS_VER=19.04
+
 before_install:
   - echo $TRAVIS_COMMIT_RANGE
   - export HOST_WORKDIR=`pwd`
