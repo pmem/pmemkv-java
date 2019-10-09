@@ -88,6 +88,10 @@ RUN ./install-libpmemobj-cpp.sh DEB
 COPY install-memkind.sh install-memkind.sh
 RUN ./install-memkind.sh
 
+# Install dependencies
+COPY install-dependencies.sh install-dependencies.sh
+RUN ./install-dependencies.sh
+
 # Add user
 ENV USER user
 ENV USERPASS pass
