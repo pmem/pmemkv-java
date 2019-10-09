@@ -75,12 +75,3 @@ cd ~
 git clone https://github.com/pmem/pmemkv-java.git
 cd pmemkv-java
 mvn install
-
-echo
-echo "################################################################"
-echo "### Executing test(s) from pmemkv-tools"
-echo "################################################################"
-cd ~
-git clone https://github.com/pmem/pmemkv-tools.git
-cd pmemkv-tools
-make example_java
