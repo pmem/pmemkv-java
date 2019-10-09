@@ -31,44 +31,86 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #
-# run-build.sh - checks bindings' building and installation
-#                with given version of pmemkv
+# install-dependencies.sh - install Java dependencies
+#                           so that it can be built offline
 #
-
-PREFIX=/usr
 
 set -e
 
+# Version 1.0, 4.10.2019
+PMEMKV_VERSION="1.0"
+
+# Add ChangeLog 0.9, 4.10.2019
+JNI_VERSION="0.9"
+
+# add ChangeLog 0.9, 4.10.2019
+JAVA_VERSION="0.9"
+
+PREFIX=/usr
+
+WORKDIR=$(pwd)
+
+#
+# 1) Build and install PMEMKV
+#
+git clone https://github.com/pmem/pmemkv.git
+cd pmemkv
+git checkout $PMEMKV_VERSION
+cp /opt/googletest/googletest-*.zip .
+mkdir build
+cd build
+# only VSMAP engine is enabled, because Java tests need it
+
+cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+	-DCMAKE_INSTALL_PREFIX=$PREFIX \
+	-DENGINE_VSMAP=ON \
+	-DENGINE_CMAP=OFF \
+	-DENGINE_VCMAP=OFF \
+	-DENGINE_CACHING=OFF \
+	-DENGINE_STREE=OFF \
+	-DBUILD_EXAMPLES=OFF \
+	-DENGINE_TREE3=OFF
+make -j$(nproc)
+make -j$(nproc) install
+
+#
+# 2) Build and install JNI
+#
+cd $WORKDIR
+git clone https://github.com/pmem/pmemkv-jni.git
+cd pmemkv-jni
+git checkout $JNI_VERSION
+cp /opt/googletest/googletest-*.zip .
+make
+make install prefix=$PREFIX
+
+#
+# 3) JAVA dependencies - all of the dependencies needed to run
+#                        pmemkv-java will be saved
+#                        in the /opt/java directory
+cd $WORKDIR
+mkdir /opt/java/
 export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 export JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8
 
-# build and install pmemkv
-cd ~
-git clone https://github.com/pmem/pmemkv.git
-cd pmemkv
-git checkout $1
-cp -v /opt/googletest/googletest-*.zip .
-mkdir build
-cd build
-cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-	-DCMAKE_INSTALL_PREFIX=$PREFIX
-make -j2
-echo $USERPASS | sudo -S make install
-
-echo
-echo "##########################################################################"
-echo "### Verifying building and installing of the pmemkv-jni and java bindings "
-echo "##########################################################################"
-cd ~
-git clone https://github.com/pmem/pmemkv-jni.git
-cd pmemkv-jni
-cp -v /opt/googletest/googletest-*.zip .
-make test
-echo $USERPASS | sudo -S make install prefix=$PREFIX
-
-cd ~
 git clone https://github.com/pmem/pmemkv-java.git
 cd pmemkv-java
-mkdir -p ~/.m2/repository
-cp -r /opt/java/repository ~/.m2/
-mvn --offline install
+git checkout $JAVA_VERSION
+mvn dependency:go-offline
+mvn install
+mv -v ~/.m2/repository /opt/java/
+
+#
+# Uninstall all installed stuff
+#
+cd $WORKDIR/pmemkv/build
+make uninstall
+
+cd $WORKDIR/pmemkv-jni
+make uninstall
+
+cd $WORKDIR
+rm -r pmemkv pmemkv-jni pmemkv-java
+
+# make the /opt/java directory world-readable
+chmod -R a+r /opt/java
