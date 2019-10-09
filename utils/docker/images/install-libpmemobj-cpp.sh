@@ -40,8 +40,8 @@ set -e
 git clone https://github.com/pmem/libpmemobj-cpp
 cd libpmemobj-cpp
 
-# stable-1.7 with fixed memcheck error of uninitialized size field; June 27th
-git checkout 693a53d5c5303c0f20be76e438133635a67b9f6a
+# common: 1.8 release, 03.10.2019
+git checkout ab4ff69b71730972e3c24b1ece9e1201698ac3fa
 
 mkdir build
 cd build
