@@ -47,6 +47,7 @@ cd ~
 git clone https://github.com/pmem/pmemkv.git
 cd pmemkv
 git checkout $1
+cp -v /opt/googletest/googletest-*.zip .
 mkdir build
 cd build
 cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo \
@@ -61,8 +62,7 @@ echo "##########################################################################
 cd ~
 git clone https://github.com/pmem/pmemkv-jni.git
 cd pmemkv-jni
-# # copy Googletest to the current directory
-# cp /opt/googletest/googletest-*.zip .
+cp -v /opt/googletest/googletest-*.zip .
 make test
 echo $USERPASS | sudo -S make install prefix=$PREFIX
 

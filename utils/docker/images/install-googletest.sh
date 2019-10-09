@@ -1,5 +1,6 @@
+#!/usr/bin/env bash
 #
-# Copyright 2016-2019, Intel Corporation
+# Copyright 2019, Intel Corporation
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -30,75 +31,31 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #
-# Dockerfile - a 'recipe' for Docker to build an image of ubuntu-based
-#              environment prepared for running pmemkv build and tests.
+# install-googletest.sh -- install Googletest
 #
 
-# Pull base image
-FROM ubuntu:19.04
-MAINTAINER lukasz.stolarczuk@intel.com
+GTEST_VERSION=1.7.0
+URL=https://github.com/google/googletest/archive/release-${GTEST_VERSION}.zip
+GTEST_SHA256HASH=b58cb7547a28b2c718d1e38aee18a3659c9e3ff52440297e965f5edffe34b6d0
+GTEST=googletest-${GTEST_VERSION}.zip
+HASH_FILE=SHA256SUM
+DEST_DIR=/opt/googletest
+PWD=$(pwd)
 
-# Update the Apt cache and install basic tools
-RUN apt-get update
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-	autoconf \
-	automake \
-	build-essential \
-	clang \
-	cmake \
-	curl \
-	debhelper \
-	devscripts \
-	fakeroot \
-	git \
-	libc6-dbg \
-	libdaxctl-dev \
-	libndctl-dev \
-	libnode-dev \
-	libnuma-dev \
-	libtbb-dev \
-	libtext-diff-perl \
-	libtool \
-	libunwind8-dev \
-	maven \
-	numactl \
-	openjdk-8-jdk \
-	pandoc \
-	pkg-config \
-	rapidjson-dev \
-	sudo \
-	wget \
-	whois \
- && rm -rf /var/lib/apt/lists/*
+set -e
 
-# Install Googletest
-COPY install-googletest.sh install-googletest.sh
-RUN ./install-googletest.sh
+rm -rf ${DEST_DIR}
+mkdir -p ${DEST_DIR}
+cd ${DEST_DIR}
 
-# Install valgrind
-COPY install-valgrind.sh install-valgrind.sh
-RUN ./install-valgrind.sh
+# create a hash file
+echo "${GTEST_SHA256HASH} ${GTEST}" > ${HASH_FILE}
 
-# Install pmdk
-COPY install-pmdk.sh install-pmdk.sh
-RUN ./install-pmdk.sh dpkg
+# Download and save Googletest packages
+wget --no-check-certificate ${URL}
+mv release-${GTEST_VERSION}.zip ${GTEST}
 
-# Install pmdk c++ bindings
-COPY install-libpmemobj-cpp.sh install-libpmemobj-cpp.sh
-RUN ./install-libpmemobj-cpp.sh DEB
+sha256sum -c ${HASH_FILE}
+rm ${HASH_FILE}
 
-# Install memkind
-COPY install-memkind.sh install-memkind.sh
-RUN ./install-memkind.sh
-
-# Add user
-ENV USER user
-ENV USERPASS pass
-RUN useradd -m $USER -g sudo -p `mkpasswd $USERPASS`
-USER $USER
-
-# Set required environment variables
-ENV OS ubuntu
-ENV OS_VER 19.04
-ENV PACKAGE_MANAGER deb
-ENV NOTTY 1
+cd ${PWD}
