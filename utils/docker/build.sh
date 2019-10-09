@@ -70,21 +70,17 @@ else
 fi
 
 imageName=${DOCKERHUB_REPO}:${OS}-${OS_VER}
-containerName=pmemkv-${OS}-${OS_VER}
+containerName=pmemkv-java-${OS}-${OS_VER}
+
+pmemkv_version=$(echo $TYPE | cut -d'-' -f 2-)
 
 if [[ "$command" == "" ]]; then
-	case $TYPE in
-		pmemkv-master)
-			command="./run-build.sh master";
-			;;
-		pmemkv-0.8)
-			command="./run-build.sh 0.8";
-			;;
-	esac
+	command="./run-build.sh $pmemkv_version";
 fi
 
 if [ "$COVERAGE" == "1" ]; then
 	docker_opts="${docker_opts} `bash <(curl -s https://codecov.io/env)`";
+	ci_env=`bash <(curl -s https://codecov.io/env)`
 fi
 
 if [ -n "$DNS_SERVER" ]; then DNS_SETTING=" --dns=$DNS_SERVER "; fi
@@ -94,18 +90,16 @@ SCRIPTSDIR=$WORKDIR/utils/docker
 
 echo Building ${OS}-${OS_VER}
 
-ci_env=`bash <(curl -s https://codecov.io/env)`
 # Run a container with
 #  - environment variables set (--env)
 #  - host directory containing source mounted (-v)
 #  - working directory set (-w)
-docker run --privileged=true --name=$containerName -ti \
+docker run --network="bridge" --name=$containerName -ti \
 	$DNS_SETTING \
 	${docker_opts} \
 	$ci_env \
 	--env http_proxy=$http_proxy \
 	--env https_proxy=$https_proxy \
-	--env AUTO_DOC_UPDATE=$AUTO_DOC_UPDATE \
 	--env GITHUB_TOKEN=$GITHUB_TOKEN \
 	--env WORKDIR=$WORKDIR \
 	--env SCRIPTSDIR=$SCRIPTSDIR \

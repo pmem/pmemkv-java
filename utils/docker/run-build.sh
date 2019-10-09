@@ -31,8 +31,8 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #
-# run-build.sh - checks bindings' building and installation with pmemkv
-# 0.8 or current master
+# run-build.sh - checks bindings' building and installation
+#                with given version of pmemkv
 #
 
 PREFIX=/usr
@@ -55,9 +55,9 @@ make -j2
 echo $USERPASS | sudo -S make install
 
 echo
-echo "#########################################################################"
-echo "### Verifying building and installing of the pmemkv-jni and java bindings"
-echo "#########################################################################"
+echo "##########################################################################"
+echo "### Verifying building and installing of the pmemkv-jni and java bindings "
+echo "##########################################################################"
 cd ~
 git clone https://github.com/pmem/pmemkv-jni.git
 cd pmemkv-jni
