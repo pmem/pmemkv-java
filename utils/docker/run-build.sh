@@ -49,9 +49,15 @@ elif [ "${OS}" = "fedora" ]; then
 fi
 
 echo
-echo "########################################################"
-echo "### Verifying building, installation and tests execution"
-echo "########################################################"
-cd $WORKDIR
-make
-echo $USERPASS | sudo -S make install prefix="${PREFIX}"
+echo "###########################################"
+echo "### Verifying building and tests execution "
+echo "###########################################"
+mkdir $WORKDIR/build
+cd $WORKDIR/build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+make -j$(nproc) pmemkv-jni
+make -j$(nproc) pmemkv-jni_test
+PMEM_IS_PMEM_FORCE=1 ./pmemkv-jni_test
+
+# check if the library exists
+ls -al libpmemkv-jni.so
