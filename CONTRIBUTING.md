@@ -3,7 +3,7 @@
 ## Opening New Issues
 
 Please log bugs or suggestions as [GitHub issues](https://github.com/pmem/pmemkv-jni/issues).
-Details such as OS and PMDK version are always appreciated.
+Details such as OS and pmemkv version are always appreciated.
 
 ## Code Style
 
@@ -18,7 +18,7 @@ We take outside code contributions to `pmemkv-jni` through GitHub pull requests.
 
 **NOTE: If you do decide to implement code changes and contribute them,
 please make sure you agree your contribution can be made available
-under the [BSD-style License used for the PMDK](https://github.com/pmem/pmdk/blob/master/LICENSE).**
+under the [BSD-style License used for pmemkv-jni](https://github.com/pmem/pmemkv-jni/blob/master/LICENSE).**
 
 **NOTE: Submitting your changes also means that you certify the following:**
 
@@ -55,7 +55,7 @@ i.e. via email or by including a `Signed-off-by:` line at the bottom
 of your commit comments.
 
 To improve tracking of who is the author of a contribution, we kindly ask you
-to use your real name (not an alias) when committing your changes to the NVM Library:
+to use your real name (not an alias) when committing your changes to pmemkv-jni:
 ```
 Author: Random J Developer <random@developer.example.org>
 ```
