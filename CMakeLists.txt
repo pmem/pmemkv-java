@@ -40,25 +40,6 @@ find_package(PkgConfig QUIET)
 include(ExternalProject)
 include(FindThreads)
 
-set(GTEST_URL ${CMAKE_SOURCE_DIR}/googletest-${GTEST_VERSION}.zip)
-if(EXISTS ${GTEST_URL})
-	# do nothing
-else()
-execute_process(COMMAND wget -O ${GTEST_URL} https://github.com/google/googletest/archive/release-${GTEST_VERSION}.zip)
-endif()
-ExternalProject_Add(gtest
-    URL ${GTEST_URL}
-    PREFIX ${CMAKE_CURRENT_BINARY_DIR}/gtest
-    INSTALL_COMMAND ""
-    CMAKE_ARGS -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
-)
-ExternalProject_Get_Property(gtest source_dir binary_dir)
-add_library(libgtest IMPORTED STATIC GLOBAL)
-add_dependencies(libgtest gtest)
-set_target_properties(libgtest PROPERTIES
-	"IMPORTED_LOCATION" "${binary_dir}/libgtest.a"
-	"IMPORTED_LINK_INTERFACE_LIBRARIES" "${CMAKE_THREAD_LIBS_INIT}"
-)
 include_directories("${source_dir}/include")
 
 find_package(JNI)
@@ -69,4 +50,4 @@ add_library(pmemkv-jni SHARED ${SOURCE_FILES})
 target_link_libraries(pmemkv-jni pmemkv pmemkv_json_config)
 
 add_executable(pmemkv-jni_test src/pmemkv-jni_test.cc)
-target_link_libraries(pmemkv-jni_test pmemkv libgtest)
+target_link_libraries(pmemkv-jni_test pmemkv gtest pthread)

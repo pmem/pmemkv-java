@@ -3,7 +3,7 @@ prefix=/usr/local
 all: test
 
 clean:
-	rm -rf ./build googletest-*.zip
+	rm -rf ./build
 
 configure:
 	mkdir -p ./build
