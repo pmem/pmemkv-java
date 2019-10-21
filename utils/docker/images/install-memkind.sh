@@ -42,7 +42,7 @@ cd memkind
 git checkout v1.9.0
 
 ./build.sh --prefix=/usr
-sudo make install
+sudo make -j$(nproc) install
 
 cd ..
 rm -r memkind

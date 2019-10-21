@@ -41,7 +41,7 @@ cd pmdk
 # common: 1.7 release, 30.09.2019
 git checkout bc5e309485df61c452d08367e4b13ba9dfed5071
 
-make BUILD_PACKAGE_CHECK=n $1
+make -j$(nproc) BUILD_PACKAGE_CHECK=n $1
 if [ "$1" = "dpkg" ]; then
       sudo dpkg -i dpkg/libpmem_*.deb dpkg/libpmem-dev_*.deb
       sudo dpkg -i dpkg/libpmemobj_*.deb dpkg/libpmemobj-dev_*.deb
