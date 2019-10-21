@@ -64,8 +64,8 @@ mkdir build
 cd build
 cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo \
 	-DCMAKE_INSTALL_PREFIX=$PREFIX
-make -j2
-echo $USERPASS | sudo -S make install
+make -j$(nproc)
+echo $USERPASS | sudo -S make -j$(nproc) install
 
 echo
 echo "###########################################################"
