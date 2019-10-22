@@ -42,7 +42,7 @@ cd pmdk
 # stable-1.7: Merge pull request #4057 from ldorau/Add-BuildRequires-fdupes-to-spec-for-opensuse, 25.10.2019
 git checkout bfec2ca71b20ac4b56e1d7be9f51aa875d7c5efc
 
-make BUILD_PACKAGE_CHECK=n $1
+make -j$(nproc) BUILD_PACKAGE_CHECK=n $1
 if [ "$1" = "dpkg" ]; then
       sudo dpkg -i dpkg/libpmem_*.deb dpkg/libpmem-dev_*.deb
       sudo dpkg -i dpkg/libpmemobj_*.deb dpkg/libpmemobj-dev_*.deb
