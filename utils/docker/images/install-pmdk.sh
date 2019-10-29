@@ -38,8 +38,9 @@ set -e
 
 git clone https://github.com/pmem/pmdk
 cd pmdk
-# stable-1.6
-git checkout 695e6eba28c53a69a0ef7bad3cc0f45c21ef3e00 
+
+# stable-1.7: Merge pull request #4057 from ldorau/Add-BuildRequires-fdupes-to-spec-for-opensuse, 25.10.2019
+git checkout bfec2ca71b20ac4b56e1d7be9f51aa875d7c5efc
 
 make BUILD_PACKAGE_CHECK=n $1
 if [ "$1" = "dpkg" ]; then

@@ -31,8 +31,8 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #
-# run-build.sh - checks bindings' building and installation with pmemkv
-# 0.8 or current master
+# run-build.sh - checks bindings' building and installation
+#                with given version of pmemkv
 #
 
 PREFIX=/usr
@@ -42,28 +42,19 @@ set -e
 export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 export JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8
 
-# build and install pmemkv
-cd ~
-git clone https://github.com/pmem/pmemkv.git
-cd pmemkv
-git checkout $1
-mkdir build
-cd build
-cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-	-DCMAKE_INSTALL_PREFIX=$PREFIX
-make -j2
-echo $USERPASS | sudo -S make install
+# install pmemkv
+pmemkv_version=$1
+cd /opt/pmemkv-$pmemkv_version/
+if [ "${PACKAGE_MANAGER}" = "deb" ]; then
+	echo $USERPASS | sudo -S dpkg -i libpmemkv*.deb
+elif [ "${PACKAGE_MANAGER}" = "rpm" ]; then
+	echo $USERPASS | sudo -S rpm -i libpmemkv*.rpm
+fi
 
 echo
-echo "#########################################################################"
-echo "### Verifying building and installing of the pmemkv-jni and java bindings"
-echo "#########################################################################"
-cd ~
-git clone https://github.com/pmem/pmemkv-jni.git
-cd pmemkv-jni
-make test
-echo $USERPASS | sudo -S make install prefix=$PREFIX
-
+echo "###########################################################"
+echo "### Verifying building and installing of the java bindings "
+echo "###########################################################"
 cd ~
 git clone https://github.com/pmem/pmemkv-java.git
 cd pmemkv-java
