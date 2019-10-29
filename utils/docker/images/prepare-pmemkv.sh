@@ -1,5 +1,6 @@
+#!/usr/bin/env bash
 #
-# Copyright 2016-2019, Intel Corporation
+# Copyright 2019, Intel Corporation
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -30,71 +31,43 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #
-# Dockerfile - a 'recipe' for Docker to build an image of ubuntu-based
-#              environment prepared for running pmemkv-java build and tests.
+# prepare-pmemkv.sh <package_type> - prepare pmemkv packages
 #
 
-# Pull base image
-FROM ubuntu:19.04
-MAINTAINER lukasz.stolarczuk@intel.com
+set -e
 
-# Update the Apt cache and install basic tools
-RUN apt-get update
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-	autoconf \
-	automake \
-	build-essential \
-	clang \
-	cmake \
-	curl \
-	debhelper \
-	devscripts \
-	fakeroot \
-	git \
-	libc6-dbg \
-	libdaxctl-dev \
-	libndctl-dev \
-	libnode-dev \
-	libnuma-dev \
-	libtbb-dev \
-	libtext-diff-perl \
-	libtool \
-	libunwind8-dev \
-	maven \
-	numactl \
-	openjdk-8-jdk \
-	pandoc \
-	pkg-config \
-	rapidjson-dev \
-	sudo \
-	wget \
-	whois \
- && rm -rf /var/lib/apt/lists/*
+PREFIX=/usr
 
-# Install valgrind
-COPY install-valgrind.sh install-valgrind.sh
-RUN ./install-valgrind.sh
+package_type=$1
 
-# Install pmdk
-COPY install-pmdk.sh install-pmdk.sh
-RUN ./install-pmdk.sh dpkg
+# Merge pull request #507 from pmem/stable-1.0, 29.10.2019
+current_pmemkv_version="fcde79c8232c6f1a05e17c7103c8f63605ebe902"
 
-# Install pmdk c++ bindings
-COPY install-libpmemobj-cpp.sh install-libpmemobj-cpp.sh
-RUN ./install-libpmemobj-cpp.sh DEB
+# Version 1.0.1, 28.10.2019
+stable_pmemkv_version="1.0.1"
 
-# Install memkind
-COPY install-memkind.sh install-memkind.sh
-RUN ./install-memkind.sh
+prepare_pmemkv () {
+	pmemkv_version="$1"
+	version_name="$2"
+	git checkout "$pmemkv_version"
+	mkdir build
+	cd build
+	cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+		-DCMAKE_INSTALL_PREFIX=$PREFIX \
+		-DCPACK_GENERATOR=$package_type \
+		-DBUILD_TESTS=OFF
+	make -j$(nproc) package
+	cd ..
+	mkdir /opt/"$version_name"
+	mv build/* /opt/"$version_name"
+	rm -rf build
+}
 
-# Add user
-ENV USER user
-ENV USERPASS pass
-RUN useradd -m $USER -g sudo -p `mkpasswd $USERPASS`
-USER $USER
+git clone https://github.com/pmem/pmemkv
+cd pmemkv
 
-# Set required environment variables
-ENV OS ubuntu
-ENV OS_VER 19.04
-ENV PACKAGE_MANAGER deb
-ENV NOTTY 1
+prepare_pmemkv "$current_pmemkv_version" "pmemkv-master"
+prepare_pmemkv "$stable_pmemkv_version" "pmemkv-stable-1.0"
+
+cd ..
+rm -r pmemkv
