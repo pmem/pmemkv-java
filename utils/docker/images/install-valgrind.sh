@@ -42,7 +42,7 @@ cd valgrind
 git checkout c27a8a2f973414934e63f1e94bc84c0a580e3840
 ./autogen.sh
 ./configure --prefix=/usr
-make
-sudo make install
+make -j$(nproc)
+sudo make -j$(nproc) install
 cd ..
 rm -r valgrind
