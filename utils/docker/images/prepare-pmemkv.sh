@@ -52,7 +52,8 @@ prepare_pmemkv () {
 	cd build
 	cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo \
 		-DCMAKE_INSTALL_PREFIX=$PREFIX \
-		-DCPACK_GENERATOR=$package_type
+		-DCPACK_GENERATOR=$package_type \
+		-DBUILD_TESTS=OFF
 	make package
 	cd ..
 	mkdir /opt/"$version_name"
