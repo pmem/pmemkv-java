@@ -38,10 +38,11 @@ set -e
 
 git clone https://github.com/pmem/pmdk
 cd pmdk
-# stable-1.6: Merge pull request #3856 from pmem/stable-1.5
-git checkout 7a39dd66eef934727bbb56a3bf34460bbdd92532
 
-make BUILD_PACKAGE_CHECK=n $1
+# stable-1.7: Merge pull request #4057 from ldorau/Add-BuildRequires-fdupes-to-spec-for-opensuse, 25.10.2019
+git checkout bfec2ca71b20ac4b56e1d7be9f51aa875d7c5efc
+
+make -j$(nproc) BUILD_PACKAGE_CHECK=n $1
 if [ "$1" = "dpkg" ]; then
       sudo dpkg -i dpkg/libpmem_*.deb dpkg/libpmem-dev_*.deb
       sudo dpkg -i dpkg/libpmemobj_*.deb dpkg/libpmemobj-dev_*.deb

@@ -72,7 +72,7 @@ fi
 imageName=${DOCKERHUB_REPO}:${OS}-${OS_VER}
 containerName=pmemkv-jni-${OS}-${OS_VER}
 
-pmemkv_version=$(echo $TYPE | cut -d'-' -f 2)
+pmemkv_version=$(echo $TYPE | cut -d'-' -f 2-)
 
 if [[ "$command" == "" ]]; then
 	command="./run-build.sh $pmemkv_version";

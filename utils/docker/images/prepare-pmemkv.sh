@@ -38,10 +38,11 @@ set -e
 
 package_type=$1
 
-# stable_pmemkv_version="0.8"
+# Merge pull request #507 from pmem/stable-1.0, 29.10.2019
+current_pmemkv_version="fcde79c8232c6f1a05e17c7103c8f63605ebe902"
 
-# commit: Merge pull request #456 from karczex/multithreaded_cmap_test; 27.09.2019
-current_pmemkv_version="70b4a1272dc0e0be1ed716ff8797092396295759"
+# Version 1.0.1, 28.10.2019
+stable_pmemkv_version="1.0.1"
 
 prepare_pmemkv () {
 	pmemkv_version="$1"
@@ -51,8 +52,9 @@ prepare_pmemkv () {
 	cd build
 	cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo \
 		-DCMAKE_INSTALL_PREFIX=$PREFIX \
-		-DCPACK_GENERATOR=$package_type
-	make package
+		-DCPACK_GENERATOR=$package_type \
+		-DBUILD_TESTS=OFF
+	make -j$(nproc) package
 	cd ..
 	mkdir /opt/"$version_name"
 	mv build/* /opt/"$version_name"
@@ -62,8 +64,8 @@ prepare_pmemkv () {
 git clone https://github.com/pmem/pmemkv
 cd pmemkv
 
-# prepare_pmemkv "$stable_pmemkv_version" "pmemkv-stable"
 prepare_pmemkv "$current_pmemkv_version" "pmemkv-master"
+prepare_pmemkv "$stable_pmemkv_version" "pmemkv-stable-1.0"
 
 cd ..
 rm -r pmemkv

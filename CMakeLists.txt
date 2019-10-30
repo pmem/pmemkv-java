@@ -40,25 +40,6 @@ find_package(PkgConfig QUIET)
 include(ExternalProject)
 include(FindThreads)
 
-set(GTEST_URL ${CMAKE_SOURCE_DIR}/googletest-${GTEST_VERSION}.zip)
-if(EXISTS ${GTEST_URL})
-	# do nothing
-else()
-execute_process(COMMAND wget -O ${GTEST_URL} https://github.com/google/googletest/archive/release-${GTEST_VERSION}.zip)
-endif()
-ExternalProject_Add(gtest
-    URL ${GTEST_URL}
-    PREFIX ${CMAKE_CURRENT_BINARY_DIR}/gtest
-    INSTALL_COMMAND ""
-    CMAKE_ARGS -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
-)
-ExternalProject_Get_Property(gtest source_dir binary_dir)
-add_library(libgtest IMPORTED STATIC GLOBAL)
-add_dependencies(libgtest gtest)
-set_target_properties(libgtest PROPERTIES
-	"IMPORTED_LOCATION" "${binary_dir}/libgtest.a"
-	"IMPORTED_LINK_INTERFACE_LIBRARIES" "${CMAKE_THREAD_LIBS_INIT}"
-)
 include_directories("${source_dir}/include")
 
 find_package(JNI)
@@ -68,5 +49,26 @@ link_directories(${JNI_LIBRARIES})
 add_library(pmemkv-jni SHARED ${SOURCE_FILES})
 target_link_libraries(pmemkv-jni pmemkv pmemkv_json_config)
 
-add_executable(pmemkv-jni_test src/pmemkv-jni_test.cc)
-target_link_libraries(pmemkv-jni_test pmemkv libgtest)
+# CMake option 'CMAKE_PREFIX_PATH' will be prioritized
+# over system paths in find_library and find_path calls
+find_library(GTEST NAMES gtest)
+if(GTEST)
+	message(STATUS "Gtest found in ${GTEST}")
+
+	find_path(GTEST_INCLUDEDIR "gtest/gtest.h")
+	if (GTEST_INCLUDEDIR)
+		message(STATUS "Gtest headers found in ${GTEST_INCLUDEDIR}")
+		include_directories(${GTEST_INCLUDEDIR})
+	endif()
+
+	add_library(libgtest IMPORTED STATIC GLOBAL)
+	set_target_properties(libgtest PROPERTIES "IMPORTED_LOCATION" "${GTEST}"
+		"IMPORTED_LINK_INTERFACE_LIBRARIES" "${CMAKE_THREAD_LIBS_INIT}")
+
+	add_executable(pmemkv-jni_test src/pmemkv-jni_test.cc)
+	target_link_libraries(pmemkv-jni_test pmemkv libgtest pthread)
+else()
+	message(FATAL_ERROR "Gtest is not installed or couldn't be found. Try using cmake option "
+			"-DCMAKE_PREFIX_PATH=<dir with lib and include dirs for gtest>. "
+			"Use e.g. like 'cmake .. -DCMAKE_PREFIX_PATH=/install/path/gtest/'")
+endif()

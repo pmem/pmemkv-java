@@ -9,9 +9,8 @@ services:
 
 env:
   matrix:
-          - TYPE=pmemkv-master OS=ubuntu OS_VER=19.04 PUSH_IMAGE=1
-          # XXX enable it when the 'stable-1.0' branch is available
-          # - TYPE=pmemkv-stable OS=ubuntu OS_VER=19.04 PUSH_IMAGE=1
+          - TYPE=pmemkv-master OS=ubuntu OS_VER=19.10 PUSH_IMAGE=1
+          - TYPE=pmemkv-stable-1.0 OS=ubuntu OS_VER=19.10
 
 before_install:
   - echo $TRAVIS_COMMIT_RANGE
