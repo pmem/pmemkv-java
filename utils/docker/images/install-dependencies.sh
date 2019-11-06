@@ -57,7 +57,7 @@ cd /opt/pmemkv-stable-1.0/
 if [ "${PACKAGE_MANAGER}" = "DEB" ]; then
 	echo $USERPASS | sudo -S dpkg -i libpmemkv*.deb
 elif [ "${PACKAGE_MANAGER}" = "RPM" ]; then
-	echo $USERPASS | sudo -S RPM -i libpmemkv*.rpm
+	echo $USERPASS | sudo -S rpm -i libpmemkv*.rpm
 fi
 
 #
@@ -92,7 +92,7 @@ mv -v ~/.m2/repository /opt/java/
 if [ "${PACKAGE_MANAGER}" = "DEB" ]; then
 	echo $USERPASS | sudo -S dpkg -r $(apt list --installed | grep -e libpmemkv | cut -d'/' -f1)
 elif [ "${PACKAGE_MANAGER}" = "RPM" ]; then
-	echo $USERPASS | sudo -S RPM -e $(rpm -qa | grep -e libpmemkv)
+	echo $USERPASS | sudo -S rpm -e $(rpm -qa | grep -e libpmemkv)
 fi
 
 cd $WORKDIR
