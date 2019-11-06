@@ -39,9 +39,6 @@ PREFIX=/usr
 
 set -e
 
-export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
-export JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8
-
 # install pmemkv
 pmemkv_version=$1
 cd /opt/pmemkv-$pmemkv_version/
