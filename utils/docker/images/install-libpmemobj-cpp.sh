@@ -32,26 +32,35 @@
 
 #
 # install-libpmemobj-cpp.sh <package_type>
-#           - installs PMDK C++ bindings (stable) packages
+#			- installs PMDK C++ bindings (libpmemobj-cpp)
 #
 
 set -e
 
-git clone https://github.com/pmem/libpmemobj-cpp
-cd libpmemobj-cpp
+PREFIX=/usr
+PACKAGE_TYPE=$1
 
-# stable 1.8: Merge pull request #502 from ldorau/Fix-installing-libpmem-.rpm, 29.10.2019
-git checkout 50d59fcc64d22b9e50e34c65b2c406a0040b15b3
+# master: Merge pull request #495 from MisterArslan/persistent_tls, 15.11.2019
+LIBPMEMOBJ_CPP_VERSION=8e390f36b98a2a09a7acce4541a29272387373d2
+
+git clone https://github.com/pmem/libpmemobj-cpp --shallow-since=2019-10-02
+cd libpmemobj-cpp
+git checkout $LIBPMEMOBJ_CPP_VERSION
 
 mkdir build
 cd build
 
-cmake .. -DCPACK_GENERATOR="$1" -DCMAKE_INSTALL_PREFIX=/usr
-make -j$(nproc) package
-if [ "$1" = "DEB" ]; then
-      sudo dpkg -i libpmemobj++*.deb
-elif [ "$1" = "RPM" ]; then
-      sudo rpm -i libpmemobj++*.rpm
+cmake .. -DCPACK_GENERATOR="$PACKAGE_TYPE" -DCMAKE_INSTALL_PREFIX=$PREFIX
+
+if [ "$PACKAGE_TYPE" = "" ]; then
+	make -j$(nproc) install
+else
+	make -j$(nproc) package
+	if [ "$PACKAGE_TYPE" = "DEB" ]; then
+		sudo dpkg -i libpmemobj++*.deb
+	elif [ "$PACKAGE_TYPE" = "RPM" ]; then
+		sudo rpm -i libpmemobj++*.rpm
+	fi
 fi
 
 cd ../..
