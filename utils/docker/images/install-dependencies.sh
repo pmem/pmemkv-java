@@ -32,7 +32,7 @@
 
 #
 # install-dependencies.sh - install Java dependencies
-#                           so that it can be built offline
+#							so that it can be built offline
 #
 
 set -e
@@ -40,11 +40,11 @@ set -e
 # package manager: DEB or RPM
 PACKAGE_MANAGER=$1
 
-# Merge pull request #30 from ldorau/Fixes-after-review, 30.10.2019
-JNI_VERSION="41499c7f3bdc16459bf73d458049f81084d64001"
+# master: Merge pull request #33 from lukaszstolarczuk/update-tr..., 21.11.2019
+JNI_VERSION="5239d6bb3214c56bc45b3296872be50b38bfbab3"
 
-# add ChangeLog 0.9, 4.10.2019
-JAVA_VERSION="0.9"
+# master: Merge pull request #32 from lukaszstolarczuk/update-tr..., 21.11.2019
+JAVA_VERSION="0ef77ee1d0b6b39ffe1cde9fb0ceec10e8a94aba"
 
 PREFIX=/usr
 
