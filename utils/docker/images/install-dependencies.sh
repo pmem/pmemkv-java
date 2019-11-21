@@ -57,7 +57,7 @@ cd /opt/pmemkv-stable-1.0/
 if [ "${PACKAGE_MANAGER}" = "DEB" ]; then
 	echo $USERPASS | sudo -S dpkg -i libpmemkv*.deb
 elif [ "${PACKAGE_MANAGER}" = "RPM" ]; then
-	echo $USERPASS | sudo -S RPM -i libpmemkv*.rpm
+	echo $USERPASS | sudo -S rpm -i libpmemkv*.rpm
 fi
 
 #
@@ -76,8 +76,6 @@ echo $USERPASS | sudo -S make install prefix=$PREFIX
 #                        in the /opt/java directory
 cd $WORKDIR
 mkdir /opt/java/
-export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
-export JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8
 
 git clone https://github.com/pmem/pmemkv-java.git
 cd pmemkv-java
@@ -92,7 +90,7 @@ mv -v ~/.m2/repository /opt/java/
 if [ "${PACKAGE_MANAGER}" = "DEB" ]; then
 	echo $USERPASS | sudo -S dpkg -r $(apt list --installed | grep -e libpmemkv | cut -d'/' -f1)
 elif [ "${PACKAGE_MANAGER}" = "RPM" ]; then
-	echo $USERPASS | sudo -S RPM -e $(rpm -qa | grep -e libpmemkv)
+	echo $USERPASS | sudo -S rpm -e $(rpm -qa | grep -e libpmemkv)
 fi
 
 cd $WORKDIR
