@@ -55,9 +55,7 @@ echo
 echo "###########################################################"
 echo "### Verifying building and installing of the java bindings "
 echo "###########################################################"
-cd ~
-git clone https://github.com/pmem/pmemkv-java.git
-cd pmemkv-java
+cd $WORKDIR
 mkdir -p ~/.m2/repository
 cp -r /opt/java/repository ~/.m2/
 mvn --offline install
