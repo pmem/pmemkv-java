@@ -46,7 +46,7 @@
         <dependency>
             <groupId>com.mscharhag.oleaster</groupId>
             <artifactId>oleaster-matcher</artifactId>
-            <version>0.2</version>
+            <version>0.2.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>

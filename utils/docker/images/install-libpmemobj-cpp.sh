@@ -40,8 +40,8 @@ set -e
 PREFIX=/usr
 PACKAGE_TYPE=$1
 
-# master: Merge pull request #495 from MisterArslan/persistent_tls, 15.11.2019
-LIBPMEMOBJ_CPP_VERSION=8e390f36b98a2a09a7acce4541a29272387373d2
+# master: Merge pull request #530 from igchor/fix_warning_tls; 3.12.2019
+LIBPMEMOBJ_CPP_VERSION=438ec8b2be263a335b9f3be5115993a01007a390
 
 git clone https://github.com/pmem/libpmemobj-cpp --shallow-since=2019-10-02
 cd libpmemobj-cpp
