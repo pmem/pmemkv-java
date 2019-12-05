@@ -11,16 +11,12 @@ All known issues and limitations are logged as GitHub issues.
 * [PMDK](https://github.com/pmem/pmdk) - native persistent memory libraries
 * [pmemkv](https://github.com/pmem/pmemkv) - native key/value library
 * [pmemkv-jni](https://github.com/pmem/pmemkv-jni) - JNI integration library
+* [Apache Maven](https://maven.apache.org) - build system
 * Used only for development & testing:
-  * [Apache Maven](https://maven.apache.org) - build system
   * [JUnit](http://junit.org/) - automated test framework
   * [Oleaster Matcher](https://github.com/mscharhag/oleaster/tree/master/oleaster-matcher) - test condition matching library
 
 ## Installation
-
-Start by installing [pmemkv](https://github.com/pmem/pmemkv/blob/master/INSTALLING.md) on your system.
-
-Next install [pmemkv-jni](https://github.com/pmem/pmemkv-jni).
 
 It may be necessary to [configure a proxy](https://maven.apache.org/guides/mini/guide-proxies.html) and set `JAVA_HOME` & `JAVA_TOOL_OPTIONS` environment variables:
 
@@ -28,6 +24,12 @@ It may be necessary to [configure a proxy](https://maven.apache.org/guides/mini/
 export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 export JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8
 ```
+
+Install dependencies:
+
+First, install [pmemkv](https://github.com/pmem/pmemkv/blob/master/INSTALLING.md) on your system.
+
+Next install [pmemkv-jni](https://github.com/pmem/pmemkv-jni).
 
 Clone the pmemkv-java tree:
 
@@ -37,6 +39,13 @@ cd pmemkv-java
 ```
 
 Finish by installing these bindings:
+
+```
+mvn install
+```
+
+If dependencies (pmemkv, pmdk or pmemkv-jni) are installed in non-standard location
+it may be necessary to set LD_LIBRARY_PATH for mvn:
 
 ```
 LD_LIBRARY_PATH=path_to_your_libs mvn install
@@ -59,6 +68,7 @@ in example.
 Example can be found within this repository in [examples directory](https://github.com/pmem/pmemkv-java/tree/master/examples).
 To execute the example:
 ```
+cd examples
 javac -cp ../target/*.jar BasicExample.java
 PMEM_IS_PMEM_FORCE=1 java -ea -Xms1G -cp .:`find ../target -name *.jar` -Djava.library.path=/usr/local/lib BasicExample
 ```
