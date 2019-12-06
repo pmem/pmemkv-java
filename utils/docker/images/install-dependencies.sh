@@ -43,8 +43,8 @@ PACKAGE_MANAGER=$1
 # Merge pull request #34 from igchor/add_pmemkv_errormsg, 06.12.2019
 JNI_VERSION="fcc8370b230ab3236d062a121e22dcebf37b90ec"
 
-# add ChangeLog 0.9, 4.10.2019
-JAVA_VERSION="0.9"
+# master: Merge pull request #35 from igchor/update_readme, 06.12.2019
+JAVA_VERSION="e295c98e9a982c1f2f45fc0482e02dd13fc13189"
 
 PREFIX=/usr
 
