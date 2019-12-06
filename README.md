@@ -8,8 +8,6 @@ All known issues and limitations are logged as GitHub issues.
 ## Dependencies
 
 * Java 8 or higher
-* [PMDK](https://github.com/pmem/pmdk) - native persistent memory libraries
-* [pmemkv](https://github.com/pmem/pmemkv) - native key/value library
 * [pmemkv-jni](https://github.com/pmem/pmemkv-jni) - JNI integration library
 * [Apache Maven](https://maven.apache.org) - build system
 * Used only for development & testing:
@@ -25,11 +23,7 @@ export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 export JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8
 ```
 
-Install dependencies:
-
-First, install [pmemkv](https://github.com/pmem/pmemkv/blob/master/INSTALLING.md) on your system.
-
-Next install [pmemkv-jni](https://github.com/pmem/pmemkv-jni).
+Install [pmemkv-jni](https://github.com/pmem/pmemkv-jni#installation).
 
 Clone the pmemkv-java tree:
 
