@@ -40,8 +40,8 @@ set -e
 # package manager: DEB or RPM
 PACKAGE_MANAGER=$1
 
-# Merge pull request #30 from ldorau/Fixes-after-review, 30.10.2019
-JNI_VERSION="41499c7f3bdc16459bf73d458049f81084d64001"
+# Merge pull request #34 from igchor/add_pmemkv_errormsg, 06.12.2019
+JNI_VERSION="fcc8370b230ab3236d062a121e22dcebf37b90ec"
 
 # add ChangeLog 0.9, 4.10.2019
 JAVA_VERSION="0.9"
