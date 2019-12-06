@@ -237,7 +237,6 @@ public class DatabaseTest {
             Assert.fail();
         } catch (DatabaseException kve) {
             expect(kve.getKey()).toBeNull();
-            expect(kve.getMessage()).toEqual("Failed to open pmemkv"); // XXX
         } catch (Exception e) {
             Assert.fail();
         }
@@ -252,7 +251,6 @@ public class DatabaseTest {
             Assert.fail();
         } catch (DatabaseException kve) {
             expect(kve.getKey()).toBeNull();
-            expect(kve.getMessage()).toEqual("JSON parsing error"); // XXX
         } catch (Exception e) {
             Assert.fail();
         }
@@ -267,7 +265,6 @@ public class DatabaseTest {
             Assert.fail();
         } catch (DatabaseException kve) {
             expect(kve.getKey()).toBeNull();
-            expect(kve.getMessage()).toEqual("Failed to open pmemkv"); // XXX
         } catch (Exception e) {
             Assert.fail();
         }
@@ -282,7 +279,6 @@ public class DatabaseTest {
             Assert.fail();
         } catch (DatabaseException kve) {
             expect(kve.getKey()).toBeNull();
-            expect(kve.getMessage()).toEqual("Failed to open pmemkv"); // XXX
         } catch (Exception e) {
             Assert.fail();
         }
@@ -297,7 +293,6 @@ public class DatabaseTest {
             Assert.fail();
         } catch (DatabaseException kve) {
             expect(kve.getKey()).toBeNull();
-            expect(kve.getMessage()).toEqual("Failed to open pmemkv"); // XXX
         } catch (Exception e) {
             Assert.fail();
         }
