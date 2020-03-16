@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Copyright 2019, Intel Corporation
+# Copyright 2019-2020, Intel Corporation
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -43,8 +43,8 @@ PACKAGE_MANAGER=$1
 # Merge pull request #34 from igchor/add_pmemkv_errormsg, 06.12.2019
 JNI_VERSION="fcc8370b230ab3236d062a121e22dcebf37b90ec"
 
-# master: Merge pull request #35 from igchor/update_readme, 06.12.2019
-JAVA_VERSION="e295c98e9a982c1f2f45fc0482e02dd13fc13189"
+# master: Merge pull request #37 from lukaszstolarczuk/set-new-j..., 06.12.2019
+JAVA_VERSION="49c0fbe4f8727b279c7aa073963792471bb5dbe7"
 
 PREFIX=/usr
 
@@ -53,7 +53,7 @@ WORKDIR=$(pwd)
 #
 # 1) Install PMEMKV
 #
-cd /opt/pmemkv-stable-1.0/
+cd /opt/pmemkv-stable-1.1/
 if [ "${PACKAGE_MANAGER}" = "DEB" ]; then
 	echo $USERPASS | sudo -S dpkg -i libpmemkv*.deb
 elif [ "${PACKAGE_MANAGER}" = "RPM" ]; then
