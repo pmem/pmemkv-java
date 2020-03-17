@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Copyright 2019, Intel Corporation
+# Copyright 2019-2020, Intel Corporation
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -39,10 +39,12 @@ set -e
 PREFIX=/usr
 PACKAGE_TYPE=$1
 
-# master: Merge pull request #553 from pmem/stable-1.0; 4.12.2019
-current_pmemkv_version="fefdce23acac4a2057705f17d5307a5ba5721e77"
-# stable-1.0: Merge pull request #508 from lukaszstolarczuk/set-manpage-alw...; 4.12.2019
-stable_1_pmemkv_version="000d63f41bb6efec8e74ad10f1155f02c6a186be"
+# master: Merge pull request #612 from igchor/test_refactor; 2.03.2020
+current_pmemkv_version="df171fb9bc55c8d3f060ec2dbdeee945a99e7b52"
+# stable-1.0: Merge pull request #618 from lukaszstolarczuk/add-hu...; 4.03.2020
+stable_1_pmemkv_version="1c15e615dd4ac25aa6fe269c955327b80a4d26dc"
+# stable-1.1: Version 1.1; 31.01.2020
+stable_1_1_pmemkv_version="2f719305afb0f44103734851cfe825e1b1d73dbf"
 
 prepare_pmemkv () {
 	pmemkv_version="$1"
@@ -66,6 +68,7 @@ cd pmemkv
 
 prepare_pmemkv "$current_pmemkv_version" "pmemkv-master"
 prepare_pmemkv "$stable_1_pmemkv_version" "pmemkv-stable-1.0"
+prepare_pmemkv "$stable_1_1_pmemkv_version" "pmemkv-stable-1.1"
 
 cd ..
 rm -r pmemkv
