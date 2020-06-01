@@ -32,7 +32,6 @@
 #
 # Dockerfile - a 'recipe' for Docker to build an image of fedora-based
 #              environment prepared for running pmemkv-java build and tests.
-#
 
 # Pull base image
 FROM fedora:31
@@ -68,6 +67,7 @@ RUN dnf update -y \
 	ndctl-devel \
 	numactl-devel \
 	java-11-openjdk \
+	java-1.8.0-openjdk-devel \
 	pandoc \
 	rapidjson-devel \
 	rpm-build \

@@ -73,6 +73,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
 	maven \
 	numactl \
 	openjdk-11-jdk \
+	openjdk-8-jdk \
 	pandoc \
 	pkg-config \
 	rapidjson-dev \
