@@ -70,6 +70,7 @@ echo "###########################################################"
 echo "### Verifying building and installing of the java bindings "
 echo "###########################################################"
 cd $WORKDIR
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${WORKDIR}/build
 mkdir -p ~/.m2/repository
 cp -r /opt/java/repository ~/.m2/
 mvn install
