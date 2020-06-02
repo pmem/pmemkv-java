@@ -40,9 +40,6 @@ set -e
 # package manager: DEB or RPM
 PACKAGE_MANAGER=$1
 
-# Merge pull request #34 from igchor/add_pmemkv_errormsg, 06.12.2019
-JNI_VERSION="fcc8370b230ab3236d062a121e22dcebf37b90ec"
-
 # master: Merge pull request #37 from lukaszstolarczuk/set-new-j..., 06.12.2019
 JAVA_VERSION="49c0fbe4f8727b279c7aa073963792471bb5dbe7"
 
@@ -61,17 +58,7 @@ elif [ "${PACKAGE_MANAGER}" = "RPM" ]; then
 fi
 
 #
-# 2) Build and install JNI
-#
-cd $WORKDIR
-git clone https://github.com/pmem/pmemkv-jni.git
-cd pmemkv-jni
-git checkout $JNI_VERSION
-make test
-echo $USERPASS | sudo -S make install prefix=$PREFIX
-
-#
-# 3) JAVA dependencies - all of the dependencies needed to run
+# 2) JAVA dependencies - all of the dependencies needed to run
 #                        pmemkv-java will be saved
 #                        in the /opt/java directory
 cd $WORKDIR
@@ -94,7 +81,7 @@ elif [ "${PACKAGE_MANAGER}" = "RPM" ]; then
 fi
 
 cd $WORKDIR
-rm -r pmemkv-jni pmemkv-java
+rm -r pmemkv-java
 
 # make the /opt/java directory world-readable
 chmod -R a+r /opt/java
