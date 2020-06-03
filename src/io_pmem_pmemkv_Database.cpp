@@ -384,22 +384,17 @@ struct ContextGetAllBuffer {
 #define CONTEXT_GET_ALL_BUFFER {env, callback, mid, 0, nullptr, nullptr, 0, nullptr, nullptr}
 
 const auto CALLBACK_GET_ALL_BUFFER = [](const char* k, size_t kb, const char* v, size_t vb, void *arg) -> int {
-    const auto c = ((ContextGetAllBuffer*) arg);
-    if (kb > c->keybytes) {
-        if (c->keybuf != nullptr) c->env->DeleteLocalRef(c->keybuf);
-        c->keybytes = kb;
-        c->key = new char[kb];
-        c->keybuf = c->env->NewDirectByteBuffer(c->key, kb);
-    }
-    if (vb > c->valuebytes) {
-        if (c->valuebuf != nullptr) c->env->DeleteLocalRef(c->valuebuf);
-        c->valuebytes = vb;
-        c->value = new char[vb];
-        c->valuebuf = c->env->NewDirectByteBuffer(c->value, vb);
-    }
-    std::memcpy(c->key, k, kb);
-    std::memcpy(c->value, v, vb);
+    const auto c = static_cast<ContextGetAllBuffer*>(arg);
+    if (c->keybuf != nullptr) c->env->DeleteLocalRef(c->keybuf);
+    c->keybuf = c->env->NewDirectByteBuffer( const_cast<char*>(k), kb);
+
+    if (c->valuebuf != nullptr) c->env->DeleteLocalRef(c->valuebuf);
+    c->valuebuf = c->env->NewDirectByteBuffer(const_cast<char*>(v), vb);
+
     c->env->CallVoidMethod(c->callback, c->mid, kb, c->keybuf, vb, c->valuebuf);
+
+    c->keybuf = nullptr;
+    c->valuebuf = nullptr;
     return 0;
 };
 
