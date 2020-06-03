@@ -48,16 +48,6 @@ PREFIX=/usr
 WORKDIR=$(pwd)
 
 #
-# 1) Install PMEMKV
-#
-cd /opt/pmemkv-stable-1.1/
-if [ "${PACKAGE_MANAGER}" = "DEB" ]; then
-	echo $USERPASS | sudo -S dpkg -i libpmemkv*.deb
-elif [ "${PACKAGE_MANAGER}" = "RPM" ]; then
-	echo $USERPASS | sudo -S rpm -i libpmemkv*.rpm
-fi
-
-#
 # 2) JAVA dependencies - all of the dependencies needed to run
 #                        pmemkv-java will be saved
 #                        in the /opt/java directory
@@ -70,15 +60,6 @@ git checkout $JAVA_VERSION
 mvn dependency:go-offline
 mvn install -Dmaven.test.skip=true
 mv -v ~/.m2/repository /opt/java/
-
-#
-# Uninstall all unneeded stuff
-#
-if [ "${PACKAGE_MANAGER}" = "DEB" ]; then
-	echo $USERPASS | sudo -S dpkg -r $(apt list --installed | grep -e libpmemkv | cut -d'/' -f1)
-elif [ "${PACKAGE_MANAGER}" = "RPM" ]; then
-	echo $USERPASS | sudo -S rpm -e $(rpm -qa | grep -e libpmemkv)
-fi
 
 cd $WORKDIR
 rm -r pmemkv-java
