@@ -105,15 +105,11 @@ struct ContextGetKeysBuffer {
 #define CONTEXT_GET_KEYS_BUFFER {env, callback, mid, 0, nullptr, nullptr}
 
 const auto CALLBACK_GET_KEYS_BUFFER = [](const char* k, size_t kb, const char* v, size_t vb, void *arg) -> int {
-    const auto c = ((ContextGetKeysBuffer*) arg);
-    if (kb > c->keybytes) {
-        if (c->keybuf != nullptr) c->env->DeleteLocalRef(c->keybuf);
-        c->keybytes = kb;
-        c->key = new char[kb];
-        c->keybuf = c->env->NewDirectByteBuffer(c->key, kb);
-    }
-    std::memcpy(c->key, k, kb);
+    const auto c = static_cast<ContextGetKeysBuffer*>(arg);
+    if (c->keybuf != nullptr) c->env->DeleteLocalRef(c->keybuf);
+    c->keybuf = c->env->NewDirectByteBuffer(const_cast<char*>(k), kb);
     c->env->CallVoidMethod(c->callback, c->mid, kb, c->keybuf);
+    c->keybuf = nullptr;
     return 0;
 };
 
