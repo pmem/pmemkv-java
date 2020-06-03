@@ -68,7 +68,7 @@ git clone https://github.com/pmem/pmemkv-java.git
 cd pmemkv-java
 git checkout $JAVA_VERSION
 mvn dependency:go-offline
-mvn install
+mvn install -Dmaven.test.skip=true
 mv -v ~/.m2/repository /opt/java/
 
 #
