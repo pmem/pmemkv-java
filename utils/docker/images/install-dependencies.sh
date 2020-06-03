@@ -51,18 +51,17 @@ WORKDIR=$(pwd)
 # 2) JAVA dependencies - all of the dependencies needed to run
 #                        pmemkv-java will be saved
 #                        in the /opt/java directory
-cd $WORKDIR
 mkdir /opt/java/
 
-git clone https://github.com/pmem/pmemkv-java.git
-cd pmemkv-java
+deps_dir=$(mktemp -d)
+git clone https://github.com/pmem/pmemkv-java.git ${deps_dir}
+pushd ${deps_dir}
 git checkout $JAVA_VERSION
 mvn dependency:go-offline
 mvn install -Dmaven.test.skip=true
 mv -v ~/.m2/repository /opt/java/
-
-cd $WORKDIR
-rm -r pmemkv-java
+popd
+rm -r ${deps_dir}
 
 # make the /opt/java directory world-readable
 chmod -R a+r /opt/java
