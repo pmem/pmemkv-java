@@ -40,9 +40,6 @@ set -e
 # package manager: DEB or RPM
 PACKAGE_MANAGER=$1
 
-# Merge pull request #34 from igchor/add_pmemkv_errormsg, 06.12.2019
-JNI_VERSION="fcc8370b230ab3236d062a121e22dcebf37b90ec"
-
 # master: Merge pull request #37 from lukaszstolarczuk/set-new-j..., 06.12.2019
 JAVA_VERSION="49c0fbe4f8727b279c7aa073963792471bb5dbe7"
 
@@ -51,50 +48,20 @@ PREFIX=/usr
 WORKDIR=$(pwd)
 
 #
-# 1) Install PMEMKV
-#
-cd /opt/pmemkv-stable-1.1/
-if [ "${PACKAGE_MANAGER}" = "DEB" ]; then
-	echo $USERPASS | sudo -S dpkg -i libpmemkv*.deb
-elif [ "${PACKAGE_MANAGER}" = "RPM" ]; then
-	echo $USERPASS | sudo -S rpm -i libpmemkv*.rpm
-fi
-
-#
-# 2) Build and install JNI
-#
-cd $WORKDIR
-git clone https://github.com/pmem/pmemkv-jni.git
-cd pmemkv-jni
-git checkout $JNI_VERSION
-make test
-echo $USERPASS | sudo -S make install prefix=$PREFIX
-
-#
-# 3) JAVA dependencies - all of the dependencies needed to run
+# 2) JAVA dependencies - all of the dependencies needed to run
 #                        pmemkv-java will be saved
 #                        in the /opt/java directory
-cd $WORKDIR
 mkdir /opt/java/
 
-git clone https://github.com/pmem/pmemkv-java.git
-cd pmemkv-java
+deps_dir=$(mktemp -d)
+git clone https://github.com/pmem/pmemkv-java.git ${deps_dir}
+pushd ${deps_dir}
 git checkout $JAVA_VERSION
 mvn dependency:go-offline
-mvn install
+mvn install -Dmaven.test.skip=true
 mv -v ~/.m2/repository /opt/java/
-
-#
-# Uninstall all unneeded stuff
-#
-if [ "${PACKAGE_MANAGER}" = "DEB" ]; then
-	echo $USERPASS | sudo -S dpkg -r $(apt list --installed | grep -e libpmemkv | cut -d'/' -f1)
-elif [ "${PACKAGE_MANAGER}" = "RPM" ]; then
-	echo $USERPASS | sudo -S rpm -e $(rpm -qa | grep -e libpmemkv)
-fi
-
-cd $WORKDIR
-rm -r pmemkv-jni pmemkv-java
+popd
+rm -r ${deps_dir}
 
 # make the /opt/java directory world-readable
 chmod -R a+r /opt/java
