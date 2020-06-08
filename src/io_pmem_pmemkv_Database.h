@@ -297,6 +297,14 @@ JNIEXPORT jint JNICALL Java_io_pmem_pmemkv_Database_database_1get_1buffer
 
 /*
  * Class:     io_pmem_pmemkv_Database
+ * Method:    database_get_buffer_with_callback
+ * Signature: (JILjava/nio/ByteBuffer;Lio/pmem/pmemkv/internal/GetKeysBuffersJNICallback;)V
+ */
+JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1buffer_1with_1callback
+  (JNIEnv *, jobject, jlong, jint, jobject, jobject);
+
+/*
+ * Class:     io_pmem_pmemkv_Database
  * Method:    database_get_bytes
  * Signature: (J[B)[B
  */
