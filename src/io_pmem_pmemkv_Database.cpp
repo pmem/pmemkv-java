@@ -532,6 +532,16 @@ const auto CALLBACK_GET = [](const char* v, size_t vb, void *arg)  {
     c->env->SetByteArrayRegion(c->result, 0, vb, (jbyte*) v);
 };
 
+
+extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1buffer_1with_1callback
+        (JNIEnv* env, jobject obj, jlong pointer, jint keybytes, jobject key, jobject callback) {
+    auto engine = (pmemkv_db*) pointer;
+    const char* ckey = (char*) env->GetDirectBufferAddress(key);
+    auto cxt = Context(env, callback, METHOD_GET_KEYS_BUFFER);
+    auto status = pmemkv_get(engine, ckey, keybytes, Callback_get_value_buffer, &cxt);
+    if (status != PMEMKV_STATUS_OK) env->ThrowNew(env->FindClass(EXCEPTION_CLASS), pmemkv_errormsg());
+}
+
 extern "C" JNIEXPORT jbyteArray JNICALL Java_io_pmem_pmemkv_Database_database_1get_1bytes
         (JNIEnv* env, jobject obj, jlong pointer, jbyteArray key) {
     auto engine = (pmemkv_db*) pointer;
