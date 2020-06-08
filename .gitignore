@@ -1,11 +1,13 @@
 .*
 !.gitignore
 !.gitattributes
+!.github/
 !.travis.yml
 *.iml
 *.log
 target/
 *.d
-bin/
-build/
+/bin/
+/build/
 cmake-build-debug/
+*~
