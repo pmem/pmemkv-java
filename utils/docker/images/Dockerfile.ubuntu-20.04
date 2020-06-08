@@ -18,6 +18,12 @@ ENV NOTTY 1
 ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64
 ENV JAVA_TOOL_OPTIONS -Dfile.encoding=UTF-8
 
+# Additional parameters to build docker without building components
+ARG SKIP_PMDK_BUILD
+ARG SKIP_LIBPMEMOBJ_CPP_BUILD
+ARG SKIP_PMEMKV_BUILD
+ARG SKIP_VALGRIND_BUILD
+
 # Update the Apt cache and install basic tools
 RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
