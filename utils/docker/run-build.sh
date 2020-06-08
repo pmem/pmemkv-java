@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright 2019, Intel Corporation
+# Copyright 2019-2020, Intel Corporation
 
 #
-# run-build.sh - checks bindings' building and installation
-#                with given version of pmemkv
+# run-build.sh - is called inside a Docker container; checks bindings' building
+#                and installation with given version of pmemkv
 #
-
-PREFIX=/usr
 
 set -e
+
+source `dirname $0`/prepare-for-build.sh
 
 # install pmemkv
 pmemkv_version=$1
@@ -22,7 +22,6 @@ else
 	echo "PACKAGE_MANAGER env variable not set or set improperly ('deb' or 'rpm' supported)."
 	exit 1
 fi
-
 
 echo "#####################################################"
 echo "### Verifying building and tests execution of the jni"
