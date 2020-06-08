@@ -15,6 +15,11 @@ PACKAGE_TYPE=$1
 # master: Version 1.10; 28.05.2020
 LIBPMEMOBJ_CPP_VERSION="1.10"
 
+if [ "${SKIP_LIBPMEMOBJ_CPP_BUILD}" ]; then
+	echo "Variable 'SKIP_LIBPMEMOBJ_CPP_BUILD' is set; skipping building of libpmemobj-cpp"
+	exit
+fi
+
 git clone https://github.com/pmem/libpmemobj-cpp --shallow-since=2020-04-28
 cd libpmemobj-cpp
 git checkout $LIBPMEMOBJ_CPP_VERSION

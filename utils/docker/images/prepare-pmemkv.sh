@@ -23,6 +23,11 @@ stable_1_1_pmemkv_version="d4de10fa09d0ce99eb15d53f7311f1b4e7c56d47"
 # stable-1.2: Version 1.2; 29.05.2020
 stable_1_2_pmemkv_version="1.2"
 
+if [ "${SKIP_PMEMKV_BUILD}" ]; then
+	echo "Variable 'SKIP_PMEMKV_BUILD' is set; skipping building of pmemkv"
+	exit
+fi
+
 prepare_pmemkv () {
 	pmemkv_version="$1"
 	version_name="$2"
