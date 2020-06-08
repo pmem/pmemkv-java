@@ -51,10 +51,8 @@ TAG="1.0-${OS}-${OS_VER}"
 imageName=${DOCKERHUB_REPO}:${TAG}
 containerName=pmemkv-java-${OS}-${OS_VER}
 
-pmemkv_version=$(echo $TYPE | cut -d'-' -f 2-)
-
 if [[ "$command" == "" ]]; then
-	command="./run-build.sh $pmemkv_version";
+	command="./run-build.sh $PMEMKV";
 fi
 
 if [ "$COVERAGE" == "1" ]; then
