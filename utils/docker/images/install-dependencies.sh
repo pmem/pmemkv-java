@@ -9,20 +9,13 @@
 
 set -e
 
-# package manager: DEB or RPM
-PACKAGE_MANAGER=$1
-
 # master: Merge pull request #37 from lukaszstolarczuk/set-new-j..., 06.12.2019
 JAVA_VERSION="49c0fbe4f8727b279c7aa073963792471bb5dbe7"
 
-PREFIX=/usr
-
-WORKDIR=$(pwd)
-
 #
-# 2) JAVA dependencies - all of the dependencies needed to run
-#                        pmemkv-java will be saved
-#                        in the /opt/java directory
+# project's dependencies - all of the dependencies needed to run pmemkv-java will
+#                          be saved in the /opt/java directory. It makes building
+#                          of this project independent of network connection.
 mkdir /opt/java/
 
 deps_dir=$(mktemp -d)
