@@ -1,17 +1,17 @@
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright 2016-2019, Intel Corporation
+# Copyright 2016-2020, Intel Corporation
 
 #
 # Dockerfile - a 'recipe' for Docker to build an image of fedora-based
 #              environment prepared for running pmemkv-java build and tests.
 
 # Pull base image
-FROM fedora:31
+FROM fedora:32
 MAINTAINER szymon.romik@intel.com
 
 # Set required environment variables
 ENV OS fedora
-ENV OS_VER 31
+ENV OS_VER 32
 ENV PACKAGE_MANAGER rpm
 ENV NOTTY 1
 ENV JAVA_HOME /usr/lib/jvm/java-openjdk/
