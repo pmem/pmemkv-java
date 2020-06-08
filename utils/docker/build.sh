@@ -12,6 +12,7 @@
 #   - 'OS' and 'OS_VER' to a system and its version, you want to build this repo on
 #     (for delivered OSes take a look at the list of Dockerfiles at the
 #     utils/docker/images directory), eg. OS=ubuntu, OS_VER=20.04.
+#   - 'PMEMKV' to a pmemkv's branch, e.g. 'master' or 'stable-1.0'
 #
 
 set -e
@@ -50,10 +51,8 @@ TAG="1.0-${OS}-${OS_VER}"
 imageName=${DOCKERHUB_REPO}:${TAG}
 containerName=pmemkv-java-${OS}-${OS_VER}
 
-pmemkv_version=$(echo $TYPE | cut -d'-' -f 2-)
-
 if [[ "$command" == "" ]]; then
-	command="./run-build.sh $pmemkv_version";
+	command="./run-build.sh $PMEMKV";
 fi
 
 if [ "$COVERAGE" == "1" ]; then

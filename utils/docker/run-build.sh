@@ -3,8 +3,8 @@
 # Copyright 2019-2020, Intel Corporation
 
 #
-# run-build.sh - is called inside a Docker container; checks bindings' building
-#                and installation with given version of pmemkv
+# run-build.sh <pmemkv_version> - is called inside a Docker container;
+#        checks bindings' building and installation with given version of pmemkv
 #
 
 set -e
