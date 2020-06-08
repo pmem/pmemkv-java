@@ -14,6 +14,11 @@ PACKAGE_TYPE=$1
 # master: Version 1.8; 31.01.2020
 PMDK_VERSION="1.8"
 
+if [ "${SKIP_PMDK_BUILD}" ]; then
+	echo "Variable 'SKIP_PMDK_BUILD' is set; skipping building of PMDK"
+	exit
+fi
+
 git clone https://github.com/pmem/pmdk --shallow-since=2020-01-15
 cd pmdk
 git checkout $PMDK_VERSION
