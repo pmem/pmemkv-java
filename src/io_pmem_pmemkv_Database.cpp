@@ -97,11 +97,15 @@ struct Context {
 #define METHOD_GET_ALL_BYTEARRAY "([B[B)V"
 #define METHOD_GET_ALL_STRING "(Ljava/lang/String;Ljava/lang/String;)V"
 
-const auto CALLBACK_GET_KEYS_BUFFER = [](const char* k, size_t kb, const char* v, size_t vb, void *arg) -> int {
+void Callback_get_value_buffer(const char* v, size_t vb, void *arg) {
     const auto c = static_cast<Context*>(arg);
-    jobject keybuf = c->env->NewDirectByteBuffer(const_cast<char*>(k), kb);
-    c->env->CallVoidMethod(c->callback, c->mid, kb, keybuf);
-    c->env->DeleteLocalRef(keybuf);
+    jobject valuebuf = c->env->NewDirectByteBuffer(const_cast<char*>(v), vb);
+    c->env->CallVoidMethod(c->callback, c->mid, vb, valuebuf);
+    c->env->DeleteLocalRef(valuebuf);
+}
+
+const auto CALLBACK_GET_KEYS_BUFFER = [](const char* k, size_t kb, const char* v, size_t vb, void *arg) -> int {
+    Callback_get_value_buffer(k, kb, arg);
     return 0;
 };
 
