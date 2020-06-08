@@ -11,8 +11,8 @@ set -e
 PREFIX=/usr
 PACKAGE_TYPE=$1
 
-# master: Merge pull request #4625 from kilobyte/rand; 13.03.2020
-PMDK_VERSION="ff790ea5fc4c38304a61207346cdee7da381255a"
+# master: Version 1.8; 31.01.2020
+PMDK_VERSION="1.8"
 
 git clone https://github.com/pmem/pmdk --shallow-since=2020-01-15
 cd pmdk
