@@ -1,4 +1,9 @@
 # pmemkv-java
+
+[![Travis build status](https://travis-ci.org/pmem/pmemkv-java.svg?branch=master)](https://travis-ci.org/pmem/pmemkv-java)
+[![GHA build status](https://github.com/pmem/pmemkv/workflows/pmemkv-java/badge.svg?branch=master)](https://github.com/pmem/pmemkv-java/actions)
+[![PMEMKV-JAVA version](https://img.shields.io/github/tag/pmem/pmemkv-java.svg)](https://github.com/pmem/pmemkv-java/releases/latest)
+
 Java bindings for pmemkv, using Java Native Interface
 
 The current API is simplified and not functionally equal to its native C/C++ counterpart.
