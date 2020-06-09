@@ -187,12 +187,12 @@ public class Database {
         value.limit(valuebytes);
     }
 
-    public byte[] get(byte[] key) {
+    public byte[] getCopy(byte[] key) {
         return database_get_bytes(pointer, key);
     }
 
-    public String get(String key) {
-        byte[] result = database_get_bytes(pointer, key.getBytes());
+    public String getCopy(String key) {
+        byte[] result = getCopy(key.getBytes());
         return result == null ? null : new String(result);
     }
 
