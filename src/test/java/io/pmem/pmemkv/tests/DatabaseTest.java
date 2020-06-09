@@ -636,4 +636,16 @@ public class DatabaseTest {
         db.stop();
     }
 
+    @Test
+    public void usesGetBufferIsDirectBufferTest() {
+        Database db = new Database(ENGINE, CONFIG);
+
+        ByteBuffer keyb = ByteBuffer.allocateDirect(3);
+        ByteBuffer valb = ByteBuffer.allocateDirect(3);
+        keyb.put("k".getBytes());
+        keyb.put("v".getBytes());
+
+        db.put(keyb, valb);
+        db.get(keyb, (ByteBuffer v) -> expect(v.isDirect()).toBeTrue());
+    }
 }
