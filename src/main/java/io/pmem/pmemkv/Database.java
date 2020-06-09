@@ -117,55 +117,55 @@ public class Database {
         return database_count_between_bytes(pointer, key1.getBytes(), key2.getBytes());
     }
 
-    public void get_all(GetAllBufferCallback callback) {
+    public void getAll(GetAllBufferCallback callback) {
         database_get_all_buffer(pointer, (int kb, ByteBuffer k, int vb, ByteBuffer v)
                 -> callback.process((ByteBuffer) k.rewind().limit(kb), (ByteBuffer) v.rewind().limit(vb)));
     }
 
-    public void get_all(GetAllByteArrayCallback callback) {
+    public void getAll(GetAllByteArrayCallback callback) {
         database_get_all_bytes(pointer, callback);
     }
 
-    public void get_all(GetAllStringCallback callback) {
+    public void getAll(GetAllStringCallback callback) {
         database_get_all_string(pointer, callback);
     }
 
-    public void get_above(ByteBuffer key, GetAllBufferCallback callback) {
+    public void getAbove(ByteBuffer key, GetAllBufferCallback callback) {
         database_get_above_buffer(pointer, key.position(), key, (int kb, ByteBuffer k, int vb, ByteBuffer v)
                 -> callback.process((ByteBuffer) k.rewind().limit(kb), (ByteBuffer) v.rewind().limit(vb)));
     }
 
-    public void get_above(byte[] key, GetAllByteArrayCallback callback) {
+    public void getAbove(byte[] key, GetAllByteArrayCallback callback) {
         database_get_above_bytes(pointer, key, callback);
     }
 
-    public void get_above(String key, GetAllStringCallback callback) {
+    public void getAbove(String key, GetAllStringCallback callback) {
         database_get_above_string(pointer, key.getBytes(), callback);
     }
 
-    public void get_below(ByteBuffer key, GetAllBufferCallback callback) {
+    public void getBelow(ByteBuffer key, GetAllBufferCallback callback) {
         database_get_below_buffer(pointer, key.position(), key, (int kb, ByteBuffer k, int vb, ByteBuffer v)
                 -> callback.process((ByteBuffer) k.rewind().limit(kb), (ByteBuffer) v.rewind().limit(vb)));
     }
 
-    public void get_below(byte[] key, GetAllByteArrayCallback callback) {
+    public void getBelow(byte[] key, GetAllByteArrayCallback callback) {
         database_get_below_bytes(pointer, key, callback);
     }
 
-    public void get_below(String key, GetAllStringCallback callback) {
+    public void getBelow(String key, GetAllStringCallback callback) {
         database_get_below_string(pointer, key.getBytes(), callback);
     }
 
-    public void get_between(ByteBuffer key1, ByteBuffer key2, GetAllBufferCallback callback) {
+    public void getBetween(ByteBuffer key1, ByteBuffer key2, GetAllBufferCallback callback) {
         database_get_between_buffer(pointer, key1.position(), key1, key2.position(), key2, (int kb, ByteBuffer k, int vb, ByteBuffer v)
                 -> callback.process((ByteBuffer) k.rewind().limit(kb), (ByteBuffer) v.rewind().limit(vb)));
     }
 
-    public void get_between(byte[] key1, byte[] key2, GetAllByteArrayCallback callback) {
+    public void getBetween(byte[] key1, byte[] key2, GetAllByteArrayCallback callback) {
         database_get_between_bytes(pointer, key1, key2, callback);
     }
 
-    public void get_between(String key1, String key2, GetAllStringCallback callback) {
+    public void getBetween(String key1, String key2, GetAllStringCallback callback) {
         database_get_between_string(pointer, key1.getBytes(), key2.getBytes(), callback);
     }
 
