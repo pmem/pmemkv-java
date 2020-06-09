@@ -10,7 +10,7 @@ public class BasicExample {
         assert db.countAll() == 1;
 
         System.out.println("Reading key back");
-        assert db.get("key1").equals("value1");
+        assert db.getCopy("key1").equals("value1");
 
         System.out.println("Iterating existing keys");
         db.put("key2", "value2");
