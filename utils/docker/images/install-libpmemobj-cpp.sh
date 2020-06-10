@@ -12,17 +12,24 @@ set -e
 PREFIX=/usr
 PACKAGE_TYPE=$1
 
-# master: Merge pull request #690 from pmem/stable-1.9; 12.03.2020
-LIBPMEMOBJ_CPP_VERSION="13099c702a9fe6aef97af3ffbc0530c60971948c"
+# master: Version 1.10; 28.05.2020
+LIBPMEMOBJ_CPP_VERSION="1.10"
 
-git clone https://github.com/pmem/libpmemobj-cpp --shallow-since=2020-01-15
+if [ "${SKIP_LIBPMEMOBJ_CPP_BUILD}" ]; then
+	echo "Variable 'SKIP_LIBPMEMOBJ_CPP_BUILD' is set; skipping building of libpmemobj-cpp"
+	exit
+fi
+
+git clone https://github.com/pmem/libpmemobj-cpp --shallow-since=2020-04-28
 cd libpmemobj-cpp
 git checkout $LIBPMEMOBJ_CPP_VERSION
 
 mkdir build
 cd build
 
-cmake .. -DCPACK_GENERATOR="$PACKAGE_TYPE" -DCMAKE_INSTALL_PREFIX=$PREFIX
+cmake .. -DCPACK_GENERATOR="$PACKAGE_TYPE" \
+	-DCMAKE_INSTALL_PREFIX=$PREFIX \
+	-DCMAKE_BUILD_TYPE=RelWithDebInfo
 
 if [ "$PACKAGE_TYPE" = "" ]; then
 	make -j$(nproc) install
