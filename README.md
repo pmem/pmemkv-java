@@ -87,3 +87,7 @@ Docs can be generated using mvn by executing commands:
 ```sh
 mvn javadoc:javadoc
 ```
+
+## Debugging
+
+Debugging process is described in [DEBUGGING.md](./DEBUGGING.md)
