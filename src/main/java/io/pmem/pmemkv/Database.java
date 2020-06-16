@@ -9,6 +9,14 @@ import io.pmem.pmemkv.internal.GetAllBufferJNICallback;
 import java.nio.ByteBuffer;
 
 public class Database {
+    private ByteBuffer getDirectBuffer(ByteBuffer buf) {
+      if (buf.isDirect()) {
+        return buf;
+      }
+      ByteBuffer directBuffer = ByteBuffer.allocateDirect(buf.capacity());
+      directBuffer.put(buf);
+      return directBuffer;
+    }
 
     public Database(String engine, String config) {
         pointer = database_start(engine, config);
@@ -31,17 +39,21 @@ public class Database {
     }
 
     public void getKeysAbove(ByteBuffer key, GetKeysBuffersCallback callback) {
-        database_get_keys_above_buffer(pointer, key.position(), key, (int kb, ByteBuffer k)
+        ByteBuffer direct_key = getDirectBuffer(key);
+        database_get_keys_above_buffer(pointer, direct_key.position(), direct_key, (int kb, ByteBuffer k)
                 -> callback.process((ByteBuffer) k.rewind().limit(kb)));
     }
 
     public void getKeysBelow(ByteBuffer key, GetKeysBuffersCallback callback) {
-        database_get_keys_below_buffer(pointer, key.position(), key, (int kb, ByteBuffer k)
+        ByteBuffer direct_key = getDirectBuffer(key);
+        database_get_keys_below_buffer(pointer, direct_key.position(), direct_key, (int kb, ByteBuffer k)
                 -> callback.process((ByteBuffer) k.rewind().limit(kb)));
     }
 
     public void getKeysBetween(ByteBuffer key1, ByteBuffer key2, GetKeysBuffersCallback callback) {
-        database_get_keys_between_buffer(pointer, key1.position(), key1, key2.position(), key2, (int kb, ByteBuffer k)
+        ByteBuffer direct_key1 = getDirectBuffer(key1);
+        ByteBuffer direct_key2 = getDirectBuffer(key2);
+        database_get_keys_between_buffer(pointer, direct_key1.position(), direct_key1, direct_key2.position(), direct_key2, (int kb, ByteBuffer k)
                 -> callback.process((ByteBuffer) k.rewind().limit(kb)));
     }
 
@@ -50,15 +62,19 @@ public class Database {
     }
 
     public long countAbove(ByteBuffer key) {
-        return database_count_above_buffer(pointer, key.position(), key);
+        ByteBuffer direct_key = getDirectBuffer(key);
+        return database_count_above_buffer(pointer, direct_key.position(), direct_key);
     }
 
     public long countBelow(ByteBuffer key) {
-        return database_count_below_buffer(pointer, key.position(), key);
+        ByteBuffer direct_key = getDirectBuffer(key);
+        return database_count_below_buffer(pointer, direct_key.position(), direct_key);
     }
 
     public long countBetween(ByteBuffer key1, ByteBuffer key2) {
-        return database_count_between_buffer(pointer, key1.position(), key1, key2.position(), key2);
+        ByteBuffer direct_key1 = getDirectBuffer(key1);
+        ByteBuffer direct_key2 = getDirectBuffer(key2);
+        return database_count_between_buffer(pointer, direct_key1.position(), direct_key1, direct_key2.position(), direct_key2);
     }
 
     public void getAll(GetAllBufferCallback callback) {
@@ -67,26 +83,32 @@ public class Database {
     }
 
     public void getAbove(ByteBuffer key, GetAllBufferCallback callback) {
-        database_get_above_buffer(pointer, key.position(), key, (int kb, ByteBuffer k, int vb, ByteBuffer v)
+        ByteBuffer direct_key = getDirectBuffer(key);
+        database_get_above_buffer(pointer, direct_key.position(), direct_key, (int kb, ByteBuffer k, int vb, ByteBuffer v)
                 -> callback.process((ByteBuffer) k.rewind().limit(kb), (ByteBuffer) v.rewind().limit(vb)));
     }
 
     public void getBelow(ByteBuffer key, GetAllBufferCallback callback) {
-        database_get_below_buffer(pointer, key.position(), key, (int kb, ByteBuffer k, int vb, ByteBuffer v)
+        ByteBuffer direct_key = getDirectBuffer(key);
+        database_get_below_buffer(pointer, direct_key.position(), direct_key, (int kb, ByteBuffer k, int vb, ByteBuffer v)
                 -> callback.process((ByteBuffer) k.rewind().limit(kb), (ByteBuffer) v.rewind().limit(vb)));
     }
 
     public void getBetween(ByteBuffer key1, ByteBuffer key2, GetAllBufferCallback callback) {
-        database_get_between_buffer(pointer, key1.position(), key1, key2.position(), key2, (int kb, ByteBuffer k, int vb, ByteBuffer v)
+        ByteBuffer direct_key1 = getDirectBuffer(key1);
+        ByteBuffer direct_key2 = getDirectBuffer(key2);
+        database_get_between_buffer(pointer, direct_key1.position(), direct_key1, direct_key2.position(), direct_key2, (int kb, ByteBuffer k, int vb, ByteBuffer v)
                 -> callback.process((ByteBuffer) k.rewind().limit(kb), (ByteBuffer) v.rewind().limit(vb)));
     }
 
     public boolean exists(ByteBuffer key) {
-        return database_exists_buffer(pointer, key.position(), key);
+        ByteBuffer direct_key = getDirectBuffer(key);
+        return database_exists_buffer(pointer, direct_key.position(), direct_key);
     }
 
     public void get(ByteBuffer key, GetKeysBuffersCallback callback) {
-        database_get_buffer_with_callback(pointer, key.position(), key, (int kb, ByteBuffer k)
+        ByteBuffer direct_key = getDirectBuffer(key);
+        database_get_buffer_with_callback(pointer, direct_key.position(), direct_key, (int kb, ByteBuffer k)
                 -> callback.process((ByteBuffer) k.rewind().limit(kb) ));
     }
 
@@ -106,17 +128,20 @@ public class Database {
     }
 
     public void put(ByteBuffer key, ByteBuffer value) {
-        try {
-            database_put_buffer(pointer, key.position(), key, value.position(), value);
-        } catch (DatabaseException kve) {
-            kve.setKey(key);
-            throw kve;
-        }
+          ByteBuffer direct_key = getDirectBuffer(key);
+          ByteBuffer direct_value = getDirectBuffer(value);
+          try {
+              database_put_buffer(pointer, direct_key.position(), direct_key, direct_value.position(), direct_value);
+          } catch (DatabaseException kve) {
+              kve.setKey(key);
+              throw kve;
+          }
     }
 
     public boolean remove(ByteBuffer key) {
+        ByteBuffer direct_key = getDirectBuffer(key);
         try {
-            return database_remove_buffer(pointer, key.position(), key);
+            return database_remove_buffer(pointer, direct_key.position(), direct_key);
         } catch (DatabaseException kve) {
             kve.setKey(key);
             throw kve;
