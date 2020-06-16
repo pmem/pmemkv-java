@@ -309,7 +309,7 @@ JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1buffer_1with_
  * Signature: (J[B)[B
  */
 JNIEXPORT jbyteArray JNICALL Java_io_pmem_pmemkv_Database_database_1get_1bytes
-  (JNIEnv *, jobject, jlong, jbyteArray);
+  (JNIEnv *, jobject, jlong, jobject);
 
 /*
  * Class:     io_pmem_pmemkv_Database

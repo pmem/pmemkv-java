@@ -543,14 +543,12 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1bu
 }
 
 extern "C" JNIEXPORT jbyteArray JNICALL Java_io_pmem_pmemkv_Database_database_1get_1bytes
-        (JNIEnv* env, jobject obj, jlong pointer, jbyteArray key) {
+        (JNIEnv* env, jobject obj, jlong pointer, jint keybytes ,jobject key) {
     auto engine = (pmemkv_db*) pointer;
-    const auto ckey = env->GetByteArrayElements(key, NULL);
-    const auto ckeybytes = env->GetArrayLength(key);
+    const char* ckey = (char*) env->GetDirectBufferAddress(key);
     ContextGet cxt = CONTEXT_GET;
-    auto status = pmemkv_get(engine, (char*) ckey, ckeybytes, CALLBACK_GET, &cxt);
-    env->ReleaseByteArrayElements(key, ckey, JNI_ABORT);
-    if (status != PMEMKV_STATUS_OK && status != PMEMKV_STATUS_NOT_FOUND)
+    auto status = pmemkv_get(engine, (char*) ckey, keybytes, CALLBACK_GET, &cxt);
+    if (status != PMEMKV_STATUS_OK)
         env->ThrowNew(env->FindClass(EXCEPTION_CLASS), pmemkv_errormsg());
     return cxt.result;
 }

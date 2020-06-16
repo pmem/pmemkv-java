@@ -118,13 +118,17 @@ public class Database {
         value.limit(valuebytes);
     }
 
-    public byte[] getCopy(byte[] key) {
-        return database_get_bytes(pointer, key);
-    }
-
-    public String getCopy(String key) {
-        byte[] result = getCopy(key.getBytes());
-        return result == null ? null : new String(result);
+    public ByteBuffer getCopy(ByteBuffer key) {
+        byte value[];
+        ByteBuffer direct_key = getDirectBuffer(key);
+        //TODO change type of exception to one related to PMEMKV_STATUS_NOT_FOUND
+        // when implemented
+        try {
+            value = database_get_bytes(pointer, direct_key.position(), direct_key);
+        } catch (DatabaseException kve) {
+            return null;
+        }
+        return ByteBuffer.wrap(value);
     }
 
     public void put(ByteBuffer key, ByteBuffer value) {
