@@ -174,7 +174,7 @@ public class Database {
     private native boolean database_exists_buffer(long ptr, int kb, ByteBuffer k);
     private native int database_get_buffer(long ptr, int kb, ByteBuffer k, int vb, ByteBuffer v);
     private native void database_get_buffer_with_callback(long ptr, int kb, ByteBuffer k, GetKeysBuffersJNICallback cb);
-    private native byte[] database_get_bytes(long ptr, byte[] k);
+    private native byte[] database_get_bytes(long ptr, int kb, ByteBuffer k);
     private native void database_put_buffer(long ptr, int kb, ByteBuffer k, int vb, ByteBuffer v);
     private native boolean database_remove_buffer(long ptr, int kb, ByteBuffer k);
 
