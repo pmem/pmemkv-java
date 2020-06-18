@@ -546,4 +546,47 @@ public class DatabaseTest {
         db.put(ByteBuffer.wrap(keyb), ByteBuffer.wrap(valb));
         db.get(ByteBuffer.wrap(keyb), (ByteBuffer v) -> expect(v.isDirect()).toBeTrue());
     }
+
+    @Test
+    public void exceptionInGetallTest() {
+        Database db = new Database(ENGINE, CONFIG);
+        // Direct ByteBuffer
+        for ( int i = 0; i< 0xFF; i++){
+            ByteBuffer key = ByteBuffer.allocateDirect(256);
+            key.putInt(i);
+            db.put(key, key);
+        }
+        expect(db.countAll()).toEqual(0xFF);
+        int exception_counter = 0;
+        try {
+            db.getAll((ByteBuffer k, ByteBuffer v) -> {
+                throw new RuntimeException("Inner exception");
+            });
+        } catch (Exception e) {
+          exception_counter++;
+        }
+        expect(exception_counter).toEqual(1);
+    }
+
+    @Test
+    public void exceptionInGetKeysTest() {
+        Database db = new Database(ENGINE, CONFIG);
+        // Direct ByteBuffer
+        for ( int i = 0; i< 0xFF; i++){
+            ByteBuffer key = ByteBuffer.allocateDirect(256);
+            key.putInt(i);
+            db.put(key, key);
+        }
+        expect(db.countAll()).toEqual(0xFF);
+        int exception_counter = 0;
+        try {
+            db.getKeys((ByteBuffer k) -> {
+                throw new RuntimeException("Inner exception");
+            });
+        } catch (Exception e) {
+          exception_counter++;
+        }
+        expect(exception_counter).toEqual(1);
+    }
+
 }
