@@ -10,6 +10,6 @@ labels: "question"
 <!-- fill this out -->
 
 <!--
-For questions and other non-bugs, you could use http://groups.google.com/group/pmem
+For questions and other non-bugs, you could use https://groups.google.com/group/pmem
 You could also chat with members of the PMDK/pmemkv team real-time on the #pmem IRC channel on OFTC
 -->
