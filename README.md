@@ -16,7 +16,7 @@ All known issues and limitations are logged as GitHub issues.
 * Java 8 or higher
 * [Apache Maven](https://maven.apache.org) - build system
 * Used only for development & testing:
-  * [JUnit](http://junit.org/) - automated test framework
+  * [JUnit](https://junit.org/) - automated test framework
   * [Oleaster Matcher](https://github.com/mscharhag/oleaster/tree/master/oleaster-matcher) - test condition matching library
 
 ## Installation
@@ -70,7 +70,7 @@ LD_LIBRARY_PATH=path_to_your_libs mvn test
 ## Example
 
 We are using `/dev/shm` to
-[emulate persistent memory](http://pmem.io/2016/02/22/pm-emulation.html)
+[emulate persistent memory](https://pmem.io/2016/02/22/pm-emulation.html)
 in example.
 
 Example can be found within this repository in [examples directory](https://github.com/pmem/pmemkv-java/tree/master/examples).
