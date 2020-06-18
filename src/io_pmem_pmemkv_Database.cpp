@@ -71,7 +71,7 @@ void Callback_get_value_buffer(const char* v, size_t vb, void *arg) {
     c->env->DeleteLocalRef(valuebuf);
 }
 
-const auto CALLBACK_GET_KEYS_BUFFER = [](const char* k, size_t kb, const char* v, size_t vb, void *arg) -> int {
+int Callback_get_keys_buffer(const char* k, size_t kb, const char* v, size_t vb, void *arg) {
     Callback_get_value_buffer(k, kb, arg);
     return 0;
 };
@@ -79,8 +79,8 @@ const auto CALLBACK_GET_KEYS_BUFFER = [](const char* k, size_t kb, const char* v
 extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1keys_1buffer
         (JNIEnv* env, jobject obj, jlong pointer, jobject callback) {
     auto engine = (pmemkv_db*) pointer;
-    auto cxt = Context(env, callback, METHOD_GET_KEYS_BUFFER);
-    auto status = pmemkv_get_all(engine, CALLBACK_GET_KEYS_BUFFER, &cxt);
+    auto cxt = Context(env, callback,  METHOD_GET_KEYS_BUFFER);
+    auto status = pmemkv_get_all(engine, Callback_get_keys_buffer, &cxt);
     if (status != PMEMKV_STATUS_OK) env->ThrowNew(env->FindClass(EXCEPTION_CLASS), pmemkv_errormsg());
 }
 
@@ -88,8 +88,8 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1ke
         (JNIEnv* env, jobject obj, jlong pointer, jint keybytes, jobject key, jobject callback) {
     auto engine = (pmemkv_db*) pointer;
     const char* ckey = (char*) env->GetDirectBufferAddress(key);
-    auto cxt = Context(env, callback, METHOD_GET_KEYS_BUFFER);
-    auto status = pmemkv_get_above(engine, ckey, keybytes, CALLBACK_GET_KEYS_BUFFER, &cxt);
+    auto cxt = Context(env, callback,  METHOD_GET_KEYS_BUFFER);
+    auto status = pmemkv_get_above(engine, ckey, keybytes, Callback_get_keys_buffer, &cxt);
     if (status != PMEMKV_STATUS_OK) env->ThrowNew(env->FindClass(EXCEPTION_CLASS), pmemkv_errormsg());
 }
 
@@ -97,8 +97,8 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1ke
         (JNIEnv* env, jobject obj, jlong pointer, jint keybytes, jobject key, jobject callback) {
     auto engine = (pmemkv_db*) pointer;
     const char* ckey = (char*) env->GetDirectBufferAddress(key);
-    auto cxt = Context(env, callback, METHOD_GET_KEYS_BUFFER);
-    auto status = pmemkv_get_below(engine, ckey, keybytes, CALLBACK_GET_KEYS_BUFFER, &cxt);
+    auto cxt = Context(env, callback,  METHOD_GET_KEYS_BUFFER);
+    auto status = pmemkv_get_below(engine, ckey, keybytes, Callback_get_keys_buffer, &cxt);
     if (status != PMEMKV_STATUS_OK) env->ThrowNew(env->FindClass(EXCEPTION_CLASS), pmemkv_errormsg());
 }
 
@@ -107,8 +107,8 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1ke
     auto engine = (pmemkv_db*) pointer;
     const char* ckey1 = (char*) env->GetDirectBufferAddress(key1);
     const char* ckey2 = (char*) env->GetDirectBufferAddress(key2);
-    auto cxt = Context(env, callback, METHOD_GET_KEYS_BUFFER);
-    auto status = pmemkv_get_between(engine, ckey1, keybytes1, ckey2, keybytes2, CALLBACK_GET_KEYS_BUFFER, &cxt);
+    auto cxt = Context(env, callback,  METHOD_GET_KEYS_BUFFER);
+    auto status = pmemkv_get_between(engine, ckey1, keybytes1, ckey2, keybytes2, Callback_get_keys_buffer, &cxt);
     if (status != PMEMKV_STATUS_OK) env->ThrowNew(env->FindClass(EXCEPTION_CLASS), pmemkv_errormsg());
 }
 
@@ -155,7 +155,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_Database_database_1count_
     return count;
 }
 
-const auto CALLBACK_GET_ALL_BUFFER = [](const char* k, size_t kb, const char* v, size_t vb, void *arg) -> int {
+int Callback_get_all_buffer(const char* k, size_t kb, const char* v, size_t vb, void *arg) {
     const auto c = static_cast<Context*>(arg);
     jobject keybuf = c->env->NewDirectByteBuffer( const_cast<char*>(k), kb);
     jobject valuebuf = c->env->NewDirectByteBuffer(const_cast<char*>(v), vb);
@@ -171,7 +171,7 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1al
         (JNIEnv* env, jobject obj, jlong pointer, jobject callback) {
     auto engine = (pmemkv_db*) pointer;
     auto cxt = Context(env, callback, METHOD_GET_ALL_BUFFER);
-    auto status = pmemkv_get_all(engine, CALLBACK_GET_ALL_BUFFER, &cxt);
+    auto status = pmemkv_get_all(engine, Callback_get_all_buffer, &cxt);
     if (status != PMEMKV_STATUS_OK) env->ThrowNew(env->FindClass(EXCEPTION_CLASS), pmemkv_errormsg());
 }
 
@@ -180,7 +180,7 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1ab
     auto engine = (pmemkv_db*) pointer;
     const char* ckey = (char*) env->GetDirectBufferAddress(key);
     auto cxt = Context(env, callback, METHOD_GET_ALL_BUFFER);
-    auto status = pmemkv_get_above(engine, ckey, keybytes, CALLBACK_GET_ALL_BUFFER, &cxt);
+    auto status = pmemkv_get_above(engine, ckey, keybytes, Callback_get_all_buffer, &cxt);
     if (status != PMEMKV_STATUS_OK) env->ThrowNew(env->FindClass(EXCEPTION_CLASS), pmemkv_errormsg());
 }
 
@@ -189,7 +189,7 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1be
     auto engine = (pmemkv_db*) pointer;
     const char* ckey = (char*) env->GetDirectBufferAddress(key);
     auto cxt = Context(env, callback, METHOD_GET_ALL_BUFFER);
-    auto status = pmemkv_get_below(engine, ckey, keybytes, CALLBACK_GET_ALL_BUFFER,&cxt);
+    auto status = pmemkv_get_below(engine, ckey, keybytes, Callback_get_all_buffer,&cxt);
     if (status != PMEMKV_STATUS_OK) env->ThrowNew(env->FindClass(EXCEPTION_CLASS), pmemkv_errormsg());
 }
 
@@ -199,7 +199,7 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1be
     const char* ckey1 = (char*) env->GetDirectBufferAddress(key1);
     const char* ckey2 = (char*) env->GetDirectBufferAddress(key2);
     auto cxt = Context(env, callback, METHOD_GET_ALL_BUFFER);
-    auto status = pmemkv_get_between(engine, ckey1, keybytes1, ckey2, keybytes2, CALLBACK_GET_ALL_BUFFER, &cxt);
+    auto status = pmemkv_get_between(engine, ckey1, keybytes1, ckey2, keybytes2, Callback_get_all_buffer, &cxt);
     if (status != PMEMKV_STATUS_OK) env->ThrowNew(env->FindClass(EXCEPTION_CLASS), pmemkv_errormsg());
 }
 
@@ -252,7 +252,7 @@ struct ContextGet {
 
 #define CONTEXT_GET {env, NULL}
 
-const auto CALLBACK_GET = [](const char* v, size_t vb, void *arg)  {
+void callback_get_byte_array(const char* v, size_t vb, void *arg)  {
     const auto c = ((ContextGet*) arg);
     c->result = c->env->NewByteArray(vb);
     c->env->SetByteArrayRegion(c->result, 0, vb, (jbyte*) v);
@@ -273,7 +273,7 @@ extern "C" JNIEXPORT jbyteArray JNICALL Java_io_pmem_pmemkv_Database_database_1g
     auto engine = (pmemkv_db*) pointer;
     const char* ckey = (char*) env->GetDirectBufferAddress(key);
     ContextGet cxt = CONTEXT_GET;
-    auto status = pmemkv_get(engine, (char*) ckey, keybytes, CALLBACK_GET, &cxt);
+    auto status = pmemkv_get(engine, (char*) ckey, keybytes, callback_get_byte_array, &cxt);
     if (status != PMEMKV_STATUS_OK)
         env->ThrowNew(env->FindClass(EXCEPTION_CLASS), pmemkv_errormsg());
     return cxt.result;
