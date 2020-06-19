@@ -5,10 +5,11 @@ package io.pmem.pmemkv;
 
 import io.pmem.pmemkv.internal.GetKeysBuffersJNICallback;
 import io.pmem.pmemkv.internal.GetAllBufferJNICallback;
+import io.pmem.pmemkv.Pmemkv;
 
 import java.nio.ByteBuffer;
 
-public class Database {
+public class Database implements Pmemkv<ByteBuffer, ByteBuffer> {
     private ByteBuffer getDirectBuffer(ByteBuffer buf) {
       if (buf.isDirect()) {
         return buf;
@@ -33,24 +34,24 @@ public class Database {
         return stopped;
     }
 
-    public void getKeys(GetKeysBuffersCallback callback) {
+    public void getKeys(KeyCallback<ByteBuffer> callback) {
         database_get_keys_buffer(pointer, (int kb, ByteBuffer k)
                 -> callback.process((ByteBuffer) k.rewind().limit(kb)));
     }
 
-    public void getKeysAbove(ByteBuffer key, GetKeysBuffersCallback callback) {
+    public void getKeysAbove(ByteBuffer key, KeyCallback<ByteBuffer> callback) {
         ByteBuffer direct_key = getDirectBuffer(key);
         database_get_keys_above_buffer(pointer, direct_key.position(), direct_key, (int kb, ByteBuffer k)
                 -> callback.process((ByteBuffer) k.rewind().limit(kb)));
     }
 
-    public void getKeysBelow(ByteBuffer key, GetKeysBuffersCallback callback) {
+    public void getKeysBelow(ByteBuffer key, KeyCallback<ByteBuffer> callback) {
         ByteBuffer direct_key = getDirectBuffer(key);
         database_get_keys_below_buffer(pointer, direct_key.position(), direct_key, (int kb, ByteBuffer k)
                 -> callback.process((ByteBuffer) k.rewind().limit(kb)));
     }
 
-    public void getKeysBetween(ByteBuffer key1, ByteBuffer key2, GetKeysBuffersCallback callback) {
+    public void getKeysBetween(ByteBuffer key1, ByteBuffer key2, KeyCallback<ByteBuffer> callback) {
         ByteBuffer direct_key1 = getDirectBuffer(key1);
         ByteBuffer direct_key2 = getDirectBuffer(key2);
         database_get_keys_between_buffer(pointer, direct_key1.position(), direct_key1, direct_key2.position(), direct_key2, (int kb, ByteBuffer k)
@@ -77,24 +78,24 @@ public class Database {
         return database_count_between_buffer(pointer, direct_key1.position(), direct_key1, direct_key2.position(), direct_key2);
     }
 
-    public void getAll(GetAllBufferCallback callback) {
+    public void getAll(KeyValueCallback<ByteBuffer, ByteBuffer>  callback) {
         database_get_all_buffer(pointer, (int kb, ByteBuffer k, int vb, ByteBuffer v)
                 -> callback.process((ByteBuffer) k.rewind().limit(kb), (ByteBuffer) v.rewind().limit(vb)));
     }
 
-    public void getAbove(ByteBuffer key, GetAllBufferCallback callback) {
+    public void getAbove(ByteBuffer key, KeyValueCallback<ByteBuffer, ByteBuffer>  callback) {
         ByteBuffer direct_key = getDirectBuffer(key);
         database_get_above_buffer(pointer, direct_key.position(), direct_key, (int kb, ByteBuffer k, int vb, ByteBuffer v)
                 -> callback.process((ByteBuffer) k.rewind().limit(kb), (ByteBuffer) v.rewind().limit(vb)));
     }
 
-    public void getBelow(ByteBuffer key, GetAllBufferCallback callback) {
+    public void getBelow(ByteBuffer key, KeyValueCallback<ByteBuffer, ByteBuffer>  callback) {
         ByteBuffer direct_key = getDirectBuffer(key);
         database_get_below_buffer(pointer, direct_key.position(), direct_key, (int kb, ByteBuffer k, int vb, ByteBuffer v)
                 -> callback.process((ByteBuffer) k.rewind().limit(kb), (ByteBuffer) v.rewind().limit(vb)));
     }
 
-    public void getBetween(ByteBuffer key1, ByteBuffer key2, GetAllBufferCallback callback) {
+    public void getBetween(ByteBuffer key1, ByteBuffer key2, KeyValueCallback<ByteBuffer, ByteBuffer>  callback) {
         ByteBuffer direct_key1 = getDirectBuffer(key1);
         ByteBuffer direct_key2 = getDirectBuffer(key2);
         database_get_between_buffer(pointer, direct_key1.position(), direct_key1, direct_key2.position(), direct_key2, (int kb, ByteBuffer k, int vb, ByteBuffer v)
@@ -106,7 +107,7 @@ public class Database {
         return database_exists_buffer(pointer, direct_key.position(), direct_key);
     }
 
-    public void get(ByteBuffer key, GetKeysBuffersCallback callback) {
+    public void get(ByteBuffer key, ValueCallback<ByteBuffer> callback) {
         ByteBuffer direct_key = getDirectBuffer(key);
         database_get_buffer_with_callback(pointer, direct_key.position(), direct_key, (int kb, ByteBuffer k)
                 -> callback.process((ByteBuffer) k.rewind().limit(kb) ));
