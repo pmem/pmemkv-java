@@ -5,10 +5,15 @@ package io.pmem.pmemkv;
 
 import io.pmem.pmemkv.internal.GetKeysBuffersJNICallback;
 import io.pmem.pmemkv.internal.GetAllBufferJNICallback;
+import io.pmem.pmemkv.Converter;
 
 import java.nio.ByteBuffer;
 
-public class Database {
+
+public class Database<K, V> {
+    Converter keyConverter;
+    Converter valueConverter;
+
     private ByteBuffer getDirectBuffer(ByteBuffer buf) {
       if (buf.isDirect()) {
         return buf;
@@ -29,88 +34,132 @@ public class Database {
         return stopped;
     }
 
-    public void getKeys(GetKeysBuffersCallback callback) {
-        database_get_keys_buffer(pointer, (int kb, ByteBuffer k)
-                -> callback.process((ByteBuffer) k.rewind().limit(kb)));
+    public void getKeys(KeyCallback<K> callback) {
+        database_get_keys_buffer(pointer, (int kb, ByteBuffer k) -> {
+          k.rewind().limit(kb);
+          K processed_object = (K) keyConverter.fromByteBuffer(k);
+          callback.process(processed_object);
+        });
     }
 
-    public void getKeysAbove(ByteBuffer key, GetKeysBuffersCallback callback) {
-        ByteBuffer direct_key = getDirectBuffer(key);
+    public void getKeysAbove(ByteBuffer key, KeyCallback<K> callback) {
+        ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
         database_get_keys_above_buffer(pointer, direct_key.position(), direct_key, (int kb, ByteBuffer k)
-                -> callback.process((ByteBuffer) k.rewind().limit(kb)));
+                -> {
+                    k.rewind().limit(kb);
+                    K processed_object = (K) keyConverter.fromByteBuffer(k);
+                    callback.process(processed_object);
+                });
     }
 
-    public void getKeysBelow(ByteBuffer key, GetKeysBuffersCallback callback) {
-        ByteBuffer direct_key = getDirectBuffer(key);
+    public void getKeysBelow(K key, KeyCallback<K> callback) {
+        ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
         database_get_keys_below_buffer(pointer, direct_key.position(), direct_key, (int kb, ByteBuffer k)
-                -> callback.process((ByteBuffer) k.rewind().limit(kb)));
+                -> {
+                    k.rewind().limit(kb);
+                    K processed_object = (K) keyConverter.fromByteBuffer(k);
+                    callback.process(processed_object);
+                });
     }
 
-    public void getKeysBetween(ByteBuffer key1, ByteBuffer key2, GetKeysBuffersCallback callback) {
-        ByteBuffer direct_key1 = getDirectBuffer(key1);
-        ByteBuffer direct_key2 = getDirectBuffer(key2);
+    public void getKeysBetween(K key1, K key2, KeyCallback<K> callback) {
+        ByteBuffer direct_key1 = getDirectBuffer(keyConverter.toByteBuffer(key1));
+        ByteBuffer direct_key2 = getDirectBuffer(keyConverter.toByteBuffer(key2));
         database_get_keys_between_buffer(pointer, direct_key1.position(), direct_key1, direct_key2.position(), direct_key2, (int kb, ByteBuffer k)
-                -> callback.process((ByteBuffer) k.rewind().limit(kb)));
+                -> {
+                    k.rewind().limit(kb);
+                    K processed_object = (K) keyConverter.fromByteBuffer(k);
+                    callback.process(processed_object);
+                });
     }
 
     public long countAll() {
         return database_count_all(pointer);
     }
 
-    public long countAbove(ByteBuffer key) {
-        ByteBuffer direct_key = getDirectBuffer(key);
+    public long countAbove(K key) {
+        ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
         return database_count_above_buffer(pointer, direct_key.position(), direct_key);
     }
 
-    public long countBelow(ByteBuffer key) {
-        ByteBuffer direct_key = getDirectBuffer(key);
+    public long countBelow(K key) {
+        ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
         return database_count_below_buffer(pointer, direct_key.position(), direct_key);
     }
 
-    public long countBetween(ByteBuffer key1, ByteBuffer key2) {
-        ByteBuffer direct_key1 = getDirectBuffer(key1);
-        ByteBuffer direct_key2 = getDirectBuffer(key2);
+    public long countBetween(K key1, K key2) {
+        ByteBuffer direct_key1 = getDirectBuffer(keyConverter.toByteBuffer(key1));
+        ByteBuffer direct_key2 = getDirectBuffer(keyConverter.toByteBuffer(key2));
         return database_count_between_buffer(pointer, direct_key1.position(), direct_key1, direct_key2.position(), direct_key2);
     }
 
-    public void getAll(GetAllBufferCallback callback) {
+    public void getAll(KeyValueCallback<K, V>  callback) {
         database_get_all_buffer(pointer, (int kb, ByteBuffer k, int vb, ByteBuffer v)
-                -> callback.process((ByteBuffer) k.rewind().limit(kb), (ByteBuffer) v.rewind().limit(vb)));
+                -> {
+                    k.rewind().limit(kb);
+                    K processed_key = (K) keyConverter.fromByteBuffer(k);
+                    v.rewind().limit(vb);
+                    V processed_value = (V) valueConverter.fromByteBuffer(v);
+                    callback.process(processed_key, processed_value);
+                });
     }
 
-    public void getAbove(ByteBuffer key, GetAllBufferCallback callback) {
-        ByteBuffer direct_key = getDirectBuffer(key);
+    public void getAbove(K key, KeyValueCallback<K, V>  callback) {
+        ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
         database_get_above_buffer(pointer, direct_key.position(), direct_key, (int kb, ByteBuffer k, int vb, ByteBuffer v)
-                -> callback.process((ByteBuffer) k.rewind().limit(kb), (ByteBuffer) v.rewind().limit(vb)));
+                -> {
+                    k.rewind().limit(kb);
+                    K processed_key = (K) keyConverter.fromByteBuffer(k);
+                    v.rewind().limit(vb);
+                    V processed_value = (V) valueConverter.fromByteBuffer(v);
+                    callback.process(processed_key, processed_value);
+                });
+
     }
 
-    public void getBelow(ByteBuffer key, GetAllBufferCallback callback) {
-        ByteBuffer direct_key = getDirectBuffer(key);
+    public void getBelow(K key, KeyValueCallback<K, V>  callback) {
+        ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
         database_get_below_buffer(pointer, direct_key.position(), direct_key, (int kb, ByteBuffer k, int vb, ByteBuffer v)
-                -> callback.process((ByteBuffer) k.rewind().limit(kb), (ByteBuffer) v.rewind().limit(vb)));
+                -> {
+                    k.rewind().limit(kb);
+                    K processed_key = (K) keyConverter.fromByteBuffer(k);
+                    v.rewind().limit(vb);
+                    V processed_value = (V) valueConverter.fromByteBuffer(v);
+                    callback.process(processed_key, processed_value);
+                });
     }
 
-    public void getBetween(ByteBuffer key1, ByteBuffer key2, GetAllBufferCallback callback) {
-        ByteBuffer direct_key1 = getDirectBuffer(key1);
-        ByteBuffer direct_key2 = getDirectBuffer(key2);
+    public void getBetween(K key1, V key2, KeyValueCallback<K, V>  callback) {
+        ByteBuffer direct_key1 = getDirectBuffer(keyConverter.toByteBuffer(key1));
+        ByteBuffer direct_key2 = getDirectBuffer(keyConverter.toByteBuffer(key2));
         database_get_between_buffer(pointer, direct_key1.position(), direct_key1, direct_key2.position(), direct_key2, (int kb, ByteBuffer k, int vb, ByteBuffer v)
-                -> callback.process((ByteBuffer) k.rewind().limit(kb), (ByteBuffer) v.rewind().limit(vb)));
+                -> {
+                    k.rewind().limit(kb);
+                    K processed_key = (K) keyConverter.fromByteBuffer(k);
+                    v.rewind().limit(vb);
+                    V processed_value = (V) valueConverter.fromByteBuffer(v);
+                    callback.process(processed_key, processed_value);
+                });
     }
 
-    public boolean exists(ByteBuffer key) {
-        ByteBuffer direct_key = getDirectBuffer(key);
+    public boolean exists(K key) {
+        ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
         return database_exists_buffer(pointer, direct_key.position(), direct_key);
     }
 
-    public void get(ByteBuffer key, GetKeysBuffersCallback callback) {
-        ByteBuffer direct_key = getDirectBuffer(key);
-        database_get_buffer_with_callback(pointer, direct_key.position(), direct_key, (int kb, ByteBuffer k)
-                -> callback.process((ByteBuffer) k.rewind().limit(kb) ));
+    public void get(K key, ValueCallback<V> callback) {
+        ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
+        database_get_buffer_with_callback(pointer, direct_key.position(), direct_key, (int vb, ByteBuffer v)
+                -> {
+                    v.rewind().limit(vb);
+                    V processed_object = (V) valueConverter.fromByteBuffer(v);
+                    callback.process(processed_object);
+                });
     }
 
-    public ByteBuffer getCopy(ByteBuffer key) {
+    public K getCopy(K key) {
         byte value[];
-        ByteBuffer direct_key = getDirectBuffer(key);
+         ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
         //TODO change type of exception to one related to PMEMKV_STATUS_NOT_FOUND
         // when implemented
         try {
@@ -118,12 +167,14 @@ public class Database {
         } catch (DatabaseException kve) {
             return null;
         }
-        return ByteBuffer.wrap(value);
+        K retval = (K) valueConverter.fromByteBuffer(ByteBuffer.wrap(value));
+
+        return retval;
     }
 
-    public void put(ByteBuffer key, ByteBuffer value) {
-          ByteBuffer direct_key = getDirectBuffer(key);
-          ByteBuffer direct_value = getDirectBuffer(value);
+    public void put(K key, K value) {
+          ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
+          ByteBuffer direct_value = getDirectBuffer(valueConverter.toByteBuffer(value));
           try {
               database_put_buffer(pointer, direct_key.position(), direct_key, direct_value.position(), direct_value);
           } catch (DatabaseException kve) {
@@ -132,8 +183,8 @@ public class Database {
           }
     }
 
-    public boolean remove(ByteBuffer key) {
-        ByteBuffer direct_key = getDirectBuffer(key);
+    public boolean remove(K key) {
+        ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
         try {
             return database_remove_buffer(pointer, direct_key.position(), direct_key);
         } catch (DatabaseException kve) {
@@ -143,6 +194,8 @@ public class Database {
     }
 
     public static class Builder {
+        private Converter keyConverter;
+        private Converter valueConverter;
         public Builder(String engine) {
             config = config_new();
 
@@ -171,15 +224,33 @@ public class Database {
             config_put_string(config, "path", path);
             return this;
         }
-
-        public Database build() {
-            Database db = new Database(this);
+        public <K, V>  Database<K, V> build() {
+            Database<K, V>  db = new Database<K, V> (this);
 
             /* After open, db takes ownership of the config */
             config = 0;
 
             return db;
         }
+
+        public Builder setKeyConverter(Converter newKeyConverter) {
+            this.keyConverter = newKeyConverter;
+            return this;
+        }
+
+        public Builder setValueConverter(Converter newValueConverter) {
+            this.valueConverter = newValueConverter;
+            return this;
+        }
+
+        public Converter getKeyConverter() {
+            return this.keyConverter;
+        }
+
+        public Converter getValueConverter() {
+            return this.valueConverter;
+        }
+
 
         private long config = 0;
         private String engine;
@@ -195,6 +266,8 @@ public class Database {
     }
 
     private Database(Builder builder) {
+        keyConverter = builder.getKeyConverter();
+        valueConverter = builder.getValueConverter();
         pointer = database_start(builder.engine, builder.config);
     }
 
