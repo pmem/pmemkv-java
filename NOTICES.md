@@ -5,14 +5,15 @@ source code for these open source projects along with license information below.
 
 ### Apache
 
-https://maven.apache.org - Apache Maven<br>
+https://maven.apache.org - Apache Maven
+
 Used under Apache License, Version 2
 
 Copyright &copy; 2016 The Apache Software Foundation
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use
 this software except in compliance with the License. You may obtain a copy of
-the License here: http://www.apache.org/licenses/LICENSE-2.0
+the License here: https://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software distributed
 under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
@@ -21,25 +22,28 @@ specific language governing permissions and limitations under the License.
 
 ### JUnit
 
-http://junit.org/<br>Used under Eclipse Public License
+https://junit.org
+
+Used under Eclipse Public License
 
 Copyright &copy; 2002-2016 JUnit
 
 All rights reserved. This program and the accompanying materials are made
 available under the terms of the Eclipse Public License v1.0 which accompanies
-this distribution, and is available at 
-http://www.eclipse.org/legal/epl-v10.html.
+this distribution, and is available at:
+https://www.eclipse.org/legal/epl-v10.html
 
 ### Oleaster Matcher
 
-https://github.com/mscharhag/oleaster/tree/master/oleaster-matcher<br>Used under
-Apache License, Version 2
+https://github.com/mscharhag/oleaster/tree/master/oleaster-matcher
+
+Used under Apache License, Version 2
 
 Copyright &copy; 2014 Michael Scharhag
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use
 this software except in compliance with the License. You may obtain a copy of
-the License here: http://www.apache.org/licenses/LICENSE-2.0
+the License here: https://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software distributed
 under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
@@ -48,7 +52,9 @@ specific language governing permissions and limitations under the License.
 
 ### OpenJDK
 
-http://openjdk.java.net/<br>Used under GPLv2 with Classpath Exception
+https://openjdk.java.net
+
+Used under GPLv2 with Classpath Exception
 
 Copyright &copy; 2016 Oracle Corporation and/or its affiliates
 
@@ -59,7 +65,7 @@ version.
 
 This program is distributed in the hope that it will be useful, but WITHOUT ANY
 WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-PARTICULAR PURPOSE. See http://openjdk.java.net/legal/gplv2+ce.html for more
+PARTICULAR PURPOSE. See https://openjdk.java.net/legal/gplv2+ce.html for more
 details.
 
 As a special exception, the copyright holders of this library give you
