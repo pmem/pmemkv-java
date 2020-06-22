@@ -11,7 +11,7 @@
 #define DO_LOG 0
 #define LOG(msg) if (DO_LOG) std::cout << "[pmemkv-jni] " << msg << "\n"
 
-#define EXCEPTION_CLASS "io/pmem/pmemkv/DatabaseException"
+#define EXCEPTION_CLASS "io/pmem/pmemkv/exceptions/DatabaseException"
 
 extern "C" JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_Database_database_1start
         (JNIEnv* env, jobject obj, jstring engine, jlong config) {

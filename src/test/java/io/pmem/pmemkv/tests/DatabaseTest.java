@@ -4,7 +4,7 @@
 package io.pmem.pmemkv.tests;
 
 import io.pmem.pmemkv.Database;
-import io.pmem.pmemkv.DatabaseException;
+import io.pmem.pmemkv.exceptions.DatabaseException;
 import org.junit.Assert;
 import org.junit.Test;
 

@@ -5,6 +5,7 @@ package io.pmem.pmemkv;
 
 import io.pmem.pmemkv.internal.GetKeysBuffersJNICallback;
 import io.pmem.pmemkv.internal.GetAllBufferJNICallback;
+import io.pmem.pmemkv.exceptions.DatabaseException;
 
 import java.nio.ByteBuffer;
 
