@@ -509,17 +509,6 @@ public class DatabaseTest {
         });
         expect(count.intValue()).toEqual(12824);
 
-        valb.clear();
-        valb.putInt(42);
-        valb.putInt(42);
-        valb.putInt(42);
-        valb.putInt(42);
-        expect(valb.position()).toEqual(16);
-        db.get(keyb, valb);
-        expect(valb.limit()).toEqual(4);
-        expect(valb.position()).toEqual(0);
-        expect(valb.getInt()).toEqual(6789);
-
         expect(db.exists(keyb)).toBeTrue();
         expect(db.remove(keyb)).toBeTrue();
         expect(db.exists(keyb)).toBeFalse();

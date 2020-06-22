@@ -112,12 +112,6 @@ public class Database {
                 -> callback.process((ByteBuffer) k.rewind().limit(kb) ));
     }
 
-    public void get(ByteBuffer key, ByteBuffer value) {
-        int valuebytes = database_get_buffer(pointer, key.position(), key, value.capacity(), value);
-        value.rewind();
-        value.limit(valuebytes);
-    }
-
     public ByteBuffer getCopy(ByteBuffer key) {
         byte value[];
         ByteBuffer direct_key = getDirectBuffer(key);
