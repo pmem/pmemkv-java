@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: BSD-3-Clause
-/* Copyright 2017-2019, Intel Corporation */
+/* Copyright 2017-2020, Intel Corporation */
 
 package io.pmem.pmemkv.tests;
 
 import io.pmem.pmemkv.Database;
-import io.pmem.pmemkv.DatabaseException;
+import io.pmem.pmemkv.exceptions.DatabaseException;
 import org.junit.Assert;
 import org.junit.Test;
 
