@@ -18,11 +18,17 @@ import static junit.framework.TestCase.fail;
 public class DatabaseTest {
 
     private final String ENGINE = "vsmap";
-    private final String CONFIG = "{\"path\":\"/dev/shm\", \"size\":1073741824}";
+
+    private Database buildDB(String engine) {
+        return new Database.Builder(engine).
+                setSize(1073741824).
+                setPath("/dev/shm").
+                build();
+    }
 
     @Test
     public void blackholeTest() {
-        Database db = new Database("blackhole", CONFIG);
+        Database db = buildDB("blackhole");
         expect(db.countAll()).toEqual(0);
         expect(db.exists("key1")).toBeFalse();
         expect(db.getCopy("key1")).toBeNull();
@@ -38,7 +44,7 @@ public class DatabaseTest {
 
     @Test
     public void startEngineTest() {
-        Database db = new Database(ENGINE, CONFIG);
+        Database db = buildDB(ENGINE);
         expect(db).toBeNotNull();
         expect(db.stopped()).toBeFalse();
         db.stop();
@@ -47,7 +53,7 @@ public class DatabaseTest {
 
     @Test
     public void stopsEngineMultipleTimesTest() {
-        Database db = new Database(ENGINE, CONFIG);
+        Database db = buildDB(ENGINE);
         expect(db.stopped()).toBeFalse();
         db.stop();
         expect(db.stopped()).toBeTrue();
@@ -59,7 +65,7 @@ public class DatabaseTest {
 
     @Test
     public void getsMissingKeyTest() {
-        Database db = new Database(ENGINE, CONFIG);
+        Database db = buildDB(ENGINE);
         expect(db.exists("key1")).toBeFalse();
         expect(db.getCopy("key1")).toBeNull();
         db.stop();
@@ -67,7 +73,7 @@ public class DatabaseTest {
 
     @Test
     public void putsBasicValueTest() {
-        Database db = new Database(ENGINE, CONFIG);
+        Database db = buildDB(ENGINE);
         expect(db.exists("key1")).toBeFalse();
         db.put("key1", "value1");
         expect(db.exists("key1")).toBeTrue();
@@ -77,7 +83,7 @@ public class DatabaseTest {
 
     @Test
     public void putsBinaryKeyTest() {
-        Database db = new Database(ENGINE, CONFIG);
+        Database db = buildDB(ENGINE);
         db.put("A\0B\0\0C", "value1");
         expect(db.exists("A\0B\0\0C")).toBeTrue();
         expect(db.getCopy("A\0B\0\0C")).toEqual("value1");
@@ -89,7 +95,7 @@ public class DatabaseTest {
 
     @Test
     public void putsBinaryValueTest() {
-        Database db = new Database(ENGINE, CONFIG);
+        Database db = buildDB(ENGINE);
         db.put("key1", "A\0B\0\0C");
         expect(db.getCopy("key1")).toEqual("A\0B\0\0C");
         db.put("key2".getBytes(), "1\02\0\03!".getBytes());
@@ -99,7 +105,7 @@ public class DatabaseTest {
 
     @Test
     public void putsComplexValueTest() {
-        Database db = new Database(ENGINE, CONFIG);
+        Database db = buildDB(ENGINE);
         String val = "one\ttwo or <p>three</p>\n {four}   and ^five";
         db.put("key1", val);
         expect(db.getCopy("key1")).toEqual(val);
@@ -108,7 +114,7 @@ public class DatabaseTest {
 
     @Test
     public void putsEmptyKeyTest() {
-        Database db = new Database(ENGINE, CONFIG);
+        Database db = buildDB(ENGINE);
         db.put("", "empty");
         db.put(" ", "single-space");
         db.put("\t\t", "two-tab");
@@ -123,7 +129,7 @@ public class DatabaseTest {
 
     @Test
     public void putsEmptyValueTest() {
-        Database db = new Database(ENGINE, CONFIG);
+        Database db = buildDB(ENGINE);
         db.put("empty", "");
         db.put("single-space", " ");
         db.put("two-tab", "\t\t");
@@ -135,7 +141,7 @@ public class DatabaseTest {
 
     @Test
     public void putsMultipleValuesTest() {
-        Database db = new Database(ENGINE, CONFIG);
+        Database db = buildDB(ENGINE);
         db.put("key1", "value1");
         db.put("key2", "value2");
         db.put("key3", "value3");
@@ -150,7 +156,7 @@ public class DatabaseTest {
 
     @Test
     public void putsOverwritingExistingValueTest() {
-        Database db = new Database(ENGINE, CONFIG);
+        Database db = buildDB(ENGINE);
         db.put("key1", "value1");
         expect(db.getCopy("key1")).toEqual("value1");
         db.put("key1", "value123");
@@ -162,7 +168,7 @@ public class DatabaseTest {
 
     @Test
     public void putsUtf8KeyTest() {
-        Database db = new Database(ENGINE, CONFIG);
+        Database db = buildDB(ENGINE);
         String val = "to remember, note, record";
         db.put("记", val);
         expect(db.exists("记")).toBeTrue();
@@ -172,7 +178,7 @@ public class DatabaseTest {
 
     @Test
     public void putsUtf8ValueTest() {
-        Database db = new Database(ENGINE, CONFIG);
+        Database db = buildDB(ENGINE);
         String val = "记 means to remember, note, record";
         db.put("key1", val);
         expect(db.getCopy("key1")).toEqual(val);
@@ -180,7 +186,7 @@ public class DatabaseTest {
     }
 
     public void removesKeyandValueTest() {
-        Database db = new Database(ENGINE, CONFIG);
+        Database db = buildDB(ENGINE);
 
         db.put("key1", "value1");
         expect(db.exists("key1")).toBeTrue();
@@ -200,39 +206,39 @@ public class DatabaseTest {
         db.stop();
     }
 
-    @Test
-    public void throwsExceptionOnStartWhenConfigIsEmptyTest() {
-        Database db = null;
-        try {
-            db = new Database(ENGINE, "{}");
-            Assert.fail();
-        } catch (DatabaseException kve) {
-            expect(kve.getKey()).toBeNull();
-        } catch (Exception e) {
-            Assert.fail();
-        }
-        expect(db).toBeNull();
-    }
+    // @Test
+    // public void throwsExceptionOnStartWhenConfigIsEmptyTest() {
+    //     Database db = null;
+    //     try {
+    //         db = new Database(ENGINE, "{}");
+    //         Assert.fail();
+    //     } catch (DatabaseException kve) {
+    //         expect(kve.getKey()).toBeNull();
+    //     } catch (Exception e) {
+    //         Assert.fail();
+    //     }
+    //     expect(db).toBeNull();
+    // }
 
-    @Test
-    public void throwsExceptionOnStartWhenConfigIsMalformedTest() {
-        Database db = null;
-        try {
-            db = new Database(ENGINE, "{");
-            Assert.fail();
-        } catch (DatabaseException kve) {
-            expect(kve.getKey()).toBeNull();
-        } catch (Exception e) {
-            Assert.fail();
-        }
-        expect(db).toBeNull();
-    }
+    // @Test
+    // public void throwsExceptionOnStartWhenConfigIsMalformedTest() {
+    //     Database db = null;
+    //     try {
+    //         db = new Database(ENGINE, "{");
+    //         Assert.fail();
+    //     } catch (DatabaseException kve) {
+    //         expect(kve.getKey()).toBeNull();
+    //     } catch (Exception e) {
+    //         Assert.fail();
+    //     }
+    //     expect(db).toBeNull();
+    // }
 
     @Test
     public void throwsExceptionOnStartWhenEngineIsInvalidTest() {
         Database db = null;
         try {
-            db = new Database("nope.nope", CONFIG);
+            db = buildDB("nope.nope");
             Assert.fail();
         } catch (DatabaseException kve) {
             expect(kve.getKey()).toBeNull();
@@ -246,7 +252,10 @@ public class DatabaseTest {
     public void throwsExceptionOnStartWhenPathIsInvalidTest() {
         Database db = null;
         try {
-            db = new Database(ENGINE, "{\"path\":\"/tmp/123/234/345/456/567/678/nope.nope\"}");
+            db = new Database.Builder(ENGINE).
+                setSize(1073741824).
+                setPath("/tmp/123/234/345/456/567/678/nope.nope").
+                build();
             Assert.fail();
         } catch (DatabaseException kve) {
             expect(kve.getKey()).toBeNull();
@@ -260,7 +269,10 @@ public class DatabaseTest {
     public void throwsExceptionOnStartWhenPathIsWrongTypeTest() {
         Database db = null;
         try {
-            db = new Database(ENGINE, "{\"path\":1234}");
+            db = new Database.Builder(ENGINE).
+                setSize(1073741824).
+                setPath("1234").
+                build();
             Assert.fail();
         } catch (DatabaseException kve) {
             expect(kve.getKey()).toBeNull();
@@ -272,7 +284,7 @@ public class DatabaseTest {
 
     @Test
     public void usesGetKeysTest() {
-        Database db = new Database(ENGINE, CONFIG);
+        Database db = buildDB(ENGINE);
         db.put("1", "one");
         db.put("2", "two");
         db.put("记!", "RR");
@@ -294,7 +306,7 @@ public class DatabaseTest {
 
     @Test
     public void usesGetKeysAboveTest() {
-        Database db = new Database(ENGINE, CONFIG);
+        Database db = buildDB(ENGINE);
         db.put("A", "1");
         db.put("AB", "2");
         db.put("AC", "3");
@@ -322,7 +334,7 @@ public class DatabaseTest {
 
     @Test
     public void usesGetKeysBelowTest() {
-        Database db = new Database(ENGINE, CONFIG);
+        Database db = buildDB(ENGINE);
         db.put("A", "1");
         db.put("AB", "2");
         db.put("AC", "3");
@@ -350,7 +362,7 @@ public class DatabaseTest {
 
     @Test
     public void usesGetKeysBetweenTest() {
-        Database db = new Database(ENGINE, CONFIG);
+        Database db = buildDB(ENGINE);
         db.put("A", "1");
         db.put("AB", "2");
         db.put("AC", "3");
@@ -386,7 +398,7 @@ public class DatabaseTest {
 
     @Test
     public void usesCountTest() {
-        Database db = new Database(ENGINE, CONFIG);
+        Database db = buildDB(ENGINE);
         db.put("A", "1");
         db.put("AB", "2");
         db.put("AC", "3");
@@ -439,7 +451,7 @@ public class DatabaseTest {
 
     @Test
     public void usesGetAllTest() {
-        Database db = new Database(ENGINE, CONFIG);
+        Database db = buildDB(ENGINE);
         db.put("1", "one");
         db.put("2", "two");
         db.put("记!", "RR");
@@ -463,7 +475,7 @@ public class DatabaseTest {
 
     @Test
     public void usesGetAllAboveTest() {
-        Database db = new Database(ENGINE, CONFIG);
+        Database db = buildDB(ENGINE);
         db.put("A", "1");
         db.put("AB", "2");
         db.put("AC", "3");
@@ -493,7 +505,7 @@ public class DatabaseTest {
 
     @Test
     public void usesGetAllBelowTest() {
-        Database db = new Database(ENGINE, CONFIG);
+        Database db = buildDB(ENGINE);
         db.put("A", "1");
         db.put("AB", "2");
         db.put("AC", "3");
@@ -523,7 +535,7 @@ public class DatabaseTest {
 
     @Test
     public void usesGetAllBetweenTest() {
-        Database db = new Database(ENGINE, CONFIG);
+        Database db = buildDB(ENGINE);
         db.put("A", "1");
         db.put("AB", "2");
         db.put("AC", "3");
@@ -561,7 +573,7 @@ public class DatabaseTest {
 
     @Test
     public void usesBuffersTest() {
-        Database db = new Database(ENGINE, CONFIG);
+        Database db = buildDB(ENGINE);
 
         ByteBuffer keyb = ByteBuffer.allocateDirect(1000);
         ByteBuffer valb = ByteBuffer.allocateDirect(1000);

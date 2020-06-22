@@ -10,10 +10,6 @@ import java.nio.ByteBuffer;
 
 public class Database {
 
-    public Database(String engine, String config) {
-        pointer = database_start(engine, config);
-    }
-
     public void stop() {
         if (!stopped) {
             stopped = true;
@@ -250,12 +246,67 @@ public class Database {
         }
     }
 
+    public static class Builder {
+        public Builder(String engine) {
+            config = config_new();
+
+            this.engine = engine;
+        }
+
+        @Override
+        public void finalize() {
+            if (config != 0) {
+                config_delete(config);
+                config = 0;
+            }
+        }
+
+        public Builder setSize(long size) {
+            config_put_int(config, "size", size);
+            return this;
+        }
+
+        public Builder setForceCreate(boolean forceCreate) {
+            config_put_int(config, "size", forceCreate ? 1 : 0);
+            return this;
+        }
+
+        public Builder setPath(String path) {
+            config_put_string(config, "path", path);
+            return this;
+        }
+
+        public Database build() {
+            Database db = new Database(this);
+
+            /* After open, db takes ownership of the config */
+            config = 0;
+
+            return db;
+        }
+
+        private long config = 0;
+        private String engine;
+
+        private native long config_new();
+        private native void config_delete(long ptr);
+        private native void config_put_int(long ptr, String key, long value);
+        private native void config_put_string(long ptr, String key, String value);
+
+        static {
+           System.loadLibrary("pmemkv-jni");
+        }
+    }
+
+    private Database(Builder builder) {
+        pointer = database_start(builder.engine, builder.config);
+    }
+
     private final long pointer;
     private boolean stopped;
 
     // JNI METHODS --------------------------------------------------------------------------------
-
-    private native long database_start(String engine, String config);
+    private native long database_start(String engine, long config);
     private native void database_stop(long ptr);
     private native void database_get_keys_buffer(long ptr, GetKeysBuffersJNICallback cb);
     private native void database_get_keys_bytes(long ptr, GetKeysByteArraysCallback cb);
