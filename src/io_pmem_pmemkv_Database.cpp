@@ -66,13 +66,20 @@ struct Context {
 
 void Callback_get_value_buffer(const char* v, size_t vb, void *arg) {
     const auto c = static_cast<Context*>(arg);
-    jobject valuebuf = c->env->NewDirectByteBuffer(const_cast<char*>(v), vb);
-    c->env->CallVoidMethod(c->callback, c->mid, vb, valuebuf);
-    c->env->DeleteLocalRef(valuebuf);
+    // OutOfMemoryError may Occurr
+    if( jobject valuebuf = c->env->NewDirectByteBuffer(const_cast<char*>(v), vb)) {
+        // Rerise exception
+        c->env->CallVoidMethod(c->callback, c->mid, vb, valuebuf);
+        c->env->DeleteLocalRef(valuebuf);
+    }
 }
 
 int Callback_get_keys_buffer(const char* k, size_t kb, const char* v, size_t vb, void *arg) {
+    const auto c = static_cast<Context*>(arg);
     Callback_get_value_buffer(k, kb, arg);
+    if( c->env->ExceptionOccurred()) {
+        return 1;
+    }
     return 0;
 };
 
@@ -157,13 +164,17 @@ extern "C" JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_Database_database_1count_
 
 int Callback_get_all_buffer(const char* k, size_t kb, const char* v, size_t vb, void *arg) {
     const auto c = static_cast<Context*>(arg);
+
     jobject keybuf = c->env->NewDirectByteBuffer( const_cast<char*>(k), kb);
     jobject valuebuf = c->env->NewDirectByteBuffer(const_cast<char*>(v), vb);
-
-    c->env->CallVoidMethod(c->callback, c->mid, kb, keybuf, vb, valuebuf);
-
-    c->env->DeleteLocalRef(keybuf);
-    c->env->DeleteLocalRef(valuebuf);
+    if( keybuf && valuebuf) {
+        c->env->CallVoidMethod(c->callback, c->mid, kb, keybuf, vb, valuebuf);
+        c->env->DeleteLocalRef(keybuf);
+        c->env->DeleteLocalRef(valuebuf);
+    }
+    if( c->env->ExceptionOccurred()) {
+        return 1;
+    }
     return 0;
 };
 
@@ -257,8 +268,11 @@ struct ContextGetByteArray {
 
 void callback_get_byte_array(const char* v, size_t vb, void *arg)  {
     const auto c = ((ContextGetByteArray*) arg);
-    c->result = c->env->NewByteArray(vb);
-    c->env->SetByteArrayRegion(c->result, 0, vb, (jbyte*) v);
+    if(c->result = c->env->NewByteArray(vb)){
+        c->env->SetByteArrayRegion(c->result, 0, vb, (jbyte*) v);
+    } else {
+        c->env->ThrowNew(c->env->FindClass(EXCEPTION_CLASS), "Cannot allocate output buffer");
+    }
 };
 
 extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1buffer_1with_1callback
