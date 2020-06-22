@@ -225,37 +225,6 @@ extern "C" JNIEXPORT jboolean JNICALL Java_io_pmem_pmemkv_Database_database_1exi
 
 }
 
-struct ContextGetBuffer {
-    JNIEnv* env;
-    int valuebytes;
-    jobject value;
-    jint result;
-};
-
-#define CONTEXT_GET_BUFFER {env, valuebytes, value, 0}
-
-const auto CALLBACK_GET_BUFFER = [](const char* v, size_t vb, void *arg) {
-    const auto c = ((ContextGetBuffer*) arg);
-    if (vb > c->valuebytes) {
-        c->env->ThrowNew(c->env->FindClass(EXCEPTION_CLASS), "ByteBuffer is too small");
-    } else {
-        char* cvalue = (char*) c->env->GetDirectBufferAddress(c->value);
-        std::memcpy(cvalue, v, vb);
-        c->result = vb;
-    }
-};
-
-extern "C" JNIEXPORT jint JNICALL Java_io_pmem_pmemkv_Database_database_1get_1buffer
-        (JNIEnv* env, jobject obj, jlong pointer, jint keybytes, jobject key, jint valuebytes, jobject value) {
-    auto engine = (pmemkv_db*) pointer;
-    const char* ckey = (char*) env->GetDirectBufferAddress(key);
-    ContextGetBuffer cxt = CONTEXT_GET_BUFFER;
-    auto status = pmemkv_get(engine, (char*) ckey, keybytes, CALLBACK_GET_BUFFER, &cxt);
-    if (status != PMEMKV_STATUS_OK && status != PMEMKV_STATUS_NOT_FOUND)
-        env->ThrowNew(env->FindClass(EXCEPTION_CLASS), pmemkv_errormsg());
-    return cxt.result;
-}
-
 struct ContextGetByteArray {
     JNIEnv* env;
     jbyteArray result;
