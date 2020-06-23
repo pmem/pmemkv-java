@@ -5,6 +5,7 @@ package io.pmem.pmemkv.tests;
 
 import io.pmem.pmemkv.Database;
 import io.pmem.pmemkv.DatabaseException;
+import io.pmem.pmemkv.Converter;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -15,15 +16,27 @@ import static com.mscharhag.oleaster.matcher.Matchers.expect;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static junit.framework.TestCase.fail;
 
+class ByteBufferConverter implements Converter<ByteBuffer> {
+    public ByteBuffer toByteBuffer(ByteBuffer entry) {
+      return entry;
+    }
+
+    public ByteBuffer fromByteBuffer(ByteBuffer entry) {
+      return entry;
+    }
+}
+
 public class DatabaseTest {
 
     private final String ENGINE = "vsmap";
 
-    private Database buildDB(String engine) {
+    private Database<ByteBuffer, ByteBuffer> buildDB(String engine) {
         return new Database.Builder(engine).
                 setSize(1073741824).
                 setPath("/dev/shm").
-                build();
+                setKeyConverter(new ByteBufferConverter()).
+                setValueConverter(new ByteBufferConverter()).
+                <ByteBuffer, ByteBuffer>build();
     }
 
     private static ByteBuffer stringToByteBuffer(String msg){
@@ -39,7 +52,7 @@ public class DatabaseTest {
 
     @Test
     public void blackholeTest() {
-        Database db = buildDB("blackhole");
+        Database<ByteBuffer, ByteBuffer> db = buildDB("blackhole");
         expect(db.countAll()).toEqual(0);
         expect(db.exists(stringToByteBuffer("key1"))).toBeFalse();
         ByteBuffer ret =  db.getCopy(stringToByteBuffer("key1"));
@@ -65,7 +78,7 @@ public class DatabaseTest {
 
     @Test
     public void stopsEngineMultipleTimesTest() {
-        Database db = buildDB(ENGINE);
+        Database<ByteBuffer, ByteBuffer> db = buildDB(ENGINE);
         expect(db.stopped()).toBeFalse();
         db.stop();
         expect(db.stopped()).toBeTrue();
@@ -77,7 +90,7 @@ public class DatabaseTest {
 
     @Test
     public void getsMissingKeyTest() {
-        Database db = buildDB(ENGINE);
+        Database<ByteBuffer, ByteBuffer> db = buildDB(ENGINE);
         expect(db.exists(stringToByteBuffer("key1"))).toBeFalse();
         expect(db.getCopy(stringToByteBuffer("key1"))).toBeNull();
         db.stop();
@@ -85,7 +98,7 @@ public class DatabaseTest {
 
     @Test
     public void putsBasicValueTest() {
-        Database db = buildDB(ENGINE);
+        Database<ByteBuffer, ByteBuffer> db = buildDB(ENGINE);
         expect(db.exists(stringToByteBuffer("key1"))).toBeFalse();
         db.put(stringToByteBuffer("key1"), stringToByteBuffer("value1"));
         expect(db.exists(stringToByteBuffer("key1"))).toBeTrue();
@@ -96,7 +109,7 @@ public class DatabaseTest {
 
     @Test
     public void putsEmptyKeyTest() {
-        Database db = buildDB(ENGINE);
+        Database<ByteBuffer, ByteBuffer> db = buildDB(ENGINE);
         db.put(stringToByteBuffer(""), stringToByteBuffer("empty"));
         db.put(stringToByteBuffer(" "), stringToByteBuffer("single-space"));
         db.put(stringToByteBuffer("\t\t"), stringToByteBuffer("two-tab"));
@@ -114,7 +127,7 @@ public class DatabaseTest {
 
     @Test
     public void putsEmptyValueTest() {
-        Database db = buildDB(ENGINE);
+        Database<ByteBuffer, ByteBuffer> db = buildDB(ENGINE);
         db.put(stringToByteBuffer("empty"), stringToByteBuffer(""));
         db.put(stringToByteBuffer("single-space"), stringToByteBuffer(" "));
         db.put(stringToByteBuffer("two-tab"), stringToByteBuffer("\t\t"));
@@ -129,7 +142,7 @@ public class DatabaseTest {
 
     @Test
     public void putsMultipleValuesTest() {
-        Database db = buildDB(ENGINE);
+        Database<ByteBuffer, ByteBuffer> db = buildDB(ENGINE);
         db.put(stringToByteBuffer("key1"), stringToByteBuffer("value1"));
         db.put(stringToByteBuffer("key2"), stringToByteBuffer("value2"));
         db.put(stringToByteBuffer("key3"), stringToByteBuffer("value3"));
@@ -148,7 +161,7 @@ public class DatabaseTest {
 
     @Test
     public void putsOverwritingExistingValueTest() {
-        Database db = buildDB(ENGINE);
+        Database<ByteBuffer, ByteBuffer> db = buildDB(ENGINE);
         db.put(stringToByteBuffer("key1"), stringToByteBuffer("value1"));
         expect(byteBufferToString(
                 db.getCopy(stringToByteBuffer("key1")))).toEqual("value1");
@@ -163,7 +176,7 @@ public class DatabaseTest {
 
     @Test
     public void removesKeyandValueTest() {
-        Database db = buildDB(ENGINE);
+        Database<ByteBuffer, ByteBuffer> db = buildDB(ENGINE);
 
         db.put(stringToByteBuffer("key1"), stringToByteBuffer("value1"));
         expect(db.exists(stringToByteBuffer("key1"))).toBeTrue();
@@ -184,7 +197,7 @@ public class DatabaseTest {
         try {
             db = new Database.Builder(ENGINE).
                 setSize(1073741824).
-                build();
+                <ByteBuffer, ByteBuffer>build();
             Assert.fail();
         } catch (DatabaseException kve) {
             expect(kve.getKey()).toBeNull();
@@ -200,7 +213,7 @@ public class DatabaseTest {
         try {
             db = new Database.Builder(ENGINE).
                 setPath("/dev/shm").
-                build();
+                <ByteBuffer, ByteBuffer>build();
             Assert.fail();
         } catch (DatabaseException kve) {
             expect(kve.getKey()).toBeNull();
@@ -231,7 +244,7 @@ public class DatabaseTest {
             db = new Database.Builder(ENGINE).
                 setSize(1073741824).
                 setPath("/tmp/123/234/345/456/567/678/nope.nope").
-                build();
+                <ByteBuffer, ByteBuffer>build();
             Assert.fail();
         } catch (DatabaseException kve) {
             expect(kve.getKey()).toBeNull();
@@ -248,7 +261,7 @@ public class DatabaseTest {
             db = new Database.Builder(ENGINE).
                 setSize(1073741824).
                 setPath("1234").
-                build();
+                <ByteBuffer, ByteBuffer>build();
             Assert.fail();
         } catch (DatabaseException kve) {
             expect(kve.getKey()).toBeNull();
@@ -260,7 +273,7 @@ public class DatabaseTest {
 
     @Test
     public void usesGetKeysTest() {
-        Database db = buildDB(ENGINE);
+        Database<ByteBuffer, ByteBuffer> db = buildDB(ENGINE);
         db.put(stringToByteBuffer("1"), stringToByteBuffer("one"));
         db.put(stringToByteBuffer("2"), stringToByteBuffer("two"));
         db.put(stringToByteBuffer("记!"), stringToByteBuffer("RR"));
@@ -275,7 +288,7 @@ public class DatabaseTest {
 
     @Test
     public void usesGetKeysAboveTest() {
-        Database db = buildDB(ENGINE);
+        Database<ByteBuffer, ByteBuffer> db = buildDB(ENGINE);
         db.put(stringToByteBuffer("A"), stringToByteBuffer("1"));
         db.put(stringToByteBuffer("AB"), stringToByteBuffer("2"));
         db.put(stringToByteBuffer("AC"), stringToByteBuffer("3"));
@@ -295,7 +308,7 @@ public class DatabaseTest {
 
     @Test
     public void usesGetKeysBelowTest() {
-        Database db = buildDB(ENGINE);
+        Database<ByteBuffer, ByteBuffer> db = buildDB(ENGINE);
         db.put(stringToByteBuffer("A"), stringToByteBuffer("1"));
         db.put(stringToByteBuffer("AB"), stringToByteBuffer("2"));
         db.put(stringToByteBuffer("AC"), stringToByteBuffer("3"));
@@ -315,7 +328,7 @@ public class DatabaseTest {
 
     @Test
     public void usesGetKeysBetweenTest() {
-        Database db = buildDB(ENGINE);
+        Database<ByteBuffer, ByteBuffer> db = buildDB(ENGINE);
         db.put(stringToByteBuffer("A"), stringToByteBuffer("1"));
         db.put(stringToByteBuffer("AB"), stringToByteBuffer("2"));
         db.put(stringToByteBuffer("AC"), stringToByteBuffer("3"));
@@ -343,7 +356,7 @@ public class DatabaseTest {
 
     @Test
     public void usesCountTest() {
-        Database db = buildDB(ENGINE);
+        Database<ByteBuffer, ByteBuffer> db = buildDB(ENGINE);
         db.put(stringToByteBuffer("A"), stringToByteBuffer("1"));
         db.put(stringToByteBuffer("AB"), stringToByteBuffer("2"));
         db.put(stringToByteBuffer("AC"), stringToByteBuffer("3"));
@@ -392,7 +405,7 @@ public class DatabaseTest {
 
     @Test
     public void usesGetAllTest() {
-        Database db = buildDB(ENGINE);
+        Database<ByteBuffer, ByteBuffer> db = buildDB(ENGINE);
         db.put(stringToByteBuffer("1"), stringToByteBuffer("one"));
         db.put(stringToByteBuffer("2"), stringToByteBuffer("two"));
         db.put(stringToByteBuffer("记!"), stringToByteBuffer("RR"));
@@ -407,7 +420,7 @@ public class DatabaseTest {
 
     @Test
     public void usesGetAllAboveTest() {
-        Database db = buildDB(ENGINE);
+        Database<ByteBuffer, ByteBuffer> db = buildDB(ENGINE);
         db.put(stringToByteBuffer("A"), stringToByteBuffer("1"));
         db.put(stringToByteBuffer("AB"), stringToByteBuffer("2"));
         db.put(stringToByteBuffer("AC"), stringToByteBuffer("3"));
@@ -434,7 +447,7 @@ public class DatabaseTest {
 
     @Test
     public void usesGetAllBelowTest() {
-        Database db = buildDB(ENGINE);
+        Database<ByteBuffer, ByteBuffer> db = buildDB(ENGINE);
         db.put(stringToByteBuffer("A"), stringToByteBuffer("1"));
         db.put(stringToByteBuffer("AB"), stringToByteBuffer("2"));
         db.put(stringToByteBuffer("AC"), stringToByteBuffer("3"));
@@ -461,7 +474,7 @@ public class DatabaseTest {
 
     @Test
     public void usesGetAllBetweenTest() {
-        Database db = buildDB(ENGINE);
+        Database<ByteBuffer, ByteBuffer> db = buildDB(ENGINE);
         db.put(stringToByteBuffer("A"), stringToByteBuffer("1"));
         db.put(stringToByteBuffer("AB"), stringToByteBuffer("2"));
         db.put(stringToByteBuffer("AC"), stringToByteBuffer("3"));
@@ -498,7 +511,7 @@ public class DatabaseTest {
 
     @Test
     public void usesBuffersTest() {
-        Database db = buildDB(ENGINE);
+        Database<ByteBuffer, ByteBuffer> db = buildDB(ENGINE);
 
         ByteBuffer keyb = ByteBuffer.allocateDirect(1000);
         ByteBuffer valb = ByteBuffer.allocateDirect(1000);
@@ -535,7 +548,7 @@ public class DatabaseTest {
 
     @Test
     public void usesGetBufferIsDirectBufferTest() {
-        Database db = buildDB(ENGINE);
+        Database<ByteBuffer, ByteBuffer> db = buildDB(ENGINE);
         // Direct ByteBuffer
         ByteBuffer keybb = ByteBuffer.allocateDirect(16);
         ByteBuffer valbb = ByteBuffer.allocateDirect(16);

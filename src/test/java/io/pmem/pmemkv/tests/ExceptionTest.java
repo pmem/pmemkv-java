@@ -2,6 +2,7 @@ package io.pmem.pmemkv.tests;
 
 import io.pmem.pmemkv.Database;
 import io.pmem.pmemkv.DatabaseException;
+import io.pmem.pmemkv.Converter;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -21,16 +22,28 @@ class CustomException extends RuntimeException {
     }
 }
 
+//class ByteBufferConverter implements Converter<ByteBuffer> {
+//    public ByteBuffer toByteBuffer(ByteBuffer entry) {
+//      return entry;
+//    }
+//
+//    public ByteBuffer fromByteBuffer(ByteBuffer entry) {
+//      return entry;
+//    }
+//}
+
 public class ExceptionTest {
 
     private final String ENGINE = "vsmap";
-    private Database db;
+    private Database<ByteBuffer, ByteBuffer> db;
 
-    private Database buildDB(String engine) {
+    private Database<ByteBuffer, ByteBuffer> buildDB(String engine) {
         return new Database.Builder(engine).
                 setSize(1073741824).
                 setPath("/dev/shm").
-                build();
+                setKeyConverter(new ByteBufferConverter()).
+                setValueConverter(new ByteBufferConverter()).
+                <ByteBuffer, ByteBuffer>build();
     }
 
     @Before
@@ -54,7 +67,7 @@ public class ExceptionTest {
     public void exceptionInGetallTest() {
         int exception_counter = 0;
         try {
-            db.getAll((ByteBuffer k, ByteBuffer v) -> {
+            db.getAll((k, v) -> {
                 throw new RuntimeException("Inner exception");
             });
         } catch (Exception e) {
@@ -68,7 +81,7 @@ public class ExceptionTest {
         int exception_counter = 0;
         AtomicInteger loop_counter = new AtomicInteger(0);
         try {
-                db.getKeys((ByteBuffer k) -> {
+                db.getKeys((k) -> {
                     loop_counter.getAndIncrement();
                     throw new RuntimeException("Inner exception");
             });
@@ -84,7 +97,7 @@ public class ExceptionTest {
         int exception_counter = 0;
         AtomicInteger loop_counter = new AtomicInteger(0);
         try {
-                db.getKeys((ByteBuffer k) -> {
+                db.getKeys((k) -> {
                     loop_counter.getAndIncrement();
                     if( k.getInt() == 15) {
                         throw new RuntimeException("Inner exception");
