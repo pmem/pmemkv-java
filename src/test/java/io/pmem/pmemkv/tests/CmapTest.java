@@ -27,18 +27,22 @@ public class CmapTest {
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
 
-    private Database createDB(String engine, String path) {
-        return new Database.Builder(engine).
+    private Database<ByteBuffer, ByteBuffer> createDB(String engine, String path) {
+        return new Database.Builder<ByteBuffer, ByteBuffer>(engine).
                 setSize(100000000).
                 setForceCreate(true).
                 setPath(path).
+                setKeyConverter(new ByteBufferConverter()).
+                setValueConverter(new ByteBufferConverter()).
                 build();
     }
 
-    private Database openDB(String engine, String path) {
-        return new Database.Builder(engine).
+    private Database<ByteBuffer, ByteBuffer> openDB(String engine, String path) {
+        return new Database.Builder<ByteBuffer, ByteBuffer>(engine).
                 setForceCreate(false).
                 setPath(path).
+                setKeyConverter(new ByteBufferConverter()).
+                setValueConverter(new ByteBufferConverter()).
                 build();
     }
 
@@ -56,7 +60,7 @@ public class CmapTest {
     @Test
     public void testCreateAndOpen() {
         String file = folder.getRoot() + File.pathSeparator + "testfile";
-        Database db = createDB(ENGINE, file);
+        Database<ByteBuffer, ByteBuffer> db = createDB(ENGINE, file);
 
         expect(db.exists(stringToByteBuffer("key1"))).toBeFalse();
         db.put(stringToByteBuffer("key1"), stringToByteBuffer("value1"));
