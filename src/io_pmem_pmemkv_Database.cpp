@@ -14,28 +14,13 @@
 #define EXCEPTION_CLASS "io/pmem/pmemkv/DatabaseException"
 
 extern "C" JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_Database_database_1start
-        (JNIEnv* env, jobject obj, jstring engine, jstring config) {
+        (JNIEnv* env, jobject obj, jstring engine, jlong config) {
     const char* cengine = env->GetStringUTFChars(engine, NULL);
-    const char* cconfig = env->GetStringUTFChars(config, NULL);
-
-    auto cfg = pmemkv_config_new();
-    if (config == nullptr) {
-        env->ThrowNew(env->FindClass(EXCEPTION_CLASS), pmemkv_errormsg());
-        return 0;
-    }
-
-    auto status = pmemkv_config_from_json(cfg, cconfig);
-    if (status != PMEMKV_STATUS_OK) {
-        pmemkv_config_delete(cfg);
-        env->ThrowNew(env->FindClass(EXCEPTION_CLASS), pmemkv_errormsg());
-        return 0;
-    }
 
     pmemkv_db *db;
-    status = pmemkv_open(cengine, cfg, &db);
+    auto status = pmemkv_open(cengine, (pmemkv_config*) config, &db);
 
     env->ReleaseStringUTFChars(engine, cengine);
-    env->ReleaseStringUTFChars(config, cconfig);
 
     if (status != PMEMKV_STATUS_OK)
         env->ThrowNew(env->FindClass(EXCEPTION_CLASS), pmemkv_errormsg());

@@ -24,12 +24,18 @@ class CustomException extends RuntimeException {
 public class ExceptionTest {
 
     private final String ENGINE = "vsmap";
-    private final String CONFIG = "{\"path\":\"/dev/shm\", \"size\":1073741824}";
     private Database db;
+
+    private Database buildDB(String engine) {
+        return new Database.Builder(engine).
+                setSize(1073741824).
+                setPath("/dev/shm").
+                build();
+    }
 
     @Before
     public void init() {
-        db = new Database(ENGINE, CONFIG);
+        db = buildDB(ENGINE);
         // Direct ByteBuffer
         for ( int i = 0; i< 0xFF; i++){
             ByteBuffer key = ByteBuffer.allocateDirect(256);
