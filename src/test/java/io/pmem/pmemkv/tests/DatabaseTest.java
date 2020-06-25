@@ -181,52 +181,59 @@ public class DatabaseTest {
     @Test
     public void throwsExceptionOnStartWhenPathIsMissing() {
         Database db = null;
+        boolean exception_occured = false;
         try {
             db = new Database.Builder(ENGINE).
                 setSize(1073741824).
                 build();
             Assert.fail();
         } catch (DatabaseException kve) {
-            expect(kve.getKey()).toBeNull();
+            exception_occured = true;
         } catch (Exception e) {
             Assert.fail();
         }
+        expect(exception_occured).toBeTrue();
         expect(db).toBeNull();
     }
 
     @Test
     public void throwsExceptionOnStartWhenSizeIsMissing() {
         Database db = null;
+        boolean exception_occured = false;
         try {
             db = new Database.Builder(ENGINE).
                 setPath("/dev/shm").
                 build();
             Assert.fail();
         } catch (DatabaseException kve) {
-            expect(kve.getKey()).toBeNull();
+            exception_occured = true;
         } catch (Exception e) {
             Assert.fail();
         }
         expect(db).toBeNull();
+        expect(exception_occured).toBeTrue();
     }
 
     @Test
     public void throwsExceptionOnStartWhenEngineIsInvalidTest() {
         Database db = null;
+        boolean exception_occured = false;
         try {
             db = buildDB("nope.nope");
             Assert.fail();
         } catch (DatabaseException kve) {
-            expect(kve.getKey()).toBeNull();
+            exception_occured = true;
         } catch (Exception e) {
             Assert.fail();
         }
         expect(db).toBeNull();
+        expect(exception_occured).toBeTrue();
     }
 
     @Test
     public void throwsExceptionOnStartWhenPathIsInvalidTest() {
         Database db = null;
+        boolean exception_occured = false;
         try {
             db = new Database.Builder(ENGINE).
                 setSize(1073741824).
@@ -234,16 +241,18 @@ public class DatabaseTest {
                 build();
             Assert.fail();
         } catch (DatabaseException kve) {
-            expect(kve.getKey()).toBeNull();
+            exception_occured = true;
         } catch (Exception e) {
             Assert.fail();
         }
         expect(db).toBeNull();
+        expect(exception_occured).toBeTrue();
     }
 
     @Test
     public void throwsExceptionOnStartWhenPathIsWrongTypeTest() {
         Database db = null;
+        boolean exception_occured = false;
         try {
             db = new Database.Builder(ENGINE).
                 setSize(1073741824).
@@ -251,10 +260,11 @@ public class DatabaseTest {
                 build();
             Assert.fail();
         } catch (DatabaseException kve) {
-            expect(kve.getKey()).toBeNull();
+            exception_occured = true;
         } catch (Exception e) {
             Assert.fail();
         }
+        expect(exception_occured).toBeTrue();
         expect(db).toBeNull();
     }
 

@@ -125,22 +125,12 @@ public class Database {
     public void put(ByteBuffer key, ByteBuffer value) {
           ByteBuffer direct_key = getDirectBuffer(key);
           ByteBuffer direct_value = getDirectBuffer(value);
-          try {
               database_put_buffer(pointer, direct_key.position(), direct_key, direct_value.position(), direct_value);
-          } catch (DatabaseException kve) {
-              kve.setKey(key);
-              throw kve;
-          }
     }
 
     public boolean remove(ByteBuffer key) {
         ByteBuffer direct_key = getDirectBuffer(key);
-        try {
-            return database_remove_buffer(pointer, direct_key.position(), direct_key);
-        } catch (DatabaseException kve) {
-            kve.setKey(key);
-            throw kve;
-        }
+        return database_remove_buffer(pointer, direct_key.position(), direct_key);
     }
 
     public static class Builder {
