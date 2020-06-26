@@ -16,6 +16,10 @@
     <packaging>so</packaging>
     <description>JNI layer for pmemkv Java bindings</description>
 
+    <properties>
+      <soversion>1</soversion>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
@@ -32,7 +36,8 @@
                     <compilerProvider>generic-classic</compilerProvider>
                     <compilerExecutable>c++</compilerExecutable>
                     <linkerExecutable>c++</linkerExecutable>
-                    <linkerFinalNameExt>${project.packaging}</linkerFinalNameExt>
+                    <linkerFinalNameExt>${project.packaging}.${soversion}</linkerFinalNameExt>
+                    <linkerSecondaryOutputExtensions>${project.packaging}</linkerSecondaryOutputExtensions>
                     <workingDirectory>${basedir}</workingDirectory>
                     <sources>
                         <source>
@@ -56,6 +61,8 @@
                     </compilerEndOptions>
                     <linkerStartOptions>
                         <linkerStartOption>-shared</linkerStartOption>
+                        <linkerStartOption>-Wl,-soname,${project.artifactId}.${project.packaging}.${soversion}</linkerStartOption>
+                        <linkerStartOption>-Wl,--version-script,${basedir}/libpmemkv_jni.map</linkerStartOption>
                         <linkerStartOption>-fPIC</linkerStartOption>
                         <linkerStartOption>-O3</linkerStartOption>
                         <linkerStartOption>-I ${JAVA_HOME}/include/</linkerStartOption>
@@ -66,6 +73,26 @@
                         <linkerEndOption>-lpmemkv</linkerEndOption>
                     </linkerEndOptions>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <configuration>
+                            <target>
+                                <symlink link="${project.build.directory}/${project.artifactId}.${project.packaging}"
+                                         resource="./${project.artifactId}.${project.packaging}.${soversion}"
+                                         overwrite="true" />
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
         <resources>
