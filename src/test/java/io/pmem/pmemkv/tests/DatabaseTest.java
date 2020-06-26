@@ -4,8 +4,8 @@
 package io.pmem.pmemkv.tests;
 
 import io.pmem.pmemkv.Database;
-import io.pmem.pmemkv.DatabaseException;
 import io.pmem.pmemkv.ByteBufferConverter;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -164,87 +164,6 @@ public class DatabaseTest {
         expect(db.getCopy(stringToByteBuffer("key1"))).toBeNull();
 
         db.stop();
-    }
-
-    @Test
-    public void throwsExceptionOnStartWhenPathIsMissing() {
-        Database db = null;
-        boolean exception_occured = false;
-        try {
-            db = new Database.Builder(ENGINE).setSize(1073741824).<ByteBuffer, ByteBuffer> build();
-            Assert.fail();
-        } catch (DatabaseException kve) {
-            exception_occured = true;
-        } catch (Exception e) {
-            Assert.fail();
-        }
-        expect(exception_occured).toBeTrue();
-        expect(db).toBeNull();
-    }
-
-    @Test
-    public void throwsExceptionOnStartWhenSizeIsMissing() {
-        Database db = null;
-        boolean exception_occured = false;
-        try {
-            db = new Database.Builder(ENGINE).setPath("/dev/shm").<ByteBuffer, ByteBuffer> build();
-            Assert.fail();
-        } catch (DatabaseException kve) {
-            exception_occured = true;
-        } catch (Exception e) {
-            Assert.fail();
-        }
-        expect(db).toBeNull();
-        expect(exception_occured).toBeTrue();
-    }
-
-    @Test
-    public void throwsExceptionOnStartWhenEngineIsInvalidTest() {
-        Database db = null;
-        boolean exception_occured = false;
-        try {
-            db = buildDB("nope.nope");
-            Assert.fail();
-        } catch (DatabaseException kve) {
-            exception_occured = true;
-        } catch (Exception e) {
-            Assert.fail();
-        }
-        expect(db).toBeNull();
-        expect(exception_occured).toBeTrue();
-    }
-
-    @Test
-    public void throwsExceptionOnStartWhenPathIsInvalidTest() {
-        Database db = null;
-        boolean exception_occured = false;
-        try {
-            db = new Database.Builder(ENGINE).setSize(1073741824).setPath("/tmp/123/234/345/456/567/678/nope.nope")
-                    .<ByteBuffer, ByteBuffer> build();
-            Assert.fail();
-        } catch (DatabaseException kve) {
-            exception_occured = true;
-        } catch (Exception e) {
-            Assert.fail();
-        }
-        expect(db).toBeNull();
-        expect(exception_occured).toBeTrue();
-    }
-
-    @Test
-    public void throwsExceptionOnStartWhenPathIsWrongTypeTest() {
-        Database db = null;
-        boolean exception_occured = false;
-        try {
-            db = new Database.Builder(ENGINE).setSize(1073741824).setPath("1234").<ByteBuffer, ByteBuffer> build();
-            Assert.fail();
-        } catch (DatabaseException kve) {
-            exception_occured = true;
-        } catch (Exception e) {
-            Assert.fail();
-        }
-        expect(exception_occured).toBeTrue();
-        expect(db).toBeNull();
     }
 
     @Test
