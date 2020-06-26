@@ -1,0 +1,34 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright 2020, Intel Corporation
+#
+#
+# libpmemkv-jni.map -- linker map file for libpmemkv-jni
+#
+LIBPMEMKV_JNI_1.0 {
+	global:
+		Java_io_pmem_pmemkv_Database_database_1start;
+		Java_io_pmem_pmemkv_Database_database_1stop;
+		Java_io_pmem_pmemkv_Database_database_1get_1keys_1buffer;
+		Java_io_pmem_pmemkv_Database_database_1get_1keys_1above_1buffer;
+		Java_io_pmem_pmemkv_Database_database_1get_1keys_1below_1buffer;
+		Java_io_pmem_pmemkv_Database_database_1get_1keys_1between_1buffer;
+		Java_io_pmem_pmemkv_Database_database_1count_1all;
+		Java_io_pmem_pmemkv_Database_database_1count_1above_1buffer;
+		Java_io_pmem_pmemkv_Database_database_1count_1below_1buffer;
+		Java_io_pmem_pmemkv_Database_database_1count_1between_1buffer;
+		Java_io_pmem_pmemkv_Database_database_1get_1all_1buffer;
+		Java_io_pmem_pmemkv_Database_database_1get_1above_1buffer;
+		Java_io_pmem_pmemkv_Database_database_1get_1below_1buffer;
+		Java_io_pmem_pmemkv_Database_database_1get_1between_1buffer;
+		Java_io_pmem_pmemkv_Database_database_1exists_1buffer;
+		Java_io_pmem_pmemkv_Database_database_1get_1buffer_1with_1callback;
+		Java_io_pmem_pmemkv_Database_database_1get_1bytes;
+		Java_io_pmem_pmemkv_Database_database_1put_1buffer;
+		Java_io_pmem_pmemkv_Database_database_1remove_1buffer;
+		Java_io_pmem_pmemkv_Database_00024Builder_config_1new;
+		Java_io_pmem_pmemkv_Database_00024Builder_config_1delete;
+		Java_io_pmem_pmemkv_Database_00024Builder_config_1put_1int;
+		Java_io_pmem_pmemkv_Database_00024Builder_config_1put_1string;
+	local:
+		*;
+};
