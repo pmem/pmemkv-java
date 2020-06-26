@@ -1,9 +1,24 @@
 # Contributing to pmemkv-java
 
+- [Opening New Issues](#opening-new-issues)
+- [Code Style](#code-style)
+- [Submitting Pull Requests](#submitting-pull-requests)
+
 ## Opening New Issues
 
 Please log bugs or suggestions as [GitHub issues](https://github.com/pmem/pmemkv-java/issues).
 Details such as OS and pmemkv version are always appreciated.
+
+# Code Style
+
+We use code style as defined in the Eclipse formatter settings.
+
+Code is validated on `mvn validate` phase (executed automatically before `mvn compile` phase).
+
+If you want to format your code you can run adequate target:
+```sh
+mvn formatter:format
+```
 
 ## Submitting Pull Requests
 
