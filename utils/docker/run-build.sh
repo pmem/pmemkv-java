@@ -23,25 +23,11 @@ else
 	exit 1
 fi
 
-echo "#####################################################"
-echo "### Verifying building and tests execution of the jni"
-echo "#####################################################"
-mkdir $WORKDIR/build
-cd $WORKDIR/build
-cmake .. -DCMAKE_BUILD_TYPE=Release
-make -j$(nproc) pmemkv-jni
-make -j$(nproc) pmemkv-jni_test
-PMEM_IS_PMEM_FORCE=1 ./pmemkv-jni_test
-
-# check if the library exists
-ls -al libpmemkv-jni.so
-
 echo
 echo "###########################################################"
 echo "### Verifying building and installing of the java bindings "
 echo "###########################################################"
 cd $WORKDIR
-export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${WORKDIR}/build
 mkdir -p ~/.m2/repository
 cp -r /opt/java/repository ~/.m2/
-mvn install
+mvn install -e
