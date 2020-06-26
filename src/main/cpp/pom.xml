@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>io.pmem</groupId>
+    <artifactId>libpmemkv-jni</artifactId>
+    <name>pmemkv-jni</name>
+    <packaging>so</packaging>
+    <description>JNI layer for Java bindings for pmemkv</description>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>native-maven-plugin</artifactId>
+                <version>1.0-alpha-11</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <compilerProvider>generic-classic</compilerProvider>
+                    <compilerExecutable>c++</compilerExecutable>
+                    <linkerExecutable>c++</linkerExecutable>
+                    <linkerFinalNameExt>${project.packaging}</linkerFinalNameExt>
+                    <workingDirectory>${basedir}</workingDirectory>
+                    <sources>
+                        <source>
+                            <directory>.</directory>
+                            <fileNames>
+                                <fileName>io_pmem_pmemkv_Database.cpp</fileName>
+                                <fileName>io_pmem_pmemkv_Database_Builder.cpp</fileName>
+                            </fileNames>
+                        </source>
+                    </sources>
+                    <compilerStartOptions>
+                        <compilerStartOption>-I ${JAVA_HOME}/include/</compilerStartOption>
+                        <compilerStartOption>-I ${JAVA_HOME}/include/linux/</compilerStartOption>
+                    </compilerStartOptions>
+                    <compilerEndOptions>
+                        <compilerEndOptions>-O3</compilerEndOptions>
+                        <compilerEndOptions>-fPIC</compilerEndOptions>
+                        <compilerEndOptions>-shared</compilerEndOptions>
+                        <compilerEndOption>-std=gnu++11</compilerEndOption>
+                    </compilerEndOptions>
+                    <linkerStartOptions>
+                        <linkerStartOption>-shared</linkerStartOption>
+                        <linkerStartOption>-fPIC</linkerStartOption>
+                        <linkerStartOption>-O3</linkerStartOption>
+                        <linkerStartOption>-I ${JAVA_HOME}/include/</linkerStartOption>
+                        <linkerStartOption>-I ${JAVA_HOME}/include/linux/</linkerStartOption>
+                        <linkerStartOption>-I ${JAVA_HOME}/lib/</linkerStartOption>
+                    </linkerStartOptions>
+                    <linkerEndOptions>
+                        <linkerEndOption>-lpmemkv</linkerEndOption>
+                        <linkerEndOption>-lpmemkv_json_config</linkerEndOption>
+                    </linkerEndOptions>
+                </configuration>
+            </plugin>
+        </plugins>
+        <resources>
+            <resource>
+                <directory>${basedir}/../resources</directory>
+                <includes>
+                    <include>version.properties</include>
+                </includes>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+    </build>
+</project>
