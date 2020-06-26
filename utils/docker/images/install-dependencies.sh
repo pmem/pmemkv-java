@@ -9,8 +9,8 @@
 
 set -e
 
-# master: Merge pull request #37 from lukaszstolarczuk/set-new-j..., 06.12.2019
-JAVA_VERSION="49c0fbe4f8727b279c7aa073963792471bb5dbe7"
+# master:  Merge pull request #52 from igchor/builder, 23.06.2020
+JAVA_VERSION="155ec92db19769b55c44875ca3beed1e8a62ae7b"
 
 #
 # project's dependencies - all of the dependencies needed to run pmemkv-java will
@@ -25,6 +25,10 @@ git checkout $JAVA_VERSION
 mvn dependency:go-offline
 mvn install -Dmaven.test.skip=true
 mv -v ~/.m2/repository /opt/java/
+
+# remove any installed pmemkv's libs
+rm -r /opt/java/repository/io/pmem/*
+
 popd
 rm -r ${deps_dir}
 
