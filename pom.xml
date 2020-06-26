@@ -5,78 +5,25 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.pmem</groupId>
-    <artifactId>pmemkv</artifactId>
+    <artifactId>pmemkv-java</artifactId>
     <version>0.9.0</version>
-    <name>pmemkv</name>
-    <description>Java bindings for pmemkv</description>
+    <name>pmemkv-java</name>
+    <description>Java bindings for pmemkv (top-level, parent artifact)</description>
     <url>https://github.com/pmem/pmemkv-java</url>
+    <packaging>pom</packaging>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.5</version>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.1</version>
-                <configuration>
-                    <useSystemClassLoader>false</useSystemClassLoader>
-                </configuration>
-            </plugin>
-        </plugins>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <includes>
-                    <include>version.properties</include>
-                </includes>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
-    </build>
+    <properties>
+        <!-- use Java in ver. 8 and UTF-8 encoding -->
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>com.mscharhag.oleaster</groupId>
-            <artifactId>oleaster-matcher</artifactId>
-            <version>0.2.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>[4.12,)</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <version>[1.10,)</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-
-    <developers>
-        <developer>
-            <id>szyrom</id>
-            <name>Szymon Romik</name>
-            <email>szymon.romik@intel.com</email>
-            <url>https://github.com/szyrom</url>
-            <organization>Intel</organization>
-            <organizationUrl>http://intel.com</organizationUrl>
-            <roles>
-                <role>architect</role>
-                <role>developer</role>
-            </roles>
-        </developer>
-    </developers>
+    <modules>
+        <module>src/main/c++</module> <!-- pom for jni part -->
+        <module>src/main</module> <!-- pom for java part -->
+    </modules>
 
     <issueManagement>
         <system>GitHub</system>
@@ -91,13 +38,24 @@
         </license>
     </licenses>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+    <developers>
+        <developer>
+            <id>szyrom</id>
+            <name>Szymon Romik</name>
+            <email>szymon.romik@intel.com</email>
+            <url>https://github.com/szyrom</url>
+            <organization>Intel</organization>
+            <organizationUrl>https://intel.com</organizationUrl>
+            <roles>
+                <role>architect</role>
+                <role>developer</role>
+            </roles>
+        </developer>
+    </developers>
 
     <organization>
         <name>Intel</name>
-        <url>http://intel.com</url>
+        <url>https://intel.com</url>
     </organization>
 
     <scm>
