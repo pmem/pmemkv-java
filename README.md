@@ -35,20 +35,9 @@ git clone https://github.com/pmem/pmemkv-java.git
 cd pmemkv-java
 ```
 
-Build and install Java Native Interface (JNI):
+Build and install Java Native Interface (JNI) and java bindings:
 
 ```sh
-mkdir build
-cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release
-make pmemkv-jni
-cd ..
-```
-
-Finish by installing java bindings:
-
-```sh
-export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:./build
 mvn install
 ```
 
@@ -78,6 +67,6 @@ To execute the example:
 
 ```sh
 cd examples
-javac -cp ../target/*.jar BasicExample.java
-PMEM_IS_PMEM_FORCE=1 java -ea -Xms1G -cp .:`find ../target -name *.jar` -Djava.library.path=/usr/local/lib BasicExample
+javac -cp ../src/main/target/*.jar BasicExample.java
+PMEM_IS_PMEM_FORCE=1 java -ea -Xms1G -cp .:`find ../src/main/target -name *.jar` -Djava.library.path=/usr/local/lib BasicExample
 ```
