@@ -27,17 +27,14 @@ public class ExceptionTest {
     private Database db;
 
     private Database buildDB(String engine) {
-        return new Database.Builder(engine).
-                setSize(1073741824).
-                setPath("/dev/shm").
-                build();
+        return new Database.Builder(engine).setSize(1073741824).setPath("/dev/shm").build();
     }
 
     @Before
     public void init() {
         db = buildDB(ENGINE);
         // Direct ByteBuffer
-        for ( int i = 0; i< 0xFF; i++){
+        for (int i = 0; i < 0xFF; i++) {
             ByteBuffer key = ByteBuffer.allocateDirect(256);
             key.putInt(i);
             db.put(key, key);
@@ -46,7 +43,7 @@ public class ExceptionTest {
     }
 
     @After
-    public void finalize(){
+    public void finalize() {
         db.stop();
     }
 
@@ -58,7 +55,7 @@ public class ExceptionTest {
                 throw new RuntimeException("Inner exception");
             });
         } catch (Exception e) {
-          exception_counter++;
+            exception_counter++;
         }
         expect(exception_counter).toEqual(1);
     }
@@ -68,12 +65,12 @@ public class ExceptionTest {
         int exception_counter = 0;
         AtomicInteger loop_counter = new AtomicInteger(0);
         try {
-                db.getKeys((ByteBuffer k) -> {
-                    loop_counter.getAndIncrement();
-                    throw new RuntimeException("Inner exception");
+            db.getKeys((ByteBuffer k) -> {
+                loop_counter.getAndIncrement();
+                throw new RuntimeException("Inner exception");
             });
         } catch (Exception e) {
-          exception_counter++;
+            exception_counter++;
         }
         expect(exception_counter).toEqual(1);
         expect(loop_counter.intValue()).toEqual(1);
@@ -84,14 +81,14 @@ public class ExceptionTest {
         int exception_counter = 0;
         AtomicInteger loop_counter = new AtomicInteger(0);
         try {
-                db.getKeys((ByteBuffer k) -> {
-                    loop_counter.getAndIncrement();
-                    if( k.getInt() == 15) {
-                        throw new RuntimeException("Inner exception");
-                    }
+            db.getKeys((ByteBuffer k) -> {
+                loop_counter.getAndIncrement();
+                if (k.getInt() == 15) {
+                    throw new RuntimeException("Inner exception");
+                }
             });
         } catch (Exception e) {
-          exception_counter++;
+            exception_counter++;
         }
         expect(exception_counter).toEqual(1);
         expect(loop_counter.intValue()).toEqual(16);
@@ -103,8 +100,8 @@ public class ExceptionTest {
         key.putInt(1);
         boolean exception_occured = false;
         try {
-                db.get(key, (ByteBuffer k) -> {
-                    throw new CustomException("Lorem ipsum");
+            db.get(key, (ByteBuffer k) -> {
+                throw new CustomException("Lorem ipsum");
             });
         } catch (CustomException e) {
             exception_occured = true;

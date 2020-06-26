@@ -28,25 +28,18 @@ public class CmapTest {
     public TemporaryFolder folder = new TemporaryFolder();
 
     private Database createDB(String engine, String path) {
-        return new Database.Builder(engine).
-                setSize(100000000).
-                setForceCreate(true).
-                setPath(path).
-                build();
+        return new Database.Builder(engine).setSize(100000000).setForceCreate(true).setPath(path).build();
     }
 
     private Database openDB(String engine, String path) {
-        return new Database.Builder(engine).
-                setForceCreate(false).
-                setPath(path).
-                build();
+        return new Database.Builder(engine).setForceCreate(false).setPath(path).build();
     }
 
-    private static ByteBuffer stringToByteBuffer(String msg){
+    private static ByteBuffer stringToByteBuffer(String msg) {
         return ByteBuffer.wrap(msg.getBytes());
     }
 
-    private static String byteBufferToString(ByteBuffer buffer){
+    private static String byteBufferToString(ByteBuffer buffer) {
         byte[] bytes;
         bytes = new byte[buffer.capacity()];
         buffer.get(bytes);
