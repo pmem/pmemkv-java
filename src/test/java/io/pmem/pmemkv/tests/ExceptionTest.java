@@ -56,6 +56,100 @@ public class ExceptionTest {
         db.stop();
     }
 
+    /* Exceptions related to config and in Open method */
+
+    @Test
+    public void throwsExceptionOnStartWhenPathIsMissing() {
+        Database db = null;
+        boolean exception_occured = false;
+        try {
+            db = new <ByteBuffer, ByteBuffer>Database.Builder(ENGINE).
+                setSize(1073741824).
+                build();
+            Assert.fail();
+        } catch (DatabaseException kve) {
+            exception_occured = true;
+        } catch (Exception e) {
+            Assert.fail();
+        }
+        expect(exception_occured).toBeTrue();
+        expect(db).toBeNull();
+    }
+
+    @Test
+    public void throwsExceptionOnStartWhenSizeIsMissing() {
+        Database db = null;
+        boolean exception_occured = false;
+        try {
+            db = new <ByteBuffer, ByteBuffer>Database.Builder(ENGINE).
+                setPath("/dev/shm").
+                build();
+            Assert.fail();
+        } catch (DatabaseException kve) {
+            exception_occured = true;
+        } catch (Exception e) {
+            Assert.fail();
+        }
+        expect(db).toBeNull();
+        expect(exception_occured).toBeTrue();
+    }
+
+    @Test
+    public void throwsExceptionOnStartWhenEngineIsInvalidTest() {
+        Database db = null;
+        boolean exception_occured = false;
+        try {
+            db = buildDB("nope.nope");
+            Assert.fail();
+        } catch (DatabaseException kve) {
+            exception_occured = true;
+        } catch (Exception e) {
+            Assert.fail();
+        }
+        expect(db).toBeNull();
+        expect(exception_occured).toBeTrue();
+    }
+
+    @Test
+    public void throwsExceptionOnStartWhenPathIsInvalidTest() {
+        Database db = null;
+        boolean exception_occured = false;
+        try {
+            db = new Database.Builder(ENGINE).
+                setSize(1073741824).
+                setPath("/tmp/123/234/345/456/567/678/nope.nope").
+                build();
+            Assert.fail();
+        } catch (DatabaseException kve) {
+            exception_occured = true;
+        } catch (Exception e) {
+            Assert.fail();
+        }
+        expect(db).toBeNull();
+        expect(exception_occured).toBeTrue();
+    }
+
+    @Test
+    public void throwsExceptionOnStartWhenPathIsWrongTypeTest() {
+        Database db = null;
+        boolean exception_occured = false;
+        try {
+            db = new <ByteBuffer, ByteBuffer>Database.Builder(ENGINE).
+                setSize(1073741824).
+                setPath("1234").
+                build();
+            Assert.fail();
+        } catch (DatabaseException kve) {
+            exception_occured = true;
+        } catch (Exception e) {
+            Assert.fail();
+        }
+        expect(exception_occured).toBeTrue();
+        expect(db).toBeNull();
+    }
+
+    /* Exceptions in Gets methods */
+
     @Test
     public void exceptionInGetallTest() {
         int exception_counter = 0;
