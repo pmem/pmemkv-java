@@ -5,7 +5,7 @@ package io.pmem.pmemkv;
 
 public class DefragErrorException extends DatabaseException {
 
-    public DefragErrorException(String message) {
-        super(message);
-    }
+	public DefragErrorException(String message) {
+		super(message);
+	}
 }

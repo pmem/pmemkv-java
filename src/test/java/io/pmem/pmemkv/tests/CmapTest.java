@@ -25,66 +25,74 @@ import static junit.framework.TestCase.fail;
 
 public class CmapTest {
 
-    private final String ENGINE = "cmap";
-    private Database db;
+	private final String ENGINE = "cmap";
+	private Database db;
 
-    @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
+	@Rule
+	public TemporaryFolder folder = new TemporaryFolder();
 
-    private Database<ByteBuffer, ByteBuffer> createDB(String engine, String path) {
-        return new Database.Builder<ByteBuffer, ByteBuffer>(engine).setSize(100000000).setForceCreate(true)
-                .setPath(path).setKeyConverter(new ByteBufferConverter()).setValueConverter(new ByteBufferConverter())
-                .build();
-    }
+	private Database<ByteBuffer, ByteBuffer> createDB(String engine, String path) {
+		return new Database.Builder<ByteBuffer, ByteBuffer>(engine)
+				.setSize(100000000)
+				.setForceCreate(true)
+				.setPath(path)
+				.setKeyConverter(new ByteBufferConverter())
+				.setValueConverter(new ByteBufferConverter())
+				.build();
+	}
 
-    private Database<ByteBuffer, ByteBuffer> openDB(String engine, String path) {
-        return new Database.Builder<ByteBuffer, ByteBuffer>(engine).setForceCreate(false).setPath(path)
-                .setKeyConverter(new ByteBufferConverter()).setValueConverter(new ByteBufferConverter()).build();
-    }
+	private Database<ByteBuffer, ByteBuffer> openDB(String engine, String path) {
+		return new Database.Builder<ByteBuffer, ByteBuffer>(engine)
+				.setForceCreate(false)
+				.setPath(path)
+				.setKeyConverter(new ByteBufferConverter())
+				.setValueConverter(new ByteBufferConverter())
+				.build();
+	}
 
-    private static ByteBuffer stringToByteBuffer(String msg) {
-        return ByteBuffer.wrap(msg.getBytes());
-    }
+	private static ByteBuffer stringToByteBuffer(String msg) {
+		return ByteBuffer.wrap(msg.getBytes());
+	}
 
-    private static String byteBufferToString(ByteBuffer buffer) {
-        byte[] bytes;
-        bytes = new byte[buffer.capacity()];
-        buffer.get(bytes);
-        return new String(bytes);
-    }
+	private static String byteBufferToString(ByteBuffer buffer) {
+		byte[] bytes;
+		bytes = new byte[buffer.capacity()];
+		buffer.get(bytes);
+		return new String(bytes);
+	}
 
-    @Test
-    public void testCreateAndOpen() {
-        String file = folder.getRoot() + File.pathSeparator + "testfile";
-        Database<ByteBuffer, ByteBuffer> db = createDB(ENGINE, file);
+	@Test
+	public void testCreateAndOpen() {
+		String file = folder.getRoot() + File.pathSeparator + "testfile";
+		Database<ByteBuffer, ByteBuffer> db = createDB(ENGINE, file);
 
-        expect(db.exists(stringToByteBuffer("key1"))).toBeFalse();
-        db.put(stringToByteBuffer("key1"), stringToByteBuffer("value1"));
-        expect(db.exists(stringToByteBuffer("key1"))).toBeTrue();
-        ByteBuffer resBuff = db.getCopy(stringToByteBuffer("key1"));
-        expect(byteBufferToString(resBuff)).toEqual("value1");
+		expect(db.exists(stringToByteBuffer("key1"))).toBeFalse();
+		db.put(stringToByteBuffer("key1"), stringToByteBuffer("value1"));
+		expect(db.exists(stringToByteBuffer("key1"))).toBeTrue();
+		ByteBuffer resBuff = db.getCopy(stringToByteBuffer("key1"));
+		expect(byteBufferToString(resBuff)).toEqual("value1");
 
-        db.stop();
+		db.stop();
 
-        db = openDB(ENGINE, file);
-        expect(db.exists(stringToByteBuffer("key1"))).toBeTrue();
-        resBuff = db.getCopy(stringToByteBuffer("key1"));
-        expect(byteBufferToString(resBuff)).toEqual("value1");
-    }
+		db = openDB(ENGINE, file);
+		expect(db.exists(stringToByteBuffer("key1"))).toBeTrue();
+		resBuff = db.getCopy(stringToByteBuffer("key1"));
+		expect(byteBufferToString(resBuff)).toEqual("value1");
+	}
 
-    @Test
-    public void throwsExceptionOnStartWhenOpeningNonExistentFile() {
-        String file = folder.getRoot() + File.pathSeparator + "testfile";
+	@Test
+	public void throwsExceptionOnStartWhenOpeningNonExistentFile() {
+		String file = folder.getRoot() + File.pathSeparator + "testfile";
 
-        Database db = null;
+		Database db = null;
 
-        try {
-            db = openDB(ENGINE, file);
-            Assert.fail();
-        } catch (DatabaseException e) {
+		try {
+			db = openDB(ENGINE, file);
+			Assert.fail();
+		} catch (DatabaseException e) {
 
-        }
+		}
 
-        expect(db).toEqual(null);
-    }
+		expect(db).toEqual(null);
+	}
 }

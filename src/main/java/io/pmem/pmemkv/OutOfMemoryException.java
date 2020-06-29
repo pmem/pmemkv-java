@@ -5,7 +5,7 @@ package io.pmem.pmemkv;
 
 public class OutOfMemoryException extends DatabaseException {
 
-    public OutOfMemoryException(String message) {
-        super(message);
-    }
+	public OutOfMemoryException(String message) {
+		super(message);
+	}
 }

@@ -5,7 +5,7 @@ package io.pmem.pmemkv;
 
 public class WrongEngineNameException extends DatabaseException {
 
-    public WrongEngineNameException(String message) {
-        super(message);
-    }
+	public WrongEngineNameException(String message) {
+		super(message);
+	}
 }
