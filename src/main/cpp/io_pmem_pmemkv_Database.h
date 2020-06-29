@@ -129,14 +129,6 @@ JNIEXPORT jboolean JNICALL Java_io_pmem_pmemkv_Database_database_1exists_1buffer
 
 /*
  * Class:     io_pmem_pmemkv_Database
- * Method:    database_get_buffer
- * Signature: (JILjava/nio/ByteBuffer;ILjava/nio/ByteBuffer;)I
- */
-JNIEXPORT jint JNICALL Java_io_pmem_pmemkv_Database_database_1get_1buffer
-  (JNIEnv *, jobject, jlong, jint, jobject, jint, jobject);
-
-/*
- * Class:     io_pmem_pmemkv_Database
  * Method:    database_get_buffer_with_callback
  * Signature: (JILjava/nio/ByteBuffer;Lio/pmem/pmemkv/internal/GetKeysBuffersJNICallback;)V
  */

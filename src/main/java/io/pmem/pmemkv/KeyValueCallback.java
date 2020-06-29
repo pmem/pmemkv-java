@@ -3,10 +3,8 @@
 
 package io.pmem.pmemkv;
 
-import java.nio.ByteBuffer;
+public interface KeyValueCallback<KeyT, ValueT> {
 
-public interface GetKeysBuffersCallback {
-
-    void process(ByteBuffer key);
+    void process(KeyT key, ValueT value);
 
 }
