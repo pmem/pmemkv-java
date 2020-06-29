@@ -161,11 +161,9 @@ public class Database<K, V> {
     public V getCopy(K key) {
         byte value[];
          ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
-        //TODO change type of exception to one related to PMEMKV_STATUS_NOT_FOUND
-        // when implemented
         try {
             value = database_get_bytes(pointer, direct_key.position(), direct_key);
-        } catch (DatabaseException kve) {
+        } catch (NotFoundException kve) {
             return null;
         }
         V retval = (V) valueConverter.fromByteBuffer(ByteBuffer.wrap(value));
