@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 /* Copyright 2020, Intel Corporation */
 
-mport io.pmem.pmemkv.Database;
+import io.pmem.pmemkv.Database;
 import io.pmem.pmemkv.ByteBufferConverter;
 
 import java.nio.ByteBuffer;
@@ -19,7 +19,7 @@ public class ByteBufferExample {
                 build();
 
         // Direct ByteBuffer
-        for ( int i = 0; i< 0xFF; i++){
+        for (int i = 0; i< 0xFF; i++){
             ByteBuffer key = ByteBuffer.allocateDirect(4);
             key.putInt(i);
             db.put(key, key);
@@ -30,6 +30,5 @@ public class ByteBufferExample {
         });
 
         db.stop();
-
     }
 }

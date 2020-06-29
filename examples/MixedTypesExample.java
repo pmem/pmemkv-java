@@ -5,7 +5,6 @@ import io.pmem.pmemkv.Database;
 import io.pmem.pmemkv.Converter;
 import io.pmem.pmemkv.ByteBufferConverter;
 
-
 import java.nio.ByteBuffer;
 
 class StringConverter implements Converter<String> {
@@ -33,7 +32,7 @@ public class MixedTypesExample{
                 setValueConverter(new ByteBufferConverter()).
                 build();
 
-        for ( int i = 0; i< 0xFF; i++){
+        for (int i = 0; i< 0xFF; i++){
             ByteBuffer value = ByteBuffer.allocateDirect(4);
             value.putInt(i);
             String key = "name: " + i;
@@ -45,6 +44,5 @@ public class MixedTypesExample{
         });
 
         db.stop();
-
     }
 }
