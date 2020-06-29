@@ -1,3 +1,18 @@
+Tue Jun 30 2020 Szymon Romik <szymon.romik@intel.com>
+
+	* Version 1.0
+
+	This is the first pmemkv-java release which is fully compatible with
+	pmmekv 1.0 and guarantees backward compatibility.
+
+	Major changes:
+	- API redesign (support for direct access with ByteBuffer)
+	- config API redesign with builder pattern
+	- extended exception list
+	- extended documentation
+	- build system refactor to start using mvn only
+	- project merge with pmemkv-jni
+
 Fri Oct 04 2019 Szymon Romik <szymon.romik@intel.com>
 
 	* Version 0.9
@@ -10,5 +25,5 @@ Fri Jun 28 2019 Szymon Romik <szymon.romik@intel.com>
 
 	This is the first official release of pmemkv-java project.
 
-        It provides Java bindings to libpmemkv 0.8 with simplified API and not
-        functionally equal to its native C/C++ counterpart.
+	It provides Java bindings to libpmemkv 0.8 with simplified API and not
+	functionally equal to its native C/C++ counterpart.
