@@ -21,7 +21,6 @@ class StringConverter implements Converter<String> {
 
 public class StringExample{
 
-
     public static void main(String[] args) {
         String ENGINE = "vsmap";
 
