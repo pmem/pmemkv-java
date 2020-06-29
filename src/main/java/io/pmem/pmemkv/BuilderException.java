@@ -4,6 +4,10 @@
 package io.pmem.pmemkv;
 
 @SuppressWarnings("serial")
+
+/**
+ * Pmemkv database configuration failed
+ */
 public class BuilderException extends DatabaseException {
 
 	public BuilderException(String message) {
