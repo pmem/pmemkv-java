@@ -5,6 +5,9 @@ package io.pmem.pmemkv;
 
 import io.pmem.pmemkv.DatabaseException;
 
+/**
+ * Pmemkv database configuration failed
+ */
 public class BuilderException extends DatabaseException {
 
 	public BuilderException(String message) {
