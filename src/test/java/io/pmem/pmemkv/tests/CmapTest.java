@@ -32,29 +32,21 @@ public class CmapTest {
     public TemporaryFolder folder = new TemporaryFolder();
 
     private Database<ByteBuffer, ByteBuffer> createDB(String engine, String path) {
-        return new Database.Builder<ByteBuffer, ByteBuffer>(engine).
-                setSize(100000000).
-                setForceCreate(true).
-                setPath(path).
-                setKeyConverter(new ByteBufferConverter()).
-                setValueConverter(new ByteBufferConverter()).
-                build();
+        return new Database.Builder<ByteBuffer, ByteBuffer>(engine).setSize(100000000).setForceCreate(true)
+                .setPath(path).setKeyConverter(new ByteBufferConverter()).setValueConverter(new ByteBufferConverter())
+                .build();
     }
 
     private Database<ByteBuffer, ByteBuffer> openDB(String engine, String path) {
-        return new Database.Builder<ByteBuffer, ByteBuffer>(engine).
-                setForceCreate(false).
-                setPath(path).
-                setKeyConverter(new ByteBufferConverter()).
-                setValueConverter(new ByteBufferConverter()).
-                build();
+        return new Database.Builder<ByteBuffer, ByteBuffer>(engine).setForceCreate(false).setPath(path)
+                .setKeyConverter(new ByteBufferConverter()).setValueConverter(new ByteBufferConverter()).build();
     }
 
-    private static ByteBuffer stringToByteBuffer(String msg){
+    private static ByteBuffer stringToByteBuffer(String msg) {
         return ByteBuffer.wrap(msg.getBytes());
     }
 
-    private static String byteBufferToString(ByteBuffer buffer){
+    private static String byteBufferToString(ByteBuffer buffer) {
         byte[] bytes;
         bytes = new byte[buffer.capacity()];
         buffer.get(bytes);

@@ -7,6 +7,6 @@ import java.nio.ByteBuffer;
 
 public interface Converter<T> {
     public ByteBuffer toByteBuffer(T entry);
+
     public T fromByteBuffer(ByteBuffer entry);
 }
-
