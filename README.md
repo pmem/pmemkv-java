@@ -48,6 +48,12 @@ location it may be also necessary to set it in LD_LIBRARY_PATH, e.g.:
 LD_LIBRARY_PATH=path_to_your_libs mvn install
 ```
 
+## Building documentation
+
+```sh
+mvn javadoc:javadoc
+```
+
 ## Testing
 
 This library includes a set of automated tests that exercise all functionality.
