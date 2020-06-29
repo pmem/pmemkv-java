@@ -1,1 +1,1 @@
-This directory contains an example for pmemkv-java.
+This directory contains examples of the pmemkv-java usage.
