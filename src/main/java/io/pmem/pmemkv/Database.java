@@ -23,6 +23,11 @@ public class Database<K, V> {
         return directBuffer;
     }
 
+    /**
+     * Stops the running engine.
+     * 
+     * @since 1.0
+     */
     public void stop() {
         if (!stopped) {
             stopped = true;
@@ -30,10 +35,23 @@ public class Database<K, V> {
         }
     }
 
+    /**
+     * Checks if engine is stopped
+     * 
+     * @return true if engine is stoped, false if is running.
+     * @since 1.0
+     */
     public boolean stopped() {
         return stopped;
     }
 
+    /**
+     * Executes callback function for every key stored in the pmemkv datastore.
+     * 
+     * @param callback
+     *            Function to be called for each key.
+     * @since 1.0
+     */
     public void getKeys(KeyCallback<K> callback) {
         database_get_keys_buffer(pointer, (int kb, ByteBuffer k) -> {
             k.rewind().limit(kb);
@@ -42,6 +60,16 @@ public class Database<K, V> {
         });
     }
 
+    /**
+     * Executes callback function for every key stored in the pmemkv datastore, whose keys are greater than the given
+     * key.
+     * 
+     * @param key
+     *            Sets the lower bound for querying.
+     * @param callback
+     *            Function to be called for each key.
+     * @since 1.0
+     */
     public void getKeysAbove(K key, KeyCallback<K> callback) {
         ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
         database_get_keys_above_buffer(pointer, direct_key.position(), direct_key, (int kb, ByteBuffer k) -> {
@@ -51,6 +79,15 @@ public class Database<K, V> {
         });
     }
 
+    /**
+     * Executes callback function for every key stored in the pmemkv datastore, whose keys are lower than the given key.
+     * 
+     * @param key
+     *            Sets the upper bound for querying.
+     * @param callback
+     *            Function to be called for each key.
+     * @since 1.0
+     */
     public void getKeysBelow(K key, KeyCallback<K> callback) {
         ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
         database_get_keys_below_buffer(pointer, direct_key.position(), direct_key, (int kb, ByteBuffer k) -> {
@@ -60,6 +97,16 @@ public class Database<K, V> {
         });
     }
 
+    /**
+     * Executes callback function for every key stored in the pmemkv datastore, whose keys are greater than the key1 and
+     * less than the key2.
+     * 
+     * @param key
+     *            Sets the upper bound for querying.
+     * @param callback
+     *            Function to be called for each key.
+     * @since 1.0
+     */
     public void getKeysBetween(K key1, K key2, KeyCallback<K> callback) {
         ByteBuffer direct_key1 = getDirectBuffer(keyConverter.toByteBuffer(key1));
         ByteBuffer direct_key2 = getDirectBuffer(keyConverter.toByteBuffer(key2));
@@ -71,20 +118,55 @@ public class Database<K, V> {
                 });
     }
 
+    /**
+     * Returns number of currently stored key/value pairs in the pmemkv datastore.
+     * 
+     * @return Total number of elements in the datastore.
+     * @since 1.0
+     */
     public long countAll() {
         return database_count_all(pointer);
     }
 
+    /**
+     * Returns number of currently stored key/value pairs in the pmemkv datastore, whose keys are greater than the given
+     * key.
+     * 
+     * @param key
+     *            Sets the lower bound for querying.
+     * @return Number of key/value pairs in the datastore, whose keys are greater, than the given key.
+     * @since 1.0
+     */
     public long countAbove(K key) {
         ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
         return database_count_above_buffer(pointer, direct_key.position(), direct_key);
     }
 
+    /**
+     * Returns number of currently stored key/value pairs in the pmemkv datastore, whose keys are less than the given
+     * key.
+     * 
+     * @param key
+     *            Sets the upper bound for querying.
+     * @return Number of key/value pairs in the datastore, whose keys are lower, than the given key.
+     * @since 1.0
+     */
     public long countBelow(K key) {
         ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
         return database_count_below_buffer(pointer, direct_key.position(), direct_key);
     }
 
+    /**
+     * Returns number of currently stored key/value pairs in the pmemkv datastore, whose keys are greater than the key1
+     * and less than the key2.
+     * 
+     * @param key1
+     *            Sets the lower bound for querying.
+     * @param key2
+     *            Sets the upper bound for querying.
+     * @return Number of key/value pairs in the datastore, between given keys.
+     * @since 1.0
+     */
     public long countBetween(K key1, K key2) {
         ByteBuffer direct_key1 = getDirectBuffer(keyConverter.toByteBuffer(key1));
         ByteBuffer direct_key2 = getDirectBuffer(keyConverter.toByteBuffer(key2));
@@ -92,6 +174,13 @@ public class Database<K, V> {
                 direct_key2);
     }
 
+    /**
+     * Executes callback function for every key/value pair stored in the pmemkv datastore.
+     * 
+     * @param callback
+     *            Function to be called for each key/value pair.
+     * @since 1.0
+     */
     public void getAll(KeyValueCallback<K, V> callback) {
         database_get_all_buffer(pointer, (int kb, ByteBuffer k, int vb, ByteBuffer v) -> {
             k.rewind().limit(kb);
@@ -102,6 +191,15 @@ public class Database<K, V> {
         });
     }
 
+    /**
+     * Executes callback function for every key/value pair stored in the pmemkv datastore, whose keys are greater than
+     * the given key.
+     * 
+     * @param key
+     *            Sets the lower bound for querying.
+     * @param callback
+     *            Function to be called for each specified key/value pair.
+     */
     public void getAbove(K key, KeyValueCallback<K, V> callback) {
         ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
         database_get_above_buffer(pointer, direct_key.position(), direct_key,
@@ -115,6 +213,15 @@ public class Database<K, V> {
 
     }
 
+    /**
+     * Executes callback function for every key/value pair stored in the pmemkv datastore, whose keys are lower than the
+     * given key.
+     * 
+     * @param key
+     *            Sets the upper bound for querying.
+     * @param callback
+     *            Function to be called for each specified key/value pair.
+     */
     public void getBelow(K key, KeyValueCallback<K, V> callback) {
         ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
         database_get_below_buffer(pointer, direct_key.position(), direct_key,
@@ -127,6 +234,17 @@ public class Database<K, V> {
                 });
     }
 
+    /**
+     * Executes callback function for every key/value pair stored in the pmemkv datastore, whose keys are greater than
+     * the key1 and less than the key2.
+     * 
+     * @param key1
+     *            Sets the lower bound for querying.
+     * @param key1
+     *            Sets the upper bound for querying.
+     * @param callback
+     *            Function to be called for each specified key/value pair.
+     */
     public void getBetween(K key1, K key2, KeyValueCallback<K, V> callback) {
         ByteBuffer direct_key1 = getDirectBuffer(keyConverter.toByteBuffer(key1));
         ByteBuffer direct_key2 = getDirectBuffer(keyConverter.toByteBuffer(key2));
@@ -140,11 +258,25 @@ public class Database<K, V> {
                 });
     }
 
+    /**
+     * Verifies the presence key/value pair in the pmemkv datastore.
+     * 
+     * @param key
+     *            to query for.
+     */
     public boolean exists(K key) {
         ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
         return database_exists_buffer(pointer, direct_key.position(), direct_key);
     }
 
+    /**
+     * Executes callback function for value for given key.
+     * 
+     * @param key
+     *            key to query for.
+     * @param callback
+     *            Function to be called for each specified key/value pair.
+     */
     public void get(K key, ValueCallback<V> callback) {
         ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
         database_get_buffer_with_callback(pointer, direct_key.position(), direct_key, (int vb, ByteBuffer v) -> {
@@ -154,6 +286,13 @@ public class Database<K, V> {
         });
     }
 
+    /**
+     * Gets copy of value for given key.
+     * 
+     * @param key
+     *            key to query for.
+     * @return Copy of value associated with the given key.
+     */
     public V getCopy(K key) {
         byte value[];
         ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
@@ -167,6 +306,14 @@ public class Database<K, V> {
         return retval;
     }
 
+    /**
+     * Inserts the key/value pair into the pmemkv datastore.
+     * 
+     * @param key
+     *            the key
+     * @param value
+     *            data to be inserted for specified key
+     */
     public void put(K key, V value) {
         ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
         ByteBuffer direct_value = getDirectBuffer(valueConverter.toByteBuffer(value));
@@ -174,6 +321,13 @@ public class Database<K, V> {
         database_put_buffer(pointer, direct_key.position(), direct_key, direct_value.position(), direct_value);
     }
 
+    /**
+     * Removes key/value pair from the pmemkv datastore for given key.
+     * 
+     * @param key
+     *            key to query for, to be removed.
+     * @return true if element was removed, false if element didn't exist before removal.
+     */
     public boolean remove(K key) {
         ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
         return database_remove_buffer(pointer, direct_key.position(), direct_key);
