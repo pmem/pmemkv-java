@@ -3,17 +3,18 @@
 
 package io.pmem.pmemkv.tests;
 
-import io.pmem.pmemkv.Database;
-import io.pmem.pmemkv.DatabaseException;
-import io.pmem.pmemkv.ByteBufferConverter;
+import io.pmem.pmemkv.*;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.Before;
 import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.List;
+import java.lang.System;
 
 import static com.mscharhag.oleaster.matcher.Matchers.expect;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -67,7 +68,7 @@ public class ExceptionTest {
                 setSize(1073741824).
                 build();
             Assert.fail();
-        } catch (DatabaseException kve) {
+        } catch (InvalidArgumentException kve) {
             exception_occured = true;
         } catch (Exception e) {
             Assert.fail();
@@ -85,7 +86,7 @@ public class ExceptionTest {
                 setPath("/dev/shm").
                 build();
             Assert.fail();
-        } catch (DatabaseException kve) {
+        } catch (InvalidArgumentException kve) {
             exception_occured = true;
         } catch (Exception e) {
             Assert.fail();
@@ -101,7 +102,7 @@ public class ExceptionTest {
         try {
             db = buildDB("nope.nope");
             Assert.fail();
-        } catch (DatabaseException kve) {
+        } catch (WrongEngineNameException kve) {
             exception_occured = true;
         } catch (Exception e) {
             Assert.fail();
@@ -120,7 +121,10 @@ public class ExceptionTest {
                 setPath("/tmp/123/234/345/456/567/678/nope.nope").
                 build();
             Assert.fail();
-        } catch (DatabaseException kve) {
+		/*
+		 * It should be InvalidArgumentException, but:
+		 * https://github.com/pmem/pmemkv/issues/565 */
+        } catch (UnknownErrorException kve) {
             exception_occured = true;
         } catch (Exception e) {
             Assert.fail();
@@ -139,7 +143,10 @@ public class ExceptionTest {
                 setPath("1234").
                 build();
             Assert.fail();
-        } catch (DatabaseException kve) {
+		/*
+		 * It's not a valid path, so it should be InvalidArgumentException, but:
+		 * https://github.com/pmem/pmemkv/issues/565 */
+        } catch (UnknownErrorException kve) {
             exception_occured = true;
         } catch (Exception e) {
             Assert.fail();
@@ -211,5 +218,18 @@ public class ExceptionTest {
             expect(e.getMessage()).toEqual("Lorem ipsum");
         }
         expect(exception_occured).toBeTrue();
+    }
+
+	/* Other */
+	@Test(expected = RuntimeException.class)
+	public void exceptionsHierarchy() {
+		/* All engines should derive from DatabaseException class */
+		List<DatabaseException> exceptions = Arrays.asList(new DatabaseException(""), new UnknownErrorException(""),
+			new NotFoundException(""), new NotSupportedException(""), new InvalidArgumentException(""),
+			new ConfigParsingErrorException(""), new ConfigTypeErrorException(""), new StoppedByCallbackException(""),
+			new OutOfMemoryException(""), new WrongEngineNameException(""), new TransactionScopeErrorException(""));
+
+		/* We just make sure DBException is of RuntimeException class */
+		throw new DatabaseException("");
     }
 }
