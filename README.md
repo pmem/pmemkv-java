@@ -81,7 +81,8 @@ PMEM_IS_PMEM_FORCE=1 java -ea -Xms1G -cp .:`find ../src/main/target -name *.jar`
 
 ## Documentation
 
-After installation, docs can be generated using ... by executing commands:
+Docs can be generated using mvn by executing commands:
+
 ```sh
-...
+mvn javadoc:javadoc
 ```
