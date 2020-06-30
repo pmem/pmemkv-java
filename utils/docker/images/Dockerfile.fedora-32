@@ -4,6 +4,7 @@
 #
 # Dockerfile - a 'recipe' for Docker to build an image of fedora-based
 #              environment prepared for running pmemkv-java build and tests.
+#
 
 # Pull base image
 FROM fedora:32
@@ -15,7 +16,6 @@ ENV OS_VER 32
 ENV PACKAGE_MANAGER rpm
 ENV NOTTY 1
 ENV JAVA_HOME /usr/lib/jvm/java-openjdk/
-ENV JAVA_TOOL_OPTIONS -Dfile.encoding=UTF-8
 
 # Additional parameters to build docker without building components
 ARG SKIP_PMDK_BUILD

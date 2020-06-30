@@ -16,7 +16,6 @@ ENV OS_VER 20.04
 ENV PACKAGE_MANAGER deb
 ENV NOTTY 1
 ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64
-ENV JAVA_TOOL_OPTIONS -Dfile.encoding=UTF-8
 
 # Additional parameters to build docker without building components
 ARG SKIP_PMDK_BUILD
