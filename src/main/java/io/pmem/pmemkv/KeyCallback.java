@@ -5,6 +5,6 @@ package io.pmem.pmemkv;
 
 public interface KeyCallback<KeyT> {
 
-    void process(KeyT key);
+	void process(KeyT key);
 
 }

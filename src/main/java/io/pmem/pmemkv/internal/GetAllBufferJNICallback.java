@@ -7,6 +7,6 @@ import java.nio.ByteBuffer;
 
 public interface GetAllBufferJNICallback {
 
-    void process(int keybytes, ByteBuffer key, int valuebytes, ByteBuffer value);
+	void process(int keybytes, ByteBuffer key, int valuebytes, ByteBuffer value);
 
 }

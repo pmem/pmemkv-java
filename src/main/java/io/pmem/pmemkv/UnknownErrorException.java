@@ -5,7 +5,7 @@ package io.pmem.pmemkv;
 
 public class UnknownErrorException extends DatabaseException {
 
-    public UnknownErrorException(String message) {
-        super(message);
-    }
+	public UnknownErrorException(String message) {
+		super(message);
+	}
 }

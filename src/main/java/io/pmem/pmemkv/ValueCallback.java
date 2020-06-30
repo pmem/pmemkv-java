@@ -5,6 +5,6 @@ package io.pmem.pmemkv;
 
 public interface ValueCallback<ValueT> {
 
-    void process(ValueT value);
+	void process(ValueT value);
 
 }

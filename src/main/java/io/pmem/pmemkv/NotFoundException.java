@@ -5,7 +5,7 @@ package io.pmem.pmemkv;
 
 public class NotFoundException extends DatabaseException {
 
-    public NotFoundException(String message) {
-        super(message);
-    }
+	public NotFoundException(String message) {
+		super(message);
+	}
 }

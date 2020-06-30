@@ -5,7 +5,7 @@ package io.pmem.pmemkv;
 
 public class ConfigTypeErrorException extends DatabaseException {
 
-    public ConfigTypeErrorException(String message) {
-        super(message);
-    }
+	public ConfigTypeErrorException(String message) {
+		super(message);
+	}
 }

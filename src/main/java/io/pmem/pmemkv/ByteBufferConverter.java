@@ -6,11 +6,11 @@ package io.pmem.pmemkv;
 import java.nio.ByteBuffer;
 
 public class ByteBufferConverter implements Converter<ByteBuffer> {
-    public ByteBuffer toByteBuffer(ByteBuffer entry) {
-        return entry;
-    }
+	public ByteBuffer toByteBuffer(ByteBuffer entry) {
+		return entry;
+	}
 
-    public ByteBuffer fromByteBuffer(ByteBuffer entry) {
-        return entry;
-    }
+	public ByteBuffer fromByteBuffer(ByteBuffer entry) {
+		return entry;
+	}
 }
