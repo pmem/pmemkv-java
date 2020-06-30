@@ -3,6 +3,7 @@
 
 package io.pmem.pmemkv;
 
+@SuppressWarnings("serial")
 public class WrongEngineNameException extends DatabaseException {
 
 	public WrongEngineNameException(String message) {

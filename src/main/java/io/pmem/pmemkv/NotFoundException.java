@@ -3,6 +3,7 @@
 
 package io.pmem.pmemkv;
 
+@SuppressWarnings("serial")
 public class NotFoundException extends DatabaseException {
 
 	public NotFoundException(String message) {

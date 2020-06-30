@@ -3,6 +3,7 @@
 
 package io.pmem.pmemkv;
 
+@SuppressWarnings("serial")
 public class OutOfMemoryException extends DatabaseException {
 
 	public OutOfMemoryException(String message) {

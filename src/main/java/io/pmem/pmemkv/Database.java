@@ -37,7 +37,7 @@ public class Database<K, V> {
 	public void getKeys(KeyCallback<K> callback) {
 		database_get_keys_buffer(pointer, (int kb, ByteBuffer k) -> {
 			k.rewind().limit(kb);
-			K processed_object = (K) keyConverter.fromByteBuffer(k);
+			K processed_object = keyConverter.fromByteBuffer(k);
 			callback.process(processed_object);
 		});
 	}
@@ -46,7 +46,7 @@ public class Database<K, V> {
 		ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
 		database_get_keys_above_buffer(pointer, direct_key.position(), direct_key, (int kb, ByteBuffer k) -> {
 			k.rewind().limit(kb);
-			K processed_object = (K) keyConverter.fromByteBuffer(k);
+			K processed_object = keyConverter.fromByteBuffer(k);
 			callback.process(processed_object);
 		});
 	}
@@ -55,7 +55,7 @@ public class Database<K, V> {
 		ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
 		database_get_keys_below_buffer(pointer, direct_key.position(), direct_key, (int kb, ByteBuffer k) -> {
 			k.rewind().limit(kb);
-			K processed_object = (K) keyConverter.fromByteBuffer(k);
+			K processed_object = keyConverter.fromByteBuffer(k);
 			callback.process(processed_object);
 		});
 	}
@@ -66,7 +66,7 @@ public class Database<K, V> {
 		database_get_keys_between_buffer(pointer, direct_key1.position(), direct_key1, direct_key2.position(),
 				direct_key2, (int kb, ByteBuffer k) -> {
 					k.rewind().limit(kb);
-					K processed_object = (K) keyConverter.fromByteBuffer(k);
+					K processed_object = keyConverter.fromByteBuffer(k);
 					callback.process(processed_object);
 				});
 	}
@@ -95,9 +95,9 @@ public class Database<K, V> {
 	public void getAll(KeyValueCallback<K, V> callback) {
 		database_get_all_buffer(pointer, (int kb, ByteBuffer k, int vb, ByteBuffer v) -> {
 			k.rewind().limit(kb);
-			K processed_key = (K) keyConverter.fromByteBuffer(k);
+			K processed_key = keyConverter.fromByteBuffer(k);
 			v.rewind().limit(vb);
-			V processed_value = (V) valueConverter.fromByteBuffer(v);
+			V processed_value = valueConverter.fromByteBuffer(v);
 			callback.process(processed_key, processed_value);
 		});
 	}
@@ -107,9 +107,9 @@ public class Database<K, V> {
 		database_get_above_buffer(pointer, direct_key.position(), direct_key,
 				(int kb, ByteBuffer k, int vb, ByteBuffer v) -> {
 					k.rewind().limit(kb);
-					K processed_key = (K) keyConverter.fromByteBuffer(k);
+					K processed_key = keyConverter.fromByteBuffer(k);
 					v.rewind().limit(vb);
-					V processed_value = (V) valueConverter.fromByteBuffer(v);
+					V processed_value = valueConverter.fromByteBuffer(v);
 					callback.process(processed_key, processed_value);
 				});
 
@@ -120,9 +120,9 @@ public class Database<K, V> {
 		database_get_below_buffer(pointer, direct_key.position(), direct_key,
 				(int kb, ByteBuffer k, int vb, ByteBuffer v) -> {
 					k.rewind().limit(kb);
-					K processed_key = (K) keyConverter.fromByteBuffer(k);
+					K processed_key = keyConverter.fromByteBuffer(k);
 					v.rewind().limit(vb);
-					V processed_value = (V) valueConverter.fromByteBuffer(v);
+					V processed_value = valueConverter.fromByteBuffer(v);
 					callback.process(processed_key, processed_value);
 				});
 	}
@@ -133,9 +133,9 @@ public class Database<K, V> {
 		database_get_between_buffer(pointer, direct_key1.position(), direct_key1, direct_key2.position(), direct_key2,
 				(int kb, ByteBuffer k, int vb, ByteBuffer v) -> {
 					k.rewind().limit(kb);
-					K processed_key = (K) keyConverter.fromByteBuffer(k);
+					K processed_key = keyConverter.fromByteBuffer(k);
 					v.rewind().limit(vb);
-					V processed_value = (V) valueConverter.fromByteBuffer(v);
+					V processed_value = valueConverter.fromByteBuffer(v);
 					callback.process(processed_key, processed_value);
 				});
 	}
@@ -149,7 +149,7 @@ public class Database<K, V> {
 		ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
 		database_get_buffer_with_callback(pointer, direct_key.position(), direct_key, (int vb, ByteBuffer v) -> {
 			v.rewind().limit(vb);
-			V processed_object = (V) valueConverter.fromByteBuffer(v);
+			V processed_object = valueConverter.fromByteBuffer(v);
 			callback.process(processed_object);
 		});
 	}
@@ -162,7 +162,7 @@ public class Database<K, V> {
 		} catch (NotFoundException kve) {
 			return null;
 		}
-		V retval = (V) valueConverter.fromByteBuffer(ByteBuffer.wrap(value));
+		V retval = valueConverter.fromByteBuffer(ByteBuffer.wrap(value));
 
 		return retval;
 	}
@@ -301,5 +301,4 @@ public class Database<K, V> {
 	static {
 		System.loadLibrary("pmemkv-jni");
 	}
-
 }

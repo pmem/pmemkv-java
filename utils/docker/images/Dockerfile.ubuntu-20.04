@@ -15,7 +15,7 @@ ENV OS ubuntu
 ENV OS_VER 20.04
 ENV PACKAGE_MANAGER deb
 ENV NOTTY 1
-ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64
+ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
 
 # Additional parameters to build docker without building components
 ARG SKIP_PMDK_BUILD
@@ -49,7 +49,6 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
 	libunwind8-dev \
 	maven \
 	numactl \
-	openjdk-11-jdk \
 	openjdk-8-jdk \
 	pandoc \
 	pkg-config \

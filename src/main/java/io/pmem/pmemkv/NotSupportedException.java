@@ -3,6 +3,7 @@
 
 package io.pmem.pmemkv;
 
+@SuppressWarnings("serial")
 public class NotSupportedException extends DatabaseException {
 
 	public NotSupportedException(String message) {

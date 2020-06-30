@@ -59,7 +59,7 @@ public class DatabaseTest {
 
 	@Test
 	public void startEngineTest() {
-		Database db = buildDB(ENGINE);
+		Database<ByteBuffer, ByteBuffer> db = buildDB(ENGINE);
 		expect(db).toBeNotNull();
 		expect(db.stopped()).toBeFalse();
 		db.stop();

@@ -44,7 +44,6 @@ RUN dnf update -y \
 	memkind-devel \
 	ndctl-devel \
 	numactl-devel \
-	java-11-openjdk \
 	java-1.8.0-openjdk-devel \
 	pandoc \
 	rapidjson-devel \

@@ -26,7 +26,7 @@ import static junit.framework.TestCase.fail;
 public class CmapTest {
 
 	private final String ENGINE = "cmap";
-	private Database db;
+	private Database<ByteBuffer, ByteBuffer> db;
 
 	@Rule
 	public TemporaryFolder folder = new TemporaryFolder();
@@ -83,7 +83,7 @@ public class CmapTest {
 	public void throwsExceptionOnStartWhenOpeningNonExistentFile() {
 		String file = folder.getRoot() + File.pathSeparator + "testfile";
 
-		Database db = null;
+		Database<ByteBuffer, ByteBuffer> db = null;
 
 		try {
 			db = openDB(ENGINE, file);
