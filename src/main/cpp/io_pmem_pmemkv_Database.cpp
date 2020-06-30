@@ -267,9 +267,9 @@ struct ContextGetByteArray {
     }
 };
 
-void callback_get_byte_array(const char* v, size_t vb, void *arg)  {
+void callback_get_byte_array(const char* v, size_t vb, void *arg) {
     const auto c = ((ContextGetByteArray*) arg);
-    if(c->result = c->env->NewByteArray(vb)){
+    if((c->result = c->env->NewByteArray(vb))) {
         c->env->SetByteArrayRegion(c->result, 0, vb, (jbyte*) v);
     } else {
         PmemkvJavaException ex = PmemkvJavaException(c->env);
