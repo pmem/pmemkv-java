@@ -1,5 +1,5 @@
 [![Travis build status](https://travis-ci.org/pmem/pmemkv-java.svg?branch=master)](https://travis-ci.org/pmem/pmemkv-java)
-[![GHA build status](https://github.com/pmem/pmemkv/workflows/pmemkv-java/badge.svg?branch=master)](https://github.com/pmem/pmemkv-java/actions)
+[![GHA build status](https://github.com/pmem/pmemkv-java/workflows/pmemkv-java/badge.svg?branch=master)](https://github.com/pmem/pmemkv-java/actions)
 [![PMEMKV-JAVA version](https://img.shields.io/github/tag/pmem/pmemkv-java.svg)](https://github.com/pmem/pmemkv-java/releases/latest)
 
 # pmemkv-java
@@ -9,6 +9,11 @@ Some of the new functionalities (from pmemkv 1.1+) are not available yet.
 
 All known issues and limitations are logged as GitHub issues or are described
 in pmemkv's man pages.
+
+Java API is documented with javadocs and can be found as html here:
+
+- [master](https://pmem.io/pmemkv-java/master/html/index.html)
+- [v1.0](https://pmem.io/pmemkv-java/v1.0/html/index.html)
 
 ## Dependencies
 
@@ -59,14 +64,14 @@ This library includes a set of automated tests that exercise all functionality.
 LD_LIBRARY_PATH=path_to_your_libs mvn test
 ```
 
-## Example
+## Examples
 
 We are using `/dev/shm` to
 [emulate persistent memory](https://pmem.io/2016/02/22/pm-emulation.html)
-in example.
+in examples.
 
-Example can be found within this repository in [examples directory](https://github.com/pmem/pmemkv-java/tree/master/examples).
-To execute the example:
+Examples can be found within this repository in [examples directory](https://github.com/pmem/pmemkv-java/tree/master/examples).
+To execute them, run e.g.:
 
 ```sh
 cd examples
