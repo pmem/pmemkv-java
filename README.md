@@ -25,11 +25,10 @@ Start by installing [pmemkv](https://github.com/pmem/pmemkv/blob/master/INSTALLI
 (currently at least in version **1.0.2**) in your system.
 
 It may be necessary to [configure a proxy](https://maven.apache.org/guides/mini/guide-proxies.html)
-and set `JAVA_HOME` & `JAVA_TOOL_OPTIONS` environment variables:
+and set `JAVA_HOME` environment variable:
 
 ```sh
 export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
-export JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8
 ```
 
 Clone the pmemkv-java tree:
