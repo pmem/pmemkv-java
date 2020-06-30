@@ -57,7 +57,7 @@ std::unordered_map<int, const char*> PmemkvJavaException::PmemkvStatusDispatcher
        { PMEMKV_STATUS_STOPPED_BY_CB, "io/pmem/pmemkv/StoppedByCallbackException"},
        { PMEMKV_STATUS_OUT_OF_MEMORY, "io/pmem/pmemkv/OutOfMemoryException"},
        { PMEMKV_STATUS_WRONG_ENGINE_NAME, "io/pmem/pmemkv/WrongEngineNameException"},
-       { PMEMKV_STATUS_TRANSACTION_SCOPE_ERROR, "io/pmem/pmemkv/TransactionScopeErrorException"},
+       { PMEMKV_STATUS_TRANSACTION_SCOPE_ERROR, "io/pmem/pmemkv/TransactionScopeException"},
 };
 
 extern "C" JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_Database_database_1start

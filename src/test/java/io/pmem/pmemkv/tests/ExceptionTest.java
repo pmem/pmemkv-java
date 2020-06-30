@@ -228,7 +228,7 @@ public class ExceptionTest {
 		List<DatabaseException> exceptions = Arrays.asList(new DatabaseException(""), new UnknownErrorException(""),
 				new NotFoundException(""), new NotSupportedException(""), new InvalidArgumentException(""),
 				new BuilderException(""), new StoppedByCallbackException(""), new OutOfMemoryException(""),
-				new WrongEngineNameException(""), new TransactionScopeErrorException(""));
+				new WrongEngineNameException(""), new TransactionScopeException(""));
 
 		/* We just make sure DBException is of RuntimeException class */
 		throw new DatabaseException("");
