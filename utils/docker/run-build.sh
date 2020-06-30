@@ -50,3 +50,9 @@ cd examples
 run_example StringExample
 run_example ByteBufferExample
 run_example MixedTypesExample
+
+# Trigger auto doc update
+if [[ "$AUTO_DOC_UPDATE" == "1" ]]; then
+	echo "Running auto doc update"
+	$SCRIPTSDIR/run-doc-update.sh
+fi
