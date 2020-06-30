@@ -7,6 +7,7 @@
 *.log
 target/
 *.d
+*.class
 /bin/
 /build/
 cmake-build-debug/

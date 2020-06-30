@@ -7,7 +7,7 @@ import io.pmem.pmemkv.DatabaseException;
 
 public class ConfigParsingErrorException extends DatabaseException {
 
-    public ConfigParsingErrorException(String message) {
-        super(message);
-    }
+	public ConfigParsingErrorException(String message) {
+		super(message);
+	}
 }

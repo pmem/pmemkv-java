@@ -5,7 +5,7 @@ package io.pmem.pmemkv;
 
 public class NotSupportedException extends DatabaseException {
 
-    public NotSupportedException(String message) {
-        super(message);
-    }
+	public NotSupportedException(String message) {
+		super(message);
+	}
 }

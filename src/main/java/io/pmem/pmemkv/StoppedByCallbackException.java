@@ -5,7 +5,7 @@ package io.pmem.pmemkv;
 
 public class StoppedByCallbackException extends DatabaseException {
 
-    public StoppedByCallbackException(String message) {
-        super(message);
-    }
+	public StoppedByCallbackException(String message) {
+		super(message);
+	}
 }

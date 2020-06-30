@@ -5,7 +5,7 @@ package io.pmem.pmemkv;
 
 public class InvalidArgumentException extends DatabaseException {
 
-    public InvalidArgumentException(String message) {
-        super(message);
-    }
+	public InvalidArgumentException(String message) {
+		super(message);
+	}
 }

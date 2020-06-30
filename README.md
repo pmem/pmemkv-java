@@ -71,8 +71,8 @@ To execute the example:
 
 ```sh
 cd examples
-javac -cp ../src/main/target/*.jar BasicExample.java
-PMEM_IS_PMEM_FORCE=1 java -ea -Xms1G -cp .:`find ../src/main/target -name *.jar` -Djava.library.path=/usr/local/lib BasicExample
+javac -cp ../src/main/target/*.jar StringExample.java
+PMEM_IS_PMEM_FORCE=1 java -ea -Xms1G -cp .:`find ../src/main/target -name *.jar` -Djava.library.path=../src/main/cpp/target StringExample
 ```
 
 ## Documentation
