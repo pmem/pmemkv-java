@@ -5,6 +5,9 @@ package io.pmem.pmemkv;
 
 import java.nio.ByteBuffer;
 
+/**
+ * Impementation of Converter interface for ByteBuffer type
+ */
 public class ByteBufferConverter implements Converter<ByteBuffer> {
 	public ByteBuffer toByteBuffer(ByteBuffer entry) {
 		return entry;
