@@ -3,6 +3,7 @@
 
 package io.pmem.pmemkv;
 
+@SuppressWarnings("serial")
 public class TransactionScopeException extends DatabaseException {
 
 	public TransactionScopeException(String message) {

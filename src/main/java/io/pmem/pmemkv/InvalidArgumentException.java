@@ -3,6 +3,7 @@
 
 package io.pmem.pmemkv;
 
+@SuppressWarnings("serial")
 public class InvalidArgumentException extends DatabaseException {
 
 	public InvalidArgumentException(String message) {

@@ -5,6 +5,7 @@ package io.pmem.pmemkv;
 
 import io.pmem.pmemkv.DatabaseException;
 
+@SuppressWarnings("serial")
 public class BuilderException extends DatabaseException {
 
 	public BuilderException(String message) {
