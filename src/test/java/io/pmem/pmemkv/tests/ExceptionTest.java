@@ -124,7 +124,7 @@ public class ExceptionTest {
 			 * It should be InvalidArgumentException, but:
 			 * https://github.com/pmem/pmemkv/issues/565
 			 */
-		} catch (UnknownErrorException kve) {
+		} catch (DatabaseException kve) {
 			exception_occured = true;
 		} catch (Exception e) {
 			Assert.fail();
@@ -147,7 +147,7 @@ public class ExceptionTest {
 			 * It's not a valid path, so it should be InvalidArgumentException, but:
 			 * https://github.com/pmem/pmemkv/issues/565
 			 */
-		} catch (UnknownErrorException kve) {
+		} catch (DatabaseException kve) {
 			exception_occured = true;
 		} catch (Exception e) {
 			Assert.fail();
@@ -225,11 +225,10 @@ public class ExceptionTest {
 	@Test(expected = RuntimeException.class)
 	public void exceptionsHierarchy() {
 		/* All engines should derive from DatabaseException class */
-		List<DatabaseException> exceptions = Arrays.asList(new DatabaseException(""), new UnknownErrorException(""),
+		List<DatabaseException> exceptions = Arrays.asList(new DatabaseException(""),
 				new NotFoundException(""), new NotSupportedException(""), new InvalidArgumentException(""),
-				new ConfigParsingErrorException(""), new ConfigTypeErrorException(""),
-				new StoppedByCallbackException(""), new OutOfMemoryException(""), new WrongEngineNameException(""),
-				new TransactionScopeErrorException(""));
+				new BuilderException(""), new StoppedByCallbackException(""), new OutOfMemoryException(""),
+				new WrongEngineNameException(""), new TransactionScopeException(""));
 
 		/* We just make sure DBException is of RuntimeException class */
 		throw new DatabaseException("");

@@ -3,9 +3,9 @@
 
 package io.pmem.pmemkv;
 
-public class UnknownErrorException extends DatabaseException {
+public class TransactionScopeException extends DatabaseException {
 
-	public UnknownErrorException(String message) {
+	public TransactionScopeException(String message) {
 		super(message);
 	}
 }
