@@ -3,8 +3,6 @@
 
 package io.pmem.pmemkv;
 
-import io.pmem.pmemkv.DatabaseException;
-
 public class BuilderException extends DatabaseException {
 
 	public BuilderException(String message) {
