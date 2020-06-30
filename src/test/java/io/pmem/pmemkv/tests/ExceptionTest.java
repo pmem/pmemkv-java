@@ -19,6 +19,7 @@ import static com.mscharhag.oleaster.matcher.Matchers.expect;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static junit.framework.TestCase.fail;
 
+@SuppressWarnings("serial")
 class CustomException extends RuntimeException {
 	public CustomException(String message) {
 		super(message);
