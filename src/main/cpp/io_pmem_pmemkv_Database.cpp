@@ -48,7 +48,7 @@ public:
 };
 
 std::unordered_map<int, const char*> PmemkvJavaException::PmemkvStatusDispatcher = {
-       { PMEMKV_STATUS_UNKNOWN_ERROR, "io/pmem/pmemkv/UnknownErrorException" },
+       { PMEMKV_STATUS_UNKNOWN_ERROR, "io/pmem/pmemkv/DatabaseException" },
        { PMEMKV_STATUS_NOT_FOUND, "io/pmem/pmemkv/NotFoundException"},
        { PMEMKV_STATUS_NOT_SUPPORTED, "io/pmem/pmemkv/NotSupportedException"},
        { PMEMKV_STATUS_INVALID_ARGUMENT, "io/pmem/pmemkv/InvalidArgumentException"},
