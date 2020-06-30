@@ -5,9 +5,9 @@ package io.pmem.pmemkv;
 
 import io.pmem.pmemkv.DatabaseException;
 
-public class ConfigParsingErrorException extends DatabaseException {
+public class BuilderException extends DatabaseException {
 
-	public ConfigParsingErrorException(String message) {
+	public BuilderException(String message) {
 		super(message);
 	}
 }

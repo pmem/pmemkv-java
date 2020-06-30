@@ -4,7 +4,7 @@
 #include <jni.h>
 #include <libpmemkv.h>
 
-#define EXCEPTION_CLASS "io/pmem/pmemkv/DatabaseException"
+#define EXCEPTION_CLASS "io/pmem/pmemkv/BuilderException"
 
 extern "C" JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_Database_00024Builder_config_1new
   (JNIEnv *env, jobject) {
