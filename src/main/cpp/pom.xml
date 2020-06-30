@@ -54,6 +54,7 @@
                     </compilerStartOptions>
                     <compilerEndOptions>
                         <compilerEndOptions>-Wall</compilerEndOptions>
+                        <compilerEndOptions>-Werror</compilerEndOptions>
                         <compilerEndOptions>-O3</compilerEndOptions>
                         <compilerEndOptions>-fPIC</compilerEndOptions>
                         <compilerEndOptions>-shared</compilerEndOptions>
