@@ -4,4 +4,5 @@
 
 declare -A TARGET_BRANCHES=(		\
 		["master"]="master"	\
+		["stable-1.0"]="v1.0"	\
 	)
