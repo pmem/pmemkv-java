@@ -5,7 +5,7 @@ package io.pmem.pmemkv;
 
 @SuppressWarnings("serial")
 /**
- * Callback function aborted
+ * Callback function aborted.
  *
  * @see <a href=
  *      "https://pmem.io/pmemkv/master/manpages/libpmemkv.3.html#errors">Pmemkv

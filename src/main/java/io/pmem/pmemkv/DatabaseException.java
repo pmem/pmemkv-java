@@ -5,9 +5,8 @@ package io.pmem.pmemkv;
 
 @SuppressWarnings("serial")
 /**
- *
  * DatabaseException is the superclass of all exceptions that can be thrown when
- * handling pmemkv errors
+ * handling pmemkv errors.
  *
  * @see <a href=
  *      "https://pmem.io/pmemkv/master/manpages/libpmemkv.3.html#errors">Pmemkv
