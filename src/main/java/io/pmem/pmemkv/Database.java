@@ -20,9 +20,9 @@ import java.nio.ByteBuffer;
  * @see <a href= "https://github.com/pmem/pmemkv/">Pmemkv</a>
  *
  * @param <K>
- *            the type of key stored in pmemkv datastore
+ *            the type of key stored in the pmemkv datastore
  * @param <V>
- *            the type of value stored in pmemkv datastore
+ *            the type of value stored in the pmemkv datastore
  */
 public class Database<K, V> {
 	Converter<K> keyConverter;
@@ -50,7 +50,7 @@ public class Database<K, V> {
 	}
 
 	/**
-	 * Checks if engine is stopped
+	 * Checks if engine is stopped.
 	 *
 	 * @return true if engine is stopped, false if it is running.
 	 * @since 1.0
@@ -79,7 +79,7 @@ public class Database<K, V> {
 	 * whose keys are greater than the given key.
 	 * <p>
 	 * Comparison mechanism is based on binary comparison of bytes - by a function
-	 * equivalent to std::string::compare in C++
+	 * equivalent to std::string::compare in C++.
 	 *
 	 * @param key
 	 *            Sets the lower bound for querying.
@@ -101,7 +101,7 @@ public class Database<K, V> {
 	 * whose keys are less than the given key.
 	 * <p>
 	 * Comparison mechanism is based on binary comparison of bytes - by a function
-	 * equivalent to std::string::compare in C++
+	 * equivalent to std::string::compare in C++.
 	 *
 	 * @param key
 	 *            Sets the upper bound for querying.
@@ -123,7 +123,7 @@ public class Database<K, V> {
 	 * whose keys are greater than the key1 and less than the key2.
 	 * <p>
 	 * Comparison mechanism is based on binary comparison of bytes - by a function
-	 * equivalent to std::string::compare in C++
+	 * equivalent to std::string::compare in C++.
 	 *
 	 * @param key1
 	 *            Sets the lower bound for querying.
@@ -145,7 +145,7 @@ public class Database<K, V> {
 	}
 
 	/**
-	 * Returns number of currently stored key/value pairs in the pmemkv datastore.
+	 * Returns number of key/value pairs currently stored in the pmemkv datastore.
 	 *
 	 * @return Total number of elements in the datastore.
 	 * @since 1.0
@@ -155,12 +155,12 @@ public class Database<K, V> {
 	}
 
 	/**
-	 * Returns number of currently stored key/value pairs in the pmemkv datastore,
+	 * Returns number of key/value pairs currently stored in the pmemkv datastore,
 	 * whose keys are greater than the given key.
 	 * <p>
 	 * Comparison mechanism is based on binary comparison of bytes - by a function
-	 * equivalent to std::string::compare in C++
-	 * 
+	 * equivalent to std::string::compare in C++.
+	 *
 	 * @param key
 	 *            Sets the lower bound for querying.
 	 * @return Number of key/value pairs in the datastore, whose keys are greater
@@ -173,12 +173,12 @@ public class Database<K, V> {
 	}
 
 	/**
-	 * Returns number of currently stored key/value pairs in the pmemkv datastore,
+	 * Returns number of key/value pairs currently stored in the pmemkv datastore,
 	 * whose keys are less than the given key.
 	 * <p>
 	 * Comparison mechanism is based on binary comparison of bytes - by a function
-	 * equivalent to std::string::compare in C++
-	 * 
+	 * equivalent to std::string::compare in C++.
+	 *
 	 * @param key
 	 *            Sets the upper bound for querying.
 	 * @return Number of key/value pairs in the datastore, whose keys are less than
@@ -191,11 +191,11 @@ public class Database<K, V> {
 	}
 
 	/**
-	 * Returns number of currently stored key/value pairs in the pmemkv datastore,
+	 * Returns number of key/value pairs currently stored in the pmemkv datastore,
 	 * whose keys are greater than the key1 and less than the key2.
 	 * <p>
 	 * Comparison mechanism is based on binary comparison of bytes - by a function
-	 * equivalent to std::string::compare in C++
+	 * equivalent to std::string::compare in C++.
 	 *
 	 * @param key1
 	 *            Sets the lower bound for querying.
@@ -234,7 +234,7 @@ public class Database<K, V> {
 	 * datastore, whose keys are greater than the given key.
 	 * <p>
 	 * Comparison mechanism is based on binary comparison of bytes - by a function
-	 * equivalent to std::string::compare in C++
+	 * equivalent to std::string::compare in C++.
 	 *
 	 * @param key
 	 *            Sets the lower bound for querying.
@@ -259,7 +259,7 @@ public class Database<K, V> {
 	 * datastore, whose keys are less than the given key.
 	 * <p>
 	 * Comparison mechanism is based on binary comparison of bytes - by a function
-	 * equivalent to std::string::compare in C++
+	 * equivalent to std::string::compare in C++.
 	 *
 	 * @param key
 	 *            Sets the upper bound for querying.
@@ -283,7 +283,7 @@ public class Database<K, V> {
 	 * datastore, whose keys are greater than the key1 and less than the key2.
 	 * <p>
 	 * Comparison mechanism is based on binary comparison of bytes - by a function
-	 * equivalent to std::string::compare in C++
+	 * equivalent to std::string::compare in C++.
 	 *
 	 * @param key1
 	 *            Sets the lower bound for querying.
@@ -309,7 +309,7 @@ public class Database<K, V> {
 	 * Verifies the presence of an element with a given key in the pmemkv datastore.
 	 *
 	 * @param key
-	 *            to query for.
+	 *            key to query for.
 	 * @return true if key exists in the datastore, false otherwise
 	 */
 	public boolean exists(K key) {
@@ -318,7 +318,7 @@ public class Database<K, V> {
 	}
 
 	/**
-	 * Executes a callback function on the value for a given key
+	 * Executes callback function on the value for a given key.
 	 *
 	 * @param key
 	 *            key to query for.
@@ -335,11 +335,11 @@ public class Database<K, V> {
 	}
 
 	/**
-	 * Gets copy of value of a given key.
+	 * Gets a copy of the value for a given key.
 	 *
 	 * @param key
 	 *            key to query for.
-	 * @return Copy of value associated with the given key or null if not found
+	 * @return Copy of value associated with the given key or null if not found.
 	 */
 	public V getCopy(K key) {
 		byte value[];
@@ -355,12 +355,12 @@ public class Database<K, V> {
 	}
 
 	/**
-	 * Inserts the key/value pair into the pmemkv datastore.
+	 * Inserts new key/value pair into the pmemkv datastore.
 	 *
 	 * @param key
-	 *            the key
+	 *            the key.
 	 * @param value
-	 *            data to be inserted for specified key
+	 *            data to be inserted for the specified key.
 	 */
 	public void put(K key, V value) {
 		ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
@@ -386,13 +386,14 @@ public class Database<K, V> {
 	 * Builder is used to build instances of pmemkv Database class.
 	 * <p>
 	 * Configuration is composed using setter functions defined in this class.
-	 * Pmemkv config fields are mapped to builder setters accordingly.
+	 * Pmemkv config fields are mapped to builder setters accordingly. Each engine
+	 * may require various config parameters.
 	 *
 	 * @see <a href=
 	 *      https://github.com/pmem/pmemkv/blob/master/doc/libpmemkv.7.md#engines>
-	 *      Pmemkv engines </a>
+	 *      Pmemkv engines and their configuration settings description</a>
 	 * @see <a href= https://pmem.io/pmemkv/master/manpages/libpmemkv_config.3.html>
-	 *      Pmemkv config </a>
+	 *      manpage of pmemkv config class</a>
 	 */
 	public static class Builder<K, V> {
 		private Converter<K> keyConverter;
@@ -413,11 +414,11 @@ public class Database<K, V> {
 		}
 
 		/**
-		 * Sets "size" parameter for pmemkv engine
+		 * Sets "size" parameter for pmemkv engine.
 		 *
 		 * @param size
-		 *            size of pmemkv datastore
-		 * @return this builder object
+		 *            size of the pmemkv datastore.
+		 * @return this builder object.
 		 *
 		 */
 		public Builder<K, V> setSize(long size) {
@@ -426,11 +427,11 @@ public class Database<K, V> {
 		}
 
 		/**
-		 * Sets "force_create" parameter for pmemkv engine
+		 * Sets "force_create" parameter for pmemkv engine.
 		 *
 		 * @param forceCreate
-		 *            specify force_create engine parameter
-		 * @return this builder object
+		 *            specify force_create engine's parameter.
+		 * @return this builder object.
 		 */
 		public Builder<K, V> setForceCreate(boolean forceCreate) {
 			config_put_int(config, "force_create", forceCreate ? 1 : 0);
@@ -441,8 +442,8 @@ public class Database<K, V> {
 		 * Sets path for pmemkv engine
 		 *
 		 * @param path
-		 *            specify path engine parameter
-		 * @return this builder
+		 *            specify path engine's parameter.
+		 * @return this builder.
 		 */
 		public Builder<K, V> setPath(String path) {
 			config_put_string(config, "path", path);
@@ -450,10 +451,10 @@ public class Database<K, V> {
 		}
 
 		/**
-		 * Returns an instance of pmemkv Database created from the fields set on this
-		 * builder
+		 * Returns an instance of pmemkv Database created from the config parameters set
+		 * within this builder.
 		 *
-		 * @return instance of pmemkv Database
+		 * @return instance of pmemkv Database.
 		 */
 		public Database<K, V> build() {
 			Database<K, V> db = new Database<K, V>(this);
@@ -466,15 +467,15 @@ public class Database<K, V> {
 
 		/**
 		 * Sets converter object from a given key type K to ByteBuffer.
-		 *
+		 * <p>
 		 * All data is internally stored as ByteBuffer. It's possible to store objects
-		 * of arbitrary chosen type K as key by providing object, which implements
-		 * conversion between K and ByteBuffer. Type of such object has to implement
-		 * Converter interface
+		 * of an arbitrary chosen type K as a key by providing object, which implements
+		 * conversion between K and ByteBuffer. Type of such an object has to implement
+		 * Converter interface.
 		 *
 		 * @param newKeyConverter
-		 *            Converter object from K type to ByteBuffer
-		 * @return this builder
+		 *            Converter object from K type to ByteBuffer.
+		 * @return this builder.
 		 */
 		public Builder<K, V> setKeyConverter(Converter<K> newKeyConverter) {
 			this.keyConverter = newKeyConverter;
@@ -483,16 +484,16 @@ public class Database<K, V> {
 
 		/**
 		 * Sets converter object from a given value type V to ByteBuffer.
-		 *
+		 * <p>
 		 * All data is internally stored as ByteBuffer. It's possible to store objects
-		 * of arbitrary chosen type V as value by providing object, which implements
-		 * conversion between V and ByteBuffer. Type of such object has to implement
-		 * Converter interface.
+		 * of an arbitrary chosen type V as a value by providing object, which
+		 * implements conversion between V and ByteBuffer. Type of such an object has to
+		 * implement Converter interface.
 		 *
 		 * @param newValueConverter
-		 *            Converter object from V type to ByteBuffer
+		 *            Converter object from V type to ByteBuffer.
 		 *
-		 * @return this builder
+		 * @return this builder.
 		 */
 		public Builder<K, V> setValueConverter(Converter<V> newValueConverter) {
 			this.valueConverter = newValueConverter;

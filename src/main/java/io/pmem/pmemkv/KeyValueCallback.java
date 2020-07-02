@@ -4,8 +4,8 @@
 package io.pmem.pmemkv;
 
 /**
- * Represents callback function, which handle value-only use cases. Such
- * expression may be passed to get() method in Database class
+ * Represents callback function, which handle key/value use cases. Such
+ * expression may be passed to get*() methods in Database class.
  *
  * @param <KeyT>
  *            the type of a key stored in the pmemkv database
