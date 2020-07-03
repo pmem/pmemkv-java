@@ -9,8 +9,34 @@
 
 set -e
 
+PREFIX=/usr
+
+# common: release 1.2, 29.05.2020
+PMEMKV_VERSION="1.2"
+
 # common: release 1.0, 30.06.2020
-JAVA_VERSION="bada69f43447d7a664171458e0ca6d5d535feeb3"
+JAVA_VERSION="1.0"
+
+#
+# Build and install PMEMKV - JNI will need it
+#
+git clone https://github.com/pmem/pmemkv.git
+cd pmemkv
+git checkout $PMEMKV_VERSION
+mkdir build
+cd build
+
+cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+	-DCMAKE_INSTALL_PREFIX=$PREFIX \
+	-DENGINE_CMAP=OFF \
+	-DENGINE_CSMAP=OFF \
+	-DENGINE_VCMAP=OFF \
+	-DENGINE_VSMAP=OFF \
+	-DBUILD_DOC=OFF \
+	-DBUILD_EXAMPLES=OFF \
+	-DBUILD_TESTS=OFF
+make -j$(nproc)
+make -j$(nproc) install
 
 #
 # project's dependencies - all of the dependencies needed to run pmemkv-java will
@@ -26,11 +52,16 @@ mvn install -Dmaven.test.skip=true
 mvn dependency:go-offline
 mv -v ~/.m2/repository /opt/java/
 
-# remove any installed pmemkv's libs
-rm -r /opt/java/repository/io/pmem/*
-
 popd
 rm -r ${deps_dir}
+
+#
+# Uninstall all installed stuff
+#
+cd $WORKDIR/pmemkv/build
+make uninstall
+# remove any installed pmemkv-java's libs
+rm -r /opt/java/repository/io/pmem/*
 
 # make the /opt/java directory world-readable
 chmod -R a+r /opt/java
