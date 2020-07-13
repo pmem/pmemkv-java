@@ -3,14 +3,14 @@
 
 package io.pmem.pmemkv;
 
-@SuppressWarnings("serial")
 /**
- * Database entry or config item not found
+ * Database entry or config item not found.
  *
  * @see <a href=
  *      "https://pmem.io/pmemkv/master/manpages/libpmemkv.3.html#errors">Pmemkv
  *      errors</a>
  */
+@SuppressWarnings("serial")
 public class NotFoundException extends DatabaseException {
 
 	public NotFoundException(String message) {

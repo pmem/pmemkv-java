@@ -3,14 +3,14 @@
 
 package io.pmem.pmemkv;
 
-@SuppressWarnings("serial")
 /**
- * Operation failed because there is not enough memory (or space on the device)
+ * Operation failed because there is not enough memory (or space on the device).
  *
  * @see <a href=
  *      "https://pmem.io/pmemkv/master/manpages/libpmemkv.3.html#errors">Pmemkv
  *      errors</a>
  */
+@SuppressWarnings("serial")
 public class OutOfMemoryException extends DatabaseException {
 
 	public OutOfMemoryException(String message) {
