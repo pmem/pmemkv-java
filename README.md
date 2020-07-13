@@ -18,11 +18,10 @@ Java API is documented with javadocs and can be found as html here:
 ## Dependencies
 
 * [pmemkv](https://github.com/pmem/pmemkv) - native key/value library
+  * pmemkv source package (libpmemkv-devel, pmemkv-devel)
 * Java 8 or higher
+* gcc-c++ compiler
 * [Apache Maven](https://maven.apache.org) - build system
-* Used only for development & testing:
-  * [JUnit](https://junit.org/) - automated test framework
-  * [Oleaster Matcher](https://github.com/mscharhag/oleaster/tree/master/oleaster-matcher) - test condition matching library
 
 ## Installation
 
