@@ -1,7 +1,7 @@
 ---
 name: Bug report
 about: Did you find a bug in pmemkv's java binding? Please let us know.
-labels: "bug"
+labels: "Type: Bug"
 ---
 <!--
 Before creating new issue, ensure that similar issue wasn't already created
