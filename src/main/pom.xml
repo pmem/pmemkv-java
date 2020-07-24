@@ -85,13 +85,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.pmem</groupId>
-            <artifactId>libpmemkv-jni</artifactId>
-            <version>1.0.0</version>
-            <scope>runtime</scope>
-            <type>so</type>
-        </dependency>
-        <dependency>
             <groupId>com.mscharhag.oleaster</groupId>
             <artifactId>oleaster-matcher</artifactId>
             <version>0.2.0</version>
