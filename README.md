@@ -18,7 +18,7 @@ Java API is documented with javadocs and can be found as html here:
 ## Dependencies
 
 * [pmemkv](https://github.com/pmem/pmemkv) - native key/value library
-* Java 8 or higher
+* Java 8
 * [Apache Maven](https://maven.apache.org) - build system
 * Used only for development & testing:
   * [JUnit](https://junit.org/) - automated test framework
