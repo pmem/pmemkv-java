@@ -19,7 +19,7 @@ Java API is documented with javadocs and can be found as html here:
 
 * [pmemkv](https://github.com/pmem/pmemkv) - native key/value library
   * pmemkv source package (libpmemkv-devel, pmemkv-devel)
-* Java 8 or higher
+* Java 8
 * gcc-c++ compiler
 * [Apache Maven](https://maven.apache.org) - build system
 
@@ -49,10 +49,12 @@ mvn install
 ```
 
 If dependencies (pmemkv, libpmemobj-cpp, pmdk, etc.) are installed in non-standard
-location it may be also necessary to set it in LD_LIBRARY_PATH, e.g.:
+location(s) it may be also necessary to set up:
+**CPLUS_INCLUDE_PATH** and **LIBRARY_PATH** for compiling and linking JNI code (gcc env. variables),
+**LD_LIBRARY_PATH** for examples/tests execution.
 
 ```sh
-LD_LIBRARY_PATH=path_to_your_libs mvn install
+CPLUS_INCLUDE_PATH=<path_to_includes> LIBRARY_PATH=<path_to_libs> LD_LIBRARY_PATH=<path_to_libs> mvn install
 ```
 
 ## Testing
@@ -60,7 +62,7 @@ LD_LIBRARY_PATH=path_to_your_libs mvn install
 This library includes a set of automated tests that exercise all functionality.
 
 ```sh
-LD_LIBRARY_PATH=path_to_your_libs mvn test
+LD_LIBRARY_PATH=<path_to_libs> mvn test
 ```
 
 ## Examples
@@ -75,7 +77,7 @@ To execute them, run e.g.:
 ```sh
 cd examples
 javac -cp ../src/main/target/*.jar StringExample.java
-PMEM_IS_PMEM_FORCE=1 java -ea -Xms1G -cp .:`find ../src/main/target -name *.jar` -Djava.library.path=../src/main/cpp/target StringExample
+LD_LIBRARY_PATH=<path_to_libs> PMEM_IS_PMEM_FORCE=1 java -ea -Xms1G -cp .:`find ../src/main/target -name *.jar` -Djava.library.path=../src/main/cpp/target StringExample
 ```
 
 ## Documentation
