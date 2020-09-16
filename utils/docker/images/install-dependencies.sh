@@ -48,7 +48,7 @@ deps_dir=$(mktemp -d)
 git clone https://github.com/pmem/pmemkv-java.git ${deps_dir}
 pushd ${deps_dir}
 git checkout $JAVA_VERSION
-mvn install -Dmaven.test.skip=true
+mvn install
 mvn dependency:go-offline
 mv -v ~/.m2/repository /opt/java/
 
