@@ -7,12 +7,12 @@ import io.pmem.pmemkv.Database;
 import io.pmem.pmemkv.ByteBufferConverter;
 
 import org.junit.Assert;
+import static org.junit.Assert.*;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.mscharhag.oleaster.matcher.Matchers.expect;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static junit.framework.TestCase.fail;
 
@@ -43,57 +43,57 @@ public class DatabaseTest {
 	@Test
 	public void blackholeTest() {
 		Database<ByteBuffer, ByteBuffer> db = buildDB("blackhole");
-		expect(db.countAll()).toEqual(0);
-		expect(db.exists(stringToByteBuffer("key1"))).toBeFalse();
+		assertEquals(db.countAll(), 0);
+		assertFalse(db.exists(stringToByteBuffer("key1")));
 		ByteBuffer ret = db.getCopy(stringToByteBuffer("key1"));
-		expect(db.getCopy(stringToByteBuffer("key1"))).toBeNull();
+		assertNull(db.getCopy(stringToByteBuffer("key1")));
 		db.put(stringToByteBuffer("key1"), stringToByteBuffer("value1"));
-		expect(db.countAll()).toEqual(0);
-		expect(db.exists(stringToByteBuffer("key1"))).toBeFalse();
-		expect(db.getCopy(stringToByteBuffer("key1"))).toBeNull();
-		expect(db.remove(stringToByteBuffer("key1"))).toBeTrue();
-		expect(db.exists(stringToByteBuffer("key1"))).toBeFalse();
-		expect(db.getCopy(stringToByteBuffer("key1"))).toBeNull();
+		assertEquals(db.countAll(), 0);
+		assertFalse(db.exists(stringToByteBuffer("key1")));
+		assertNull(db.getCopy(stringToByteBuffer("key1")));
+		assertTrue(db.remove(stringToByteBuffer("key1")));
+		assertFalse(db.exists(stringToByteBuffer("key1")));
+		assertNull(db.getCopy(stringToByteBuffer("key1")));
 		db.stop();
 	}
 
 	@Test
 	public void startEngineTest() {
 		Database<ByteBuffer, ByteBuffer> db = buildDB(ENGINE);
-		expect(db).toBeNotNull();
-		expect(db.stopped()).toBeFalse();
+		assertNotNull(db);
+		assertFalse(db.stopped());
 		db.stop();
-		expect(db.stopped()).toBeTrue();
+		assertTrue(db.stopped());
 	}
 
 	@Test
 	public void stopsEngineMultipleTimesTest() {
 		Database<ByteBuffer, ByteBuffer> db = buildDB(ENGINE);
-		expect(db.stopped()).toBeFalse();
+		assertFalse(db.stopped());
 		db.stop();
-		expect(db.stopped()).toBeTrue();
+		assertTrue(db.stopped());
 		db.stop();
-		expect(db.stopped()).toBeTrue();
+		assertTrue(db.stopped());
 		db.stop();
-		expect(db.stopped()).toBeTrue();
+		assertTrue(db.stopped());
 	}
 
 	@Test
 	public void getsMissingKeyTest() {
 		Database<ByteBuffer, ByteBuffer> db = buildDB(ENGINE);
-		expect(db.exists(stringToByteBuffer("key1"))).toBeFalse();
-		expect(db.getCopy(stringToByteBuffer("key1"))).toBeNull();
+		assertFalse(db.exists(stringToByteBuffer("key1")));
+		assertNull(db.getCopy(stringToByteBuffer("key1")));
 		db.stop();
 	}
 
 	@Test
 	public void putsBasicValueTest() {
 		Database<ByteBuffer, ByteBuffer> db = buildDB(ENGINE);
-		expect(db.exists(stringToByteBuffer("key1"))).toBeFalse();
+		assertFalse(db.exists(stringToByteBuffer("key1")));
 		db.put(stringToByteBuffer("key1"), stringToByteBuffer("value1"));
-		expect(db.exists(stringToByteBuffer("key1"))).toBeTrue();
+		assertTrue(db.exists(stringToByteBuffer("key1")));
 		ByteBuffer resBuff = db.getCopy(stringToByteBuffer("key1"));
-		expect(byteBufferToString(resBuff)).toEqual("value1");
+		assertEquals(byteBufferToString(resBuff), "value1");
 		db.stop();
 	}
 
@@ -103,12 +103,12 @@ public class DatabaseTest {
 		db.put(stringToByteBuffer(""), stringToByteBuffer("empty"));
 		db.put(stringToByteBuffer(" "), stringToByteBuffer("single-space"));
 		db.put(stringToByteBuffer("\t\t"), stringToByteBuffer("two-tab"));
-		expect(db.exists(stringToByteBuffer(""))).toBeTrue();
-		expect(byteBufferToString(db.getCopy(stringToByteBuffer("")))).toEqual("empty");
-		expect(db.exists(stringToByteBuffer(" "))).toBeTrue();
-		expect(byteBufferToString(db.getCopy(stringToByteBuffer(" ")))).toEqual("single-space");
-		expect(db.exists(stringToByteBuffer("\t\t"))).toBeTrue();
-		expect(byteBufferToString(db.getCopy(stringToByteBuffer("\t\t")))).toEqual("two-tab");
+		assertTrue(db.exists(stringToByteBuffer("")));
+		assertEquals(byteBufferToString(db.getCopy(stringToByteBuffer(""))), "empty");
+		assertTrue(db.exists(stringToByteBuffer(" ")));
+		assertEquals(byteBufferToString(db.getCopy(stringToByteBuffer(" "))), "single-space");
+		assertTrue(db.exists(stringToByteBuffer("\t\t")));
+		assertEquals(byteBufferToString(db.getCopy(stringToByteBuffer("\t\t"))), "two-tab");
 		db.stop();
 	}
 
@@ -118,9 +118,9 @@ public class DatabaseTest {
 		db.put(stringToByteBuffer("empty"), stringToByteBuffer(""));
 		db.put(stringToByteBuffer("single-space"), stringToByteBuffer(" "));
 		db.put(stringToByteBuffer("two-tab"), stringToByteBuffer("\t\t"));
-		expect(byteBufferToString(db.getCopy(stringToByteBuffer("empty")))).toEqual("");
-		expect(byteBufferToString(db.getCopy(stringToByteBuffer("single-space")))).toEqual(" ");
-		expect(byteBufferToString(db.getCopy(stringToByteBuffer("two-tab")))).toEqual("\t\t");
+		assertEquals(byteBufferToString(db.getCopy(stringToByteBuffer("empty"))), "");
+		assertEquals(byteBufferToString(db.getCopy(stringToByteBuffer("single-space"))), " ");
+		assertEquals(byteBufferToString(db.getCopy(stringToByteBuffer("two-tab"))), "\t\t");
 		db.stop();
 	}
 
@@ -130,13 +130,13 @@ public class DatabaseTest {
 		db.put(stringToByteBuffer("key1"), stringToByteBuffer("value1"));
 		db.put(stringToByteBuffer("key2"), stringToByteBuffer("value2"));
 		db.put(stringToByteBuffer("key3"), stringToByteBuffer("value3"));
-		expect(db.exists(stringToByteBuffer("key1"))).toBeTrue();
-		expect(byteBufferToString(db.getCopy(stringToByteBuffer("key1")))).toEqual("value1");
-		expect(db.exists(stringToByteBuffer("key2"))).toBeTrue();
-		expect(byteBufferToString(db.getCopy(stringToByteBuffer("key2")))).toEqual("value2");
-		expect(db.exists(stringToByteBuffer("key3"))).toBeTrue();
-		expect(byteBufferToString(db.getCopy(stringToByteBuffer("key3")))).toEqual("value3");
-		expect(db.countAll()).toEqual(3);
+		assertTrue(db.exists(stringToByteBuffer("key1")));
+		assertEquals(byteBufferToString(db.getCopy(stringToByteBuffer("key1"))), "value1");
+		assertTrue(db.exists(stringToByteBuffer("key2")));
+		assertEquals(byteBufferToString(db.getCopy(stringToByteBuffer("key2"))), "value2");
+		assertTrue(db.exists(stringToByteBuffer("key3")));
+		assertEquals(byteBufferToString(db.getCopy(stringToByteBuffer("key3"))), "value3");
+		assertEquals(db.countAll(), 3);
 		db.stop();
 	}
 
@@ -144,11 +144,11 @@ public class DatabaseTest {
 	public void putsOverwritingExistingValueTest() {
 		Database<ByteBuffer, ByteBuffer> db = buildDB(ENGINE);
 		db.put(stringToByteBuffer("key1"), stringToByteBuffer("value1"));
-		expect(byteBufferToString(db.getCopy(stringToByteBuffer("key1")))).toEqual("value1");
+		assertEquals(byteBufferToString(db.getCopy(stringToByteBuffer("key1"))), "value1");
 		db.put(stringToByteBuffer("key1"), stringToByteBuffer("value123"));
-		expect(byteBufferToString(db.getCopy(stringToByteBuffer("key1")))).toEqual("value123");
+		assertEquals(byteBufferToString(db.getCopy(stringToByteBuffer("key1"))), "value123");
 		db.put(stringToByteBuffer("key1"), stringToByteBuffer("asdf"));
-		expect(byteBufferToString(db.getCopy(stringToByteBuffer("key1")))).toEqual("asdf");
+		assertEquals(byteBufferToString(db.getCopy(stringToByteBuffer("key1"))), "asdf");
 		db.stop();
 	}
 
@@ -157,14 +157,14 @@ public class DatabaseTest {
 		Database<ByteBuffer, ByteBuffer> db = buildDB(ENGINE);
 
 		db.put(stringToByteBuffer("key1"), stringToByteBuffer("value1"));
-		expect(db.exists(stringToByteBuffer("key1"))).toBeTrue();
+		assertTrue(db.exists(stringToByteBuffer("key1")));
 		db.get(stringToByteBuffer("key1"), (ByteBuffer v) -> {
-			expect(byteBufferToString(v)).toEqual("value1");
+			assertEquals(byteBufferToString(v), "value1");
 		});
-		expect(db.remove(stringToByteBuffer("key1"))).toBeTrue();
-		expect(db.remove(stringToByteBuffer("key1"))).toBeFalse();
-		expect(db.exists(stringToByteBuffer("key1"))).toBeFalse();
-		expect(db.getCopy(stringToByteBuffer("key1"))).toBeNull();
+		assertTrue(db.remove(stringToByteBuffer("key1")));
+		assertFalse(db.remove(stringToByteBuffer("key1")));
+		assertFalse(db.exists(stringToByteBuffer("key1")));
+		assertNull(db.getCopy(stringToByteBuffer("key1")));
 
 		db.stop();
 	}
@@ -176,10 +176,10 @@ public class DatabaseTest {
 		db.put(stringToByteBuffer("2"), stringToByteBuffer("two"));
 		db.put(stringToByteBuffer("记!"), stringToByteBuffer("RR"));
 
-		expect(db.countAll()).toEqual(3);
+		assertEquals(db.countAll(), 3);
 		StringBuilder x3 = new StringBuilder();
 		db.getKeys((ByteBuffer k) -> x3.append("<").append(UTF_8.decode(k).toString()).append(">,"));
-		expect(x3.toString()).toEqual("<1>,<2>,<记!>,");
+		assertEquals(x3.toString(), "<1>,<2>,<记!>,");
 
 		db.stop();
 	}
@@ -199,7 +199,7 @@ public class DatabaseTest {
 		ByteBuffer keyb = ByteBuffer.allocateDirect(1000);
 		keyb.put("B".getBytes());
 		db.getKeysAbove(keyb, (ByteBuffer k) -> x3.append(UTF_8.decode(k).toString()).append(","));
-		expect(x3.toString()).toEqual("BB,BC,记!,");
+		assertEquals(x3.toString(), "BB,BC,记!,");
 
 		db.stop();
 	}
@@ -219,7 +219,7 @@ public class DatabaseTest {
 		ByteBuffer keyb = ByteBuffer.allocateDirect(1000);
 		keyb.put("\uFFFF".getBytes());
 		db.getKeysBelow(keyb, (ByteBuffer k) -> x3.append(UTF_8.decode(k).toString()).append(","));
-		expect(x3.toString()).toEqual("A,AB,AC,B,BB,BC,记!,");
+		assertEquals(x3.toString(), "A,AB,AC,B,BB,BC,记!,");
 
 		db.stop();
 	}
@@ -241,13 +241,13 @@ public class DatabaseTest {
 		ByteBuffer key2b = ByteBuffer.allocateDirect(1000);
 		key2b.put("\uFFFF".getBytes());
 		db.getKeysBetween(key1b, key2b, (ByteBuffer k) -> x3.append(UTF_8.decode(k).toString()).append(","));
-		expect(x3.toString()).toEqual("BB,BC,记!,");
+		assertEquals(x3.toString(), "BB,BC,记!,");
 
 		StringBuilder x4 = new StringBuilder();
 		db.getKeysBetween(stringToByteBuffer(""), stringToByteBuffer(""), (ByteBuffer k) -> x4.append(k).append(","));
 		db.getKeysBetween(stringToByteBuffer("A"), stringToByteBuffer("A"), (ByteBuffer k) -> x4.append(k).append(","));
 		db.getKeysBetween(stringToByteBuffer("B"), stringToByteBuffer("A"), (ByteBuffer k) -> x4.append(k).append(","));
-		expect(x4.toString()).toEqual("");
+		assertEquals(x4.toString(), "");
 
 		db.stop();
 	}
@@ -262,41 +262,41 @@ public class DatabaseTest {
 		db.put(stringToByteBuffer("BB"), stringToByteBuffer("5"));
 		db.put(stringToByteBuffer("BC"), stringToByteBuffer("6"));
 		db.put(stringToByteBuffer("BD"), stringToByteBuffer("7"));
-		expect(db.countAll()).toEqual(7);
+		assertEquals(db.countAll(), 7);
 
-		expect(db.countAbove(stringToByteBuffer(""))).toEqual(7);
-		expect(db.countAbove(stringToByteBuffer("A"))).toEqual(6);
-		expect(db.countAbove(stringToByteBuffer("B"))).toEqual(3);
-		expect(db.countAbove(stringToByteBuffer("BC"))).toEqual(1);
-		expect(db.countAbove(stringToByteBuffer("BD"))).toEqual(0);
-		expect(db.countAbove(stringToByteBuffer("Z"))).toEqual(0);
+		assertEquals(db.countAbove(stringToByteBuffer("")), 7);
+		assertEquals(db.countAbove(stringToByteBuffer("A")), 6);
+		assertEquals(db.countAbove(stringToByteBuffer("B")), 3);
+		assertEquals(db.countAbove(stringToByteBuffer("BC")), 1);
+		assertEquals(db.countAbove(stringToByteBuffer("BD")), 0);
+		assertEquals(db.countAbove(stringToByteBuffer("Z")), 0);
 
-		expect(db.countBelow(stringToByteBuffer(""))).toEqual(0);
-		expect(db.countBelow(stringToByteBuffer("A"))).toEqual(0);
-		expect(db.countBelow(stringToByteBuffer("B"))).toEqual(3);
-		expect(db.countBelow(stringToByteBuffer("BD"))).toEqual(6);
-		expect(db.countBelow(stringToByteBuffer("ZZZZZ"))).toEqual(7);
+		assertEquals(db.countBelow(stringToByteBuffer("")), 0);
+		assertEquals(db.countBelow(stringToByteBuffer("A")), 0);
+		assertEquals(db.countBelow(stringToByteBuffer("B")), 3);
+		assertEquals(db.countBelow(stringToByteBuffer("BD")), 6);
+		assertEquals(db.countBelow(stringToByteBuffer("ZZZZZ")), 7);
 
-		expect(db.countBetween(stringToByteBuffer(""), stringToByteBuffer("ZZZZ"))).toEqual(7);
-		expect(db.countBetween(stringToByteBuffer(""), stringToByteBuffer("A"))).toEqual(0);
-		expect(db.countBetween(stringToByteBuffer(""), stringToByteBuffer("B"))).toEqual(3);
-		expect(db.countBetween(stringToByteBuffer("A"), stringToByteBuffer("B"))).toEqual(2);
-		expect(db.countBetween(stringToByteBuffer("B"), stringToByteBuffer("ZZZZ"))).toEqual(3);
+		assertEquals(db.countBetween(stringToByteBuffer(""), stringToByteBuffer("ZZZZ")), 7);
+		assertEquals(db.countBetween(stringToByteBuffer(""), stringToByteBuffer("A")), 0);
+		assertEquals(db.countBetween(stringToByteBuffer(""), stringToByteBuffer("B")), 3);
+		assertEquals(db.countBetween(stringToByteBuffer("A"), stringToByteBuffer("B")), 2);
+		assertEquals(db.countBetween(stringToByteBuffer("B"), stringToByteBuffer("ZZZZ")), 3);
 
-		expect(db.countBetween(stringToByteBuffer(""), stringToByteBuffer(""))).toEqual(0);
-		expect(db.countBetween(stringToByteBuffer("A"), stringToByteBuffer("A"))).toEqual(0);
-		expect(db.countBetween(stringToByteBuffer("AC"), stringToByteBuffer("A"))).toEqual(0);
-		expect(db.countBetween(stringToByteBuffer("B"), stringToByteBuffer("A"))).toEqual(0);
-		expect(db.countBetween(stringToByteBuffer("BD"), stringToByteBuffer("A"))).toEqual(0);
-		expect(db.countBetween(stringToByteBuffer("ZZZ"), stringToByteBuffer("B"))).toEqual(0);
+		assertEquals(db.countBetween(stringToByteBuffer(""), stringToByteBuffer("")), 0);
+		assertEquals(db.countBetween(stringToByteBuffer("A"), stringToByteBuffer("A")), 0);
+		assertEquals(db.countBetween(stringToByteBuffer("AC"), stringToByteBuffer("A")), 0);
+		assertEquals(db.countBetween(stringToByteBuffer("B"), stringToByteBuffer("A")), 0);
+		assertEquals(db.countBetween(stringToByteBuffer("BD"), stringToByteBuffer("A")), 0);
+		assertEquals(db.countBetween(stringToByteBuffer("ZZZ"), stringToByteBuffer("B")), 0);
 
 		ByteBuffer key1b = ByteBuffer.allocateDirect(1000);
 		key1b.put("B".getBytes());
 		ByteBuffer key2b = ByteBuffer.allocateDirect(1000);
 		key2b.put("BD".getBytes());
-		expect(db.countAbove(key1b)).toEqual(3);
-		expect(db.countBelow(key2b)).toEqual(6);
-		expect(db.countBetween(key1b, key2b)).toEqual(2);
+		assertEquals(db.countAbove(key1b), 3);
+		assertEquals(db.countBelow(key2b), 6);
+		assertEquals(db.countBetween(key1b, key2b), 2);
 
 		db.stop();
 	}
@@ -311,7 +311,7 @@ public class DatabaseTest {
 		StringBuilder x3 = new StringBuilder();
 		db.getAll((ByteBuffer k, ByteBuffer v) -> x3.append("<").append(UTF_8.decode(k).toString()).append(">,<")
 				.append(UTF_8.decode(v).toString()).append(">|"));
-		expect(x3.toString()).toEqual("<1>,<one>|<2>,<two>|<记!>,<RR>|");
+		assertEquals(x3.toString(), "<1>,<one>|<2>,<two>|<记!>,<RR>|");
 
 		db.stop();
 	}
@@ -331,14 +331,14 @@ public class DatabaseTest {
 		db.getAbove(stringToByteBuffer("B"), (ByteBuffer k, ByteBuffer v) -> x.append(UTF_8.decode(k).toString())
 				.append(",").append(UTF_8.decode(v).toString()).append("|"));
 
-		expect(x.toString()).toEqual("BB,5|BC,6|记!,RR|");
+		assertEquals(x.toString(), "BB,5|BC,6|记!,RR|");
 
 		StringBuilder x3 = new StringBuilder();
 		ByteBuffer keyb = ByteBuffer.allocateDirect(1000);
 		keyb.put("B".getBytes());
 		db.getAbove(keyb, (ByteBuffer k, ByteBuffer v) -> x3.append(UTF_8.decode(k).toString()).append(",")
 				.append(UTF_8.decode(v).toString()).append("|"));
-		expect(x3.toString()).toEqual("BB,5|BC,6|记!,RR|");
+		assertEquals(x3.toString(), "BB,5|BC,6|记!,RR|");
 
 		db.stop();
 	}
@@ -358,14 +358,14 @@ public class DatabaseTest {
 		db.getBelow(stringToByteBuffer("AC"), (ByteBuffer k, ByteBuffer v) -> x.append(UTF_8.decode(k).toString())
 				.append(",").append(UTF_8.decode(v).toString()).append("|"));
 
-		expect(x.toString()).toEqual("A,1|AB,2|");
+		assertEquals(x.toString(), "A,1|AB,2|");
 
 		StringBuilder x3 = new StringBuilder();
 		ByteBuffer keyb = ByteBuffer.allocateDirect(1000);
 		keyb.put("\uFFFF".getBytes());
 		db.getBelow(keyb, (ByteBuffer k, ByteBuffer v) -> x3.append(UTF_8.decode(k).toString()).append(",")
 				.append(UTF_8.decode(v).toString()).append("|"));
-		expect(x3.toString()).toEqual("A,1|AB,2|AC,3|B,4|BB,5|BC,6|记!,RR|");
+		assertEquals(x3.toString(), "A,1|AB,2|AC,3|B,4|BB,5|BC,6|记!,RR|");
 
 		db.stop();
 	}
@@ -386,7 +386,7 @@ public class DatabaseTest {
 		db.getBetween(stringToByteBuffer("A"), stringToByteBuffer("B"), (ByteBuffer k, ByteBuffer v) -> {
 			x.append(UTF_8.decode(k).toString()).append(",").append(UTF_8.decode(v).toString()).append("|");
 		});
-		expect(x.toString()).toEqual("AB,2|AC,3|");
+		assertEquals(x.toString(), "AB,2|AC,3|");
 
 		StringBuilder x3 = new StringBuilder();
 		ByteBuffer key1b = ByteBuffer.allocateDirect(1000);
@@ -396,7 +396,7 @@ public class DatabaseTest {
 		db.getBetween(key1b, key2b, (ByteBuffer k, ByteBuffer v) -> {
 			x3.append(UTF_8.decode(k).toString()).append(",").append(UTF_8.decode(v).toString()).append("|");
 		});
-		expect(x3.toString()).toEqual("BB,5|BC,6|记!,RR|");
+		assertEquals(x3.toString(), "BB,5|BC,6|记!,RR|");
 
 		StringBuilder x4 = new StringBuilder();
 		db.getBetween(stringToByteBuffer(""), stringToByteBuffer(""),
@@ -405,7 +405,7 @@ public class DatabaseTest {
 				(ByteBuffer k, ByteBuffer v) -> x4.append(k).append(","));
 		db.getBetween(stringToByteBuffer("B"), stringToByteBuffer("A"),
 				(ByteBuffer k, ByteBuffer v) -> x4.append(k).append(","));
-		expect(x4.toString()).toEqual("");
+		assertEquals(x4.toString(), "");
 
 		db.stop();
 	}
@@ -418,31 +418,31 @@ public class DatabaseTest {
 		ByteBuffer valb = ByteBuffer.allocateDirect(1000);
 		keyb.putInt(123);
 		valb.putInt(234);
-		expect(db.exists(keyb)).toBeFalse();
+		assertFalse(db.exists(keyb));
 		db.put(keyb, valb);
-		expect(db.exists(keyb)).toBeTrue();
-		expect(db.countAll()).toEqual(1);
+		assertTrue(db.exists(keyb));
+		assertEquals(db.countAll(), 1);
 
 		keyb.clear();
 		keyb.putInt(5678);
 		valb.clear();
 		valb.putInt(6789);
-		expect(db.exists(keyb)).toBeFalse();
+		assertFalse(db.exists(keyb));
 		db.put(keyb, valb);
-		expect(db.exists(keyb)).toBeTrue();
-		expect(db.countAll()).toEqual(2);
+		assertTrue(db.exists(keyb));
+		assertEquals(db.countAll(), 2);
 
 		AtomicInteger count = new AtomicInteger(0);
 		db.getAll((ByteBuffer kb, ByteBuffer vb) -> {
 			count.addAndGet(kb.getInt());
 			count.addAndGet(vb.getInt());
 		});
-		expect(count.intValue()).toEqual(12824);
+		assertEquals(count.intValue(), 12824);
 
-		expect(db.exists(keyb)).toBeTrue();
-		expect(db.remove(keyb)).toBeTrue();
-		expect(db.exists(keyb)).toBeFalse();
-		expect(db.remove(keyb)).toBeFalse();
+		assertTrue(db.exists(keyb));
+		assertTrue(db.remove(keyb));
+		assertFalse(db.exists(keyb));
+		assertFalse(db.remove(keyb));
 
 		db.stop();
 	}
@@ -457,12 +457,12 @@ public class DatabaseTest {
 		valbb.putInt(42);
 
 		db.put(keybb, valbb);
-		db.get(keybb, (ByteBuffer v) -> expect(v.isDirect()).toBeTrue());
+		db.get(keybb, (ByteBuffer v) -> assertTrue(v.isDirect()));
 		// Indirect ByteBuffer
 		byte[] keyb = {41};
 		byte[] valb = {41};
 
 		db.put(ByteBuffer.wrap(keyb), ByteBuffer.wrap(valb));
-		db.get(ByteBuffer.wrap(keyb), (ByteBuffer v) -> expect(v.isDirect()).toBeTrue());
+		db.get(ByteBuffer.wrap(keyb), (ByteBuffer v) -> assertTrue(v.isDirect()));
 	}
 }
