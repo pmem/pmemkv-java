@@ -8,6 +8,7 @@ import io.pmem.pmemkv.DatabaseException;
 import io.pmem.pmemkv.ByteBufferConverter;
 
 import org.junit.Assert;
+import static org.junit.Assert.*;
 import org.junit.Test;
 import org.junit.Before;
 import org.junit.After;
@@ -19,7 +20,6 @@ import java.io.File;
 import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.mscharhag.oleaster.matcher.Matchers.expect;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static junit.framework.TestCase.fail;
 
@@ -65,18 +65,18 @@ public class CmapTest {
 		String file = folder.getRoot() + File.pathSeparator + "testfile";
 		Database<ByteBuffer, ByteBuffer> db = createDB(ENGINE, file);
 
-		expect(db.exists(stringToByteBuffer("key1"))).toBeFalse();
+		assertFalse(db.exists(stringToByteBuffer("key1")));
 		db.put(stringToByteBuffer("key1"), stringToByteBuffer("value1"));
-		expect(db.exists(stringToByteBuffer("key1"))).toBeTrue();
+		assertTrue(db.exists(stringToByteBuffer("key1")));
 		ByteBuffer resBuff = db.getCopy(stringToByteBuffer("key1"));
-		expect(byteBufferToString(resBuff)).toEqual("value1");
+		assertEquals(byteBufferToString(resBuff), "value1");
 
 		db.stop();
 
 		db = openDB(ENGINE, file);
-		expect(db.exists(stringToByteBuffer("key1"))).toBeTrue();
+		assertTrue(db.exists(stringToByteBuffer("key1")));
 		resBuff = db.getCopy(stringToByteBuffer("key1"));
-		expect(byteBufferToString(resBuff)).toEqual("value1");
+		assertEquals(byteBufferToString(resBuff), "value1");
 	}
 
 	@Test
@@ -92,6 +92,6 @@ public class CmapTest {
 
 		}
 
-		expect(db).toEqual(null);
+		assertNull(db);
 	}
 }
