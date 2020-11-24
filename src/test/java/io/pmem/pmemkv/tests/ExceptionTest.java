@@ -9,13 +9,13 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.List;
 
-import static com.mscharhag.oleaster.matcher.Matchers.expect;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static junit.framework.TestCase.fail;
 
@@ -49,7 +49,7 @@ public class ExceptionTest {
 			key.putInt(i);
 			db.put(key, key);
 		}
-		expect(db.countAll()).toEqual(0xFF);
+		assertEquals(db.countAll(), 0xFF);
 	}
 
 	@After
@@ -73,8 +73,8 @@ public class ExceptionTest {
 		} catch (Exception e) {
 			Assert.fail();
 		}
-		expect(exception_occured).toBeTrue();
-		expect(db).toBeNull();
+		assertTrue(exception_occured);
+		assertNull(db);
 	}
 
 	@Test
@@ -91,8 +91,8 @@ public class ExceptionTest {
 		} catch (Exception e) {
 			Assert.fail();
 		}
-		expect(db).toBeNull();
-		expect(exception_occured).toBeTrue();
+		assertNull(db);
+		assertTrue(exception_occured);
 	}
 
 	@Test
@@ -107,8 +107,8 @@ public class ExceptionTest {
 		} catch (Exception e) {
 			Assert.fail();
 		}
-		expect(db).toBeNull();
-		expect(exception_occured).toBeTrue();
+		assertNull(db);
+		assertTrue(exception_occured);
 	}
 
 	@Test
@@ -130,8 +130,8 @@ public class ExceptionTest {
 		} catch (Exception e) {
 			Assert.fail();
 		}
-		expect(db).toBeNull();
-		expect(exception_occured).toBeTrue();
+		assertNull(db);
+		assertTrue(exception_occured);
 	}
 
 	@Test
@@ -153,8 +153,8 @@ public class ExceptionTest {
 		} catch (Exception e) {
 			Assert.fail();
 		}
-		expect(exception_occured).toBeTrue();
-		expect(db).toBeNull();
+		assertNull(db);
+		assertTrue(exception_occured);
 	}
 
 	/* Exceptions in Gets methods */
@@ -169,7 +169,7 @@ public class ExceptionTest {
 		} catch (Exception e) {
 			exception_counter++;
 		}
-		expect(exception_counter).toEqual(1);
+		assertEquals(exception_counter, 1);
 	}
 
 	@Test
@@ -184,8 +184,8 @@ public class ExceptionTest {
 		} catch (Exception e) {
 			exception_counter++;
 		}
-		expect(exception_counter).toEqual(1);
-		expect(loop_counter.intValue()).toEqual(1);
+		assertEquals(exception_counter, 1);
+		assertEquals(loop_counter.intValue(), 1);
 	}
 
 	@Test
@@ -202,8 +202,8 @@ public class ExceptionTest {
 		} catch (Exception e) {
 			exception_counter++;
 		}
-		expect(exception_counter).toEqual(1);
-		expect(loop_counter.intValue()).toEqual(16);
+		assertEquals(exception_counter, 1);
+		assertEquals(loop_counter.intValue(), 16);
 	}
 
 	@Test
@@ -217,9 +217,9 @@ public class ExceptionTest {
 			});
 		} catch (CustomException e) {
 			exception_occured = true;
-			expect(e.getMessage()).toEqual("Lorem ipsum");
+			assertEquals(e.getMessage(), "Lorem ipsum");
 		}
-		expect(exception_occured).toBeTrue();
+		assertTrue(exception_occured);
 	}
 
 	/* Other */
