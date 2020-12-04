@@ -17,8 +17,8 @@ Java API is documented with javadocs and can be found as html here:
 
 ## Dependencies
 
-* [pmemkv](https://github.com/pmem/pmemkv) - native key/value library
-  * pmemkv source package (libpmemkv-devel, pmemkv-devel)
+* [pmemkv](https://github.com/pmem/pmemkv) - Key-value Datastore for Persistent Memory
+  * pmemkv source package (pmemkv-devel or libpmemkv-dev)
 * Java 8
 * gcc-c++ compiler
 * [Apache Maven](https://maven.apache.org) - build system
