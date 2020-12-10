@@ -5,27 +5,27 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.pmem</groupId>
-    <artifactId>pmemkv-java</artifactId>
+    <artifactId>pmemkv-root</artifactId>
     <version>1.0.0</version>
-    <name>pmemkv-java</name>
+    <name>pmemkv-root</name>
     <description>Java bindings for pmemkv (top-level, parent artifact)</description>
     <url>https://github.com/pmem/pmemkv-java</url>
     <packaging>pom</packaging>
 
-    <properties>
+	<properties>
         <!-- use Java in ver. 8 and UTF-8 encoding -->
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-
     <modules>
-        <module>src/main/cpp</module> <!-- pom for jni part -->
-        <module>src/main</module> <!-- pom for java part -->
+        <module>jni-bindings</module> <!-- pom for jni part -->
+        <module>pmemkv-binding</module> <!-- pom for java part -->
+        <module>pmemkv-examples</module> <!-- pom for examples part -->
     </modules>
 
-    <build>
+     <build>
       <plugins>
         <plugin>
           <groupId>net.revelc.code.formatter</groupId>
@@ -34,16 +34,10 @@
           <configuration>
             <configFile>${project.build.sourceDirectory}/../resources/eclipse-formatter-config.xml</configFile>
             <lineEnding>LF</lineEnding>
-            <directories>
-              <directory>${project.build.sourceDirectory}</directory>
-              <directory>${project.build.testSourceDirectory}</directory>
-              <directory>${project.build.sourceDirectory}/../../../examples</directory>
-            </directories>
           </configuration>
           <executions>
             <execution>
               <goals>
-			    <!-- It will validate all files on compilation -->
                 <goal>validate</goal>
               </goals>
             </execution>
@@ -52,7 +46,7 @@
       </plugins>
     </build>
 
-    <issueManagement>
+     <issueManagement>
         <system>GitHub</system>
         <url>https://github.com/pmem/pmemkv-java/issues</url>
     </issueManagement>
@@ -75,6 +69,17 @@
             <organizationUrl>https://intel.com</organizationUrl>
             <roles>
                 <role>architect</role>
+                <role>developer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>kfilipek</id>
+            <name>Krzysztof Filipek</name>
+            <email>krzysztof.filipek@intel.com</email>
+            <url>https://github.com/kfilipek</url>
+            <organization>Intel</organization>
+            <organizationUrl>https://intel.com</organizationUrl>
+            <roles>
                 <role>developer</role>
             </roles>
         </developer>
