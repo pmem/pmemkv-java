@@ -6,12 +6,12 @@
 
     <parent>
         <groupId>io.pmem</groupId>
-        <artifactId>pmemkv-java</artifactId>
+        <artifactId>pmemkv-root</artifactId>
         <version>1.0.0</version>
-        <relativePath>../../..</relativePath>
+        <relativePath>../</relativePath>
     </parent>
     <groupId>io.pmem</groupId>
-    <artifactId>libpmemkv-jni</artifactId>
+    <artifactId>pmemkv-jni</artifactId>
     <name>pmemkv-jni</name>
     <packaging>so</packaging>
     <description>JNI layer for pmemkv Java bindings</description>
