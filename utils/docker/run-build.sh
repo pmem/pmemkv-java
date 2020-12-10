@@ -13,10 +13,9 @@ source `dirname $0`/prepare-for-build.sh
 
 function run_example() {
 	example_name=$1
-	jar_path=../src/main/target/pmemkv-1.0.0.jar
-
-	javac -g -cp ${jar_path} ${example_name}.java
-	java -ea -Xms1G -cp .:${jar_path} ${example_name}
+	jar_path=../pmemkv-binding/target/pmemkv-1.0.0.jar
+  example_path=`find .. | grep -P '\b(?!pmemkv)\b([a-zA-Z]+)\-([0-9.]+)\.jar' | grep ${example_name}`
+	java -ea -Xms1G -cp ${jar_path}:${example_path} ${example_name}
 }
 
 # install pmemkv
@@ -44,9 +43,7 @@ echo
 echo "###########################################################"
 echo "### Verifying building and execution of examples"
 echo "###########################################################"
-# set path to libpmemkv-jni.so
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$WORKDIR/src/main/cpp/target
-cd examples
+cd pmemkv-examples
 run_example StringExample
 run_example ByteBufferExample
 run_example MixedTypesExample
