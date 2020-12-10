@@ -5,7 +5,9 @@ package io.pmem.pmemkv;
 
 import io.pmem.pmemkv.internal.*;
 
+import java.io.*;
 import java.nio.ByteBuffer;
+import java.nio.file.Path;
 
 /**
  * Main Java binding pmemkv class, which is a local/embedded key-value datastore
@@ -512,7 +514,38 @@ public class Database<K, V> {
 		private native void config_put_string(long ptr, String key, String value);
 
 		static {
-			System.loadLibrary("pmemkv-jni");
+			try {
+				System.loadLibrary("pmemkv-jni");
+			} catch (UnsatisfiedLinkError e) {
+				InputStream is = Database.class.getResourceAsStream("/libpmemkv-jni.so.1");
+				if (is == null) {
+					try {
+						throw new Exception("Cannot get resource from Jar file.");
+					} catch (Exception exception) {
+						System.err.println("Error: " + exception.getMessage());
+					}
+				}
+
+				File file;
+				try {
+					file = File.createTempFile("lib", ".so");
+					OutputStream os = null;
+					os = new FileOutputStream(file);
+					byte[] buf = new byte[8192];
+					int length;
+					while ((length = is.read(buf)) > 0) {
+						os.write(buf, 0, length);
+					}
+					is.close();
+					os.close();
+
+					System.load(file.getAbsolutePath());
+				} catch (FileNotFoundException fileNotFoundException) {
+					fileNotFoundException.printStackTrace();
+				} catch (IOException ioException) {
+					ioException.printStackTrace();
+				}
+			}
 		}
 	}
 
@@ -566,8 +599,4 @@ public class Database<K, V> {
 	private native void database_put_buffer(long ptr, int kb, ByteBuffer k, int vb, ByteBuffer v);
 
 	private native boolean database_remove_buffer(long ptr, int kb, ByteBuffer k);
-
-	static {
-		System.loadLibrary("pmemkv-jni");
-	}
 }
