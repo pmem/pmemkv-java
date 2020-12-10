@@ -21,7 +21,7 @@ Java API is documented with javadocs and can be found as html here:
   * pmemkv source package (pmemkv-devel or libpmemkv-dev)
 * Java 8
 * gcc-c++ compiler
-* [Apache Maven](https://maven.apache.org) - build system
+* [Apache Maven 3](https://maven.apache.org) - build system
 
 ## Installation
 
@@ -71,13 +71,13 @@ We are using `/dev/shm` to
 [emulate persistent memory](https://pmem.io/2016/02/22/pm-emulation.html)
 in examples.
 
-Examples can be found within this repository in [examples directory](https://github.com/pmem/pmemkv-java/tree/master/examples).
+Examples can be found within this repository in [examples directory](https://github.com/pmem/pmemkv-java/tree/master/pmemkv-examples).
 To execute them, run e.g.:
 
 ```sh
 cd examples
-javac -cp ../src/main/target/*.jar StringExample.java
-LD_LIBRARY_PATH=<path_to_libs> PMEM_IS_PMEM_FORCE=1 java -ea -Xms1G -cp .:`find ../src/main/target -name *.jar` -Djava.library.path=../src/main/cpp/target StringExample
+mvn package
+PMEM_IS_PMEM_FORCE=1 java -ea -Xms1G -jar StringExample/StringExample-1.0.0-jar-with-dependencies.jar
 ```
 
 ## Documentation
