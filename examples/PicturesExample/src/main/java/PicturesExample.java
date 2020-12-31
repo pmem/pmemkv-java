@@ -79,6 +79,7 @@ public class PicturesExample extends Canvas {
 
 	private Database<String, BufferedImage> db;
 	private String engine = "cmap";
+	static final long serialVersionUID = 9101254512891724823L;
 
 	public PicturesExample(String Path, int size) {
 		System.out.println("Creating new database in path: " + Path + " with size: " + size);
