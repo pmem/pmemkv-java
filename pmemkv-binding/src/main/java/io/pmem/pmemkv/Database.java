@@ -5,7 +5,9 @@ package io.pmem.pmemkv;
 
 import io.pmem.pmemkv.internal.*;
 
+import java.io.*;
 import java.nio.ByteBuffer;
+import java.nio.file.Path;
 
 /**
  * Main Java binding pmemkv class, which is a local/embedded key-value datastore
@@ -512,7 +514,38 @@ public class Database<K, V> {
 		private native void config_put_string(long ptr, String key, String value);
 
 		static {
-			System.loadLibrary("pmemkv-jni");
+			boolean unsatisfied_error = false;
+			try {
+				System.loadLibrary("pmemkv-jni");
+			} catch (UnsatisfiedLinkError e) {
+				unsatisfied_error = true;
+			}
+			if (unsatisfied_error) {
+				InputStream is = Database.class.getResourceAsStream("/libpmemkv-jni.so.1");
+
+				File file;
+				try {
+					if (is == null) {
+						throw new Exception("Cannot open stream and get resource from Jar file.");
+					}
+					file = File.createTempFile("lib", ".so");
+					OutputStream os = null;
+					os = new FileOutputStream(file);
+					byte[] buf = new byte[8192];
+					int length;
+					while ((length = is.read(buf)) > 0) {
+						os.write(buf, 0, length);
+					}
+					is.close();
+					os.close();
+
+					System.load(file.getAbsolutePath());
+					file.deleteOnExit();
+				} catch (Exception e) {
+					e.printStackTrace();
+					System.exit(-1);
+				}
+			}
 		}
 	}
 
@@ -538,7 +571,7 @@ public class Database<K, V> {
 	private native void database_get_keys_below_buffer(long ptr, int kb, ByteBuffer k, GetKeysBuffersJNICallback cb);
 
 	private native void database_get_keys_between_buffer(long ptr, int kb1, ByteBuffer k1, int kb2, ByteBuffer k2,
-														 GetKeysBuffersJNICallback cb);
+			GetKeysBuffersJNICallback cb);
 
 	private native long database_count_all(long ptr);
 
@@ -555,7 +588,7 @@ public class Database<K, V> {
 	private native void database_get_below_buffer(long ptr, int kb, ByteBuffer k, GetAllBufferJNICallback cb);
 
 	private native void database_get_between_buffer(long ptr, int kb1, ByteBuffer k1, int kb2, ByteBuffer k2,
-													GetAllBufferJNICallback cb);
+			GetAllBufferJNICallback cb);
 
 	private native boolean database_exists_buffer(long ptr, int kb, ByteBuffer k);
 
@@ -566,8 +599,4 @@ public class Database<K, V> {
 	private native void database_put_buffer(long ptr, int kb, ByteBuffer k, int vb, ByteBuffer v);
 
 	private native boolean database_remove_buffer(long ptr, int kb, ByteBuffer k);
-
-	static {
-		System.loadLibrary("pmemkv-jni");
-	}
 }
