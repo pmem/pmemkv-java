@@ -40,8 +40,8 @@ git remote update
 git checkout -B ${TARGET_BRANCH} upstream/${TARGET_BRANCH}
 
 # Build docs
-mvn javadoc:javadoc -e
-cp -r $CURR_DIR/pmemkv-java/src/main/target/site/apidocs $CURR_DIR/
+mvn javadoc:javadoc javadoc:aggregate -e
+cp -r $CURR_DIR/pmemkv-java/target/site/apidocs $CURR_DIR/
 
 # Checkout gh-pages and copy docs
 GH_PAGES_NAME="gh-pages-for-${TARGET_BRANCH}"

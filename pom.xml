@@ -12,7 +12,7 @@
     <url>https://github.com/pmem/pmemkv-java</url>
     <packaging>pom</packaging>
 
-	<properties>
+    <properties>
         <!-- use Java in ver. 8 and UTF-8 encoding -->
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
@@ -25,28 +25,33 @@
         <module>examples</module> <!-- pom for java examples part -->
     </modules>
 
-     <build>
-      <plugins>
-        <plugin>
-          <groupId>net.revelc.code.formatter</groupId>
-          <artifactId>formatter-maven-plugin</artifactId>
-          <version>2.11.0</version>
-          <configuration>
-            <configFile>${pom.basedir}/utils/eclipse-formatter-config.xml</configFile>
-            <lineEnding>LF</lineEnding>
-          </configuration>
-          <executions>
-            <execution>
-              <goals>
-                <goal>validate</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-      </plugins>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>net.revelc.code.formatter</groupId>
+                <artifactId>formatter-maven-plugin</artifactId>
+                <version>2.11.0</version>
+                <configuration>
+                    <configFile>${pom.basedir}/utils/eclipse-formatter-config.xml</configFile>
+                    <lineEnding>LF</lineEnding>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>validate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.2.0</version>
+            </plugin>
+        </plugins>
     </build>
 
-     <issueManagement>
+    <issueManagement>
         <system>GitHub</system>
         <url>https://github.com/pmem/pmemkv-java/issues</url>
     </issueManagement>
