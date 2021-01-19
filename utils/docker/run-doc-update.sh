@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright 2018-2020, Intel Corporation
+# Copyright 2018-2021, Intel Corporation
 
 #
 # run-doc-update.sh - is called inside a Docker container,
@@ -41,7 +41,7 @@ git checkout -B ${TARGET_BRANCH} upstream/${TARGET_BRANCH}
 
 # Build docs
 mvn javadoc:javadoc -e
-cp -r $CURR_DIR/pmemkv-java/src/main/target/site/apidocs $CURR_DIR/
+cp -r $CURR_DIR/pmemkv-java/target/site/apidocs $CURR_DIR/
 
 # Checkout gh-pages and copy docs
 GH_PAGES_NAME="gh-pages-for-${TARGET_BRANCH}"
