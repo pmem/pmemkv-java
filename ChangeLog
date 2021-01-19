@@ -1,3 +1,18 @@
+Tue Jan 19 2020 Krzysztof Filipek <krzysztof.filipek@intel.com>
+
+	* Version 1.0.1
+
+	Major changes:
+	- simplify compilation
+	- fix Maven modules locations
+	- generated Jar file includes dependencies
+	- every example is compiled to runnable Jar
+	- remove oleaster-matcher dependency
+
+	Minor changes:
+	- readme updates
+	- javadoc generation fix
+
 Tue Jun 30 2020 Szymon Romik <szymon.romik@intel.com>
 
 	* Version 1.0
