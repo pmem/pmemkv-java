@@ -66,9 +66,10 @@ public class Database<K, V> {
 	 *
 	 * @param callback
 	 *            Function to be called for each key.
+	 * @throws DatabaseException
 	 * @since 1.0
 	 */
-	public void getKeys(KeyCallback<K> callback) {
+	public void getKeys(KeyCallback<K> callback) throws DatabaseException {
 		database_get_keys_buffer(pointer, (int kb, ByteBuffer k) -> {
 			k.rewind().limit(kb);
 			K processed_object = keyConverter.fromByteBuffer(k);
@@ -87,9 +88,10 @@ public class Database<K, V> {
 	 *            Sets the lower bound for querying.
 	 * @param callback
 	 *            Function to be called for each key.
+	 * @throws DatabaseException
 	 * @since 1.0
 	 */
-	public void getKeysAbove(K key, KeyCallback<K> callback) {
+	public void getKeysAbove(K key, KeyCallback<K> callback) throws DatabaseException {
 		ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
 		database_get_keys_above_buffer(pointer, direct_key.position(), direct_key, (int kb, ByteBuffer k) -> {
 			k.rewind().limit(kb);
@@ -109,9 +111,10 @@ public class Database<K, V> {
 	 *            Sets the upper bound for querying.
 	 * @param callback
 	 *            Function to be called for each key.
+	 * @throws DatabaseException
 	 * @since 1.0
 	 */
-	public void getKeysBelow(K key, KeyCallback<K> callback) {
+	public void getKeysBelow(K key, KeyCallback<K> callback) throws DatabaseException {
 		ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
 		database_get_keys_below_buffer(pointer, direct_key.position(), direct_key, (int kb, ByteBuffer k) -> {
 			k.rewind().limit(kb);
@@ -133,9 +136,10 @@ public class Database<K, V> {
 	 *            Sets the upper bound for querying.
 	 * @param callback
 	 *            Function to be called for each key.
+	 * @throws DatabaseException
 	 * @since 1.0
 	 */
-	public void getKeysBetween(K key1, K key2, KeyCallback<K> callback) {
+	public void getKeysBetween(K key1, K key2, KeyCallback<K> callback) throws DatabaseException {
 		ByteBuffer direct_key1 = getDirectBuffer(keyConverter.toByteBuffer(key1));
 		ByteBuffer direct_key2 = getDirectBuffer(keyConverter.toByteBuffer(key2));
 		database_get_keys_between_buffer(pointer, direct_key1.position(), direct_key1, direct_key2.position(),
@@ -219,9 +223,10 @@ public class Database<K, V> {
 	 *
 	 * @param callback
 	 *            Function to be called for each key/value pair.
+	 * @throws DatabaseException
 	 * @since 1.0
 	 */
-	public void getAll(KeyValueCallback<K, V> callback) {
+	public void getAll(KeyValueCallback<K, V> callback) throws DatabaseException {
 		database_get_all_buffer(pointer, (int kb, ByteBuffer k, int vb, ByteBuffer v) -> {
 			k.rewind().limit(kb);
 			K processed_key = keyConverter.fromByteBuffer(k);
@@ -242,8 +247,9 @@ public class Database<K, V> {
 	 *            Sets the lower bound for querying.
 	 * @param callback
 	 *            Function to be called for each specified key/value pair.
+	 * @throws DatabaseException
 	 */
-	public void getAbove(K key, KeyValueCallback<K, V> callback) {
+	public void getAbove(K key, KeyValueCallback<K, V> callback) throws DatabaseException {
 		ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
 		database_get_above_buffer(pointer, direct_key.position(), direct_key,
 				(int kb, ByteBuffer k, int vb, ByteBuffer v) -> {
@@ -267,8 +273,9 @@ public class Database<K, V> {
 	 *            Sets the upper bound for querying.
 	 * @param callback
 	 *            Function to be called for each specified key/value pair.
+	 * @throws DatabaseException
 	 */
-	public void getBelow(K key, KeyValueCallback<K, V> callback) {
+	public void getBelow(K key, KeyValueCallback<K, V> callback) throws DatabaseException {
 		ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
 		database_get_below_buffer(pointer, direct_key.position(), direct_key,
 				(int kb, ByteBuffer k, int vb, ByteBuffer v) -> {
@@ -293,8 +300,9 @@ public class Database<K, V> {
 	 *            Sets the upper bound for querying.
 	 * @param callback
 	 *            Function to be called for each specified key/value pair.
+	 * @throws DatabaseException
 	 */
-	public void getBetween(K key1, K key2, KeyValueCallback<K, V> callback) {
+	public void getBetween(K key1, K key2, KeyValueCallback<K, V> callback) throws DatabaseException {
 		ByteBuffer direct_key1 = getDirectBuffer(keyConverter.toByteBuffer(key1));
 		ByteBuffer direct_key2 = getDirectBuffer(keyConverter.toByteBuffer(key2));
 		database_get_between_buffer(pointer, direct_key1.position(), direct_key1, direct_key2.position(), direct_key2,
@@ -313,8 +321,9 @@ public class Database<K, V> {
 	 * @param key
 	 *            key to query for.
 	 * @return true if key exists in the datastore, false otherwise
+	 * @throws DatabaseException
 	 */
-	public boolean exists(K key) {
+	public boolean exists(K key) throws DatabaseException {
 		ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
 		return database_exists_buffer(pointer, direct_key.position(), direct_key);
 	}
@@ -326,8 +335,9 @@ public class Database<K, V> {
 	 *            key to query for.
 	 * @param callback
 	 *            Function to be called for each specified key/value pair.
+	 * @throws DatabaseException
 	 */
-	public void get(K key, ValueCallback<V> callback) {
+	public void get(K key, ValueCallback<V> callback) throws DatabaseException {
 		ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
 		database_get_buffer_with_callback(pointer, direct_key.position(), direct_key, (int vb, ByteBuffer v) -> {
 			v.rewind().limit(vb);
@@ -342,8 +352,9 @@ public class Database<K, V> {
 	 * @param key
 	 *            key to query for.
 	 * @return Copy of value associated with the given key or null if not found.
+	 * @throws DatabaseException
 	 */
-	public V getCopy(K key) {
+	public V getCopy(K key) throws DatabaseException {
 		byte value[];
 		ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
 		try {
@@ -363,8 +374,9 @@ public class Database<K, V> {
 	 *            the key.
 	 * @param value
 	 *            data to be inserted for the specified key.
+	 * @throws DatabaseException
 	 */
-	public void put(K key, V value) {
+	public void put(K key, V value) throws DatabaseException {
 		ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
 		ByteBuffer direct_value = getDirectBuffer(valueConverter.toByteBuffer(value));
 
@@ -378,8 +390,9 @@ public class Database<K, V> {
 	 *            key to query for, to be removed.
 	 * @return true if element was removed, false if element didn't exist before
 	 *         removal.
+	 * @throws DatabaseException
 	 */
-	public boolean remove(K key) {
+	public boolean remove(K key) throws DatabaseException {
 		ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
 		return database_remove_buffer(pointer, direct_key.position(), direct_key);
 	}
@@ -502,6 +515,8 @@ public class Database<K, V> {
 			return this;
 		}
 
+		// JNI DATABASE BUILDER METHODS
+		// --------------------------------------------------------------------------------
 		private long config = 0;
 		private String engine;
 
@@ -558,7 +573,7 @@ public class Database<K, V> {
 	private final long pointer;
 	private boolean stopped;
 
-	// JNI METHODS
+	// JNI DATABASE METHODS
 	// --------------------------------------------------------------------------------
 	private native long database_start(String engine, long config);
 
