@@ -327,7 +327,7 @@ public class Database<K, V> {
 	 * @param callback
 	 *            Function to be called for each specified key/value pair.
 	 */
-	public void get(K key, ValueCallback<V> callback) {
+	public void get(K key, ValueCallback<V> callback) throws NotFoundException {
 		ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
 		database_get_buffer_with_callback(pointer, direct_key.position(), direct_key, (int vb, ByteBuffer v) -> {
 			v.rewind().limit(vb);
