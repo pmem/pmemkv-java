@@ -21,7 +21,6 @@ ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
 ARG SKIP_PMDK_BUILD
 ARG SKIP_LIBPMEMOBJ_CPP_BUILD
 ARG SKIP_PMEMKV_BUILD
-ARG SKIP_VALGRIND_BUILD
 
 # Update the Apt cache and install basic tools
 RUN apt-get update
@@ -57,10 +56,6 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
 	wget \
 	whois \
  && rm -rf /var/lib/apt/lists/*
-
-# Install valgrind
-COPY install-valgrind.sh install-valgrind.sh
-RUN ./install-valgrind.sh
 
 # Install pmdk
 COPY install-pmdk.sh install-pmdk.sh

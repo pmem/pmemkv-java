@@ -14,7 +14,7 @@
 set -e
 
 OS__OS_VER=$1
-TAG="1.0-${OS__OS_VER}"
+TAG="1.1-${OS__OS_VER}"
 
 function usage {
 	echo "Usage:"

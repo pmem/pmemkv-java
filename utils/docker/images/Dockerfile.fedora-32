@@ -21,7 +21,6 @@ ENV JAVA_HOME /usr/lib/jvm/java-openjdk/
 ARG SKIP_PMDK_BUILD
 ARG SKIP_LIBPMEMOBJ_CPP_BUILD
 ARG SKIP_PMEMKV_BUILD
-ARG SKIP_VALGRIND_BUILD
 
 # Install basic tools
 RUN dnf update -y \
