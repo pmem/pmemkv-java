@@ -5,9 +5,10 @@ on: [push, pull_request]
 env:
     REPO:           pmemkv-java
     GITHUB_REPO:    pmem/pmemkv-java
-    DOCKERHUB_REPO: pmem/pmemkv-java
-    DOCKERHUB_USER:          ${{ secrets.DOCKERHUB_USER }}
-    DOCKERHUB_PASSWORD:      ${{ secrets.DOCKERHUB_PASSWORD }}
+    CONTAINER_REG:  ghcr.io/pmem/pmemkv-java
+    # use org's Private Access Token to log in to GitHub Container Registry
+    CONTAINER_REG_USER:   ${{ secrets.GH_CR_USER }}
+    CONTAINER_REG_PASS:   ${{ secrets.GH_CR_PAT }}
     DOC_UPDATE_GITHUB_TOKEN:   ${{ secrets.DOC_UPDATE_GITHUB_TOKEN }}
     DOC_UPDATE_BOT_NAME:       ${{ secrets.DOC_UPDATE_BOT_NAME }}
     DOC_REPO_OWNER:            ${{ secrets.DOC_REPO_OWNER }}
