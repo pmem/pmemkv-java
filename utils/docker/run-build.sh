@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright 2019-2020, Intel Corporation
+# Copyright 2019-2021, Intel Corporation
 
 #
 # run-build.sh <pmemkv_version> - is called inside a Docker container;
-#        checks bindings' building and installation with given version of pmemkv
+#		checks bindings' building and installation with given version of pmemkv
 #
 
 set -e
@@ -13,10 +13,10 @@ source `dirname $0`/prepare-for-build.sh
 
 function run_example() {
 	example_name=$1
-	jar_path=../src/main/target/pmemkv-1.0.0.jar
-
-	javac -g -cp ${jar_path} ${example_name}.java
-	java -ea -Xms1G -cp .:${jar_path} ${example_name}
+	jar_path=../pmemkv-binding/target/pmemkv-1.0.0.jar
+	# Find path to a jar with specific example name
+	example_path=`find .. | grep -P '\b(?!pmemkv)\b([a-zA-Z]+)\-([0-9.]+)\.jar' | grep ${example_name}`
+	java -ea -Xms1G -cp ${jar_path}:${example_path} ${example_name}
 }
 
 # install pmemkv
@@ -44,15 +44,16 @@ echo
 echo "###########################################################"
 echo "### Verifying building and execution of examples"
 echo "###########################################################"
-# set path to libpmemkv-jni.so
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$WORKDIR/src/main/cpp/target
 cd examples
 run_example StringExample
 run_example ByteBufferExample
 run_example MixedTypesExample
+# PicturesExample is a GUI application, so just test compilation.
+run_example PicturesExample
 
 # Trigger auto doc update
-if [[ "$AUTO_DOC_UPDATE" == "1" ]]; then
+if [[ "${AUTO_DOC_UPDATE}" == "1" ]]; then
 	echo "Running auto doc update"
-	$SCRIPTSDIR/run-doc-update.sh
+	cd ${WORKDIR}
+	${SCRIPTSDIR}/run-doc-update.sh
 fi

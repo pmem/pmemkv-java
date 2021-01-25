@@ -50,7 +50,7 @@ if [[ -z "$HOST_WORKDIR" ]]; then
 	exit 1
 fi
 
-TAG="1.0-${OS}-${OS_VER}"
+TAG="1.1-${OS}-${OS_VER}"
 
 # Find all the commits for the current build
 if [ -n "$CI_COMMIT_RANGE" ]; then

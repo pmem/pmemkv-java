@@ -17,12 +17,11 @@ Java API is documented with javadocs and can be found as html here:
 
 ## Dependencies
 
-* [pmemkv](https://github.com/pmem/pmemkv) - native key/value library
+* [pmemkv](https://github.com/pmem/pmemkv) - Key-value Datastore for Persistent Memory
+  * pmemkv source package (pmemkv-devel or libpmemkv-dev)
 * Java 8
-* [Apache Maven](https://maven.apache.org) - build system
-* Used only for development & testing:
-  * [JUnit](https://junit.org/) - automated test framework
-  * [Oleaster Matcher](https://github.com/mscharhag/oleaster/tree/master/oleaster-matcher) - test condition matching library
+* gcc-c++ compiler
+* [Apache Maven 3](https://maven.apache.org) - build system
 
 ## Installation
 
@@ -77,8 +76,8 @@ To execute them, run e.g.:
 
 ```sh
 cd examples
-javac -cp ../src/main/target/*.jar StringExample.java
-LD_LIBRARY_PATH=<path_to_libs> PMEM_IS_PMEM_FORCE=1 java -ea -Xms1G -cp .:`find ../src/main/target -name *.jar` -Djava.library.path=../src/main/cpp/target StringExample
+mvn package
+PMEM_IS_PMEM_FORCE=1 java -ea -Xms1G -jar StringExample/StringExample-1.0.0-jar-with-dependencies.jar
 ```
 
 ## Documentation
@@ -88,3 +87,7 @@ Docs can be generated using mvn by executing commands:
 ```sh
 mvn javadoc:javadoc
 ```
+
+## Debugging
+
+Debugging process is described in [DEBUGGING.md](./DEBUGGING.md)

@@ -47,7 +47,7 @@ if [[ -z "$HOST_WORKDIR" ]]; then
 	exit 1
 fi
 
-TAG="1.0-${OS}-${OS_VER}"
+TAG="1.1-${OS}-${OS_VER}"
 imageName=${DOCKERHUB_REPO}:${TAG}
 containerName=pmemkv-java-${OS}-${OS_VER}
 
