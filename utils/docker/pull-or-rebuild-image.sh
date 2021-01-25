@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright 2016-2020, Intel Corporation
+# Copyright 2016-2021, Intel Corporation
 
 #
 # pull-or-rebuild-image.sh - rebuilds the Docker image used in the
@@ -10,13 +10,13 @@
 # OS version (Dockerfile.${OS}-${OS_VER}) or any .sh script from the directory
 # with Dockerfiles were modified and committed.
 #
-# If the Travis build is not of the "pull_request" type (i.e. in case of
+# If the CI build is not of the "pull_request" type (i.e. in case of
 # merge after pull_request) and it succeed, the Docker image should be pushed
-# to the Docker Hub repository. An empty file is created to signal that to
+# to the ${CONTAINER_REG}. An empty file is created to signal that to
 # further scripts.
 #
 # If the Docker image does not have to be rebuilt, it will be pulled from
-# Docker Hub.
+# the Container Registry.
 #
 
 set -e
@@ -47,6 +47,12 @@ fi
 if [[ -z "$HOST_WORKDIR" ]]; then
 	echo "ERROR: The variable HOST_WORKDIR has to contain a path to " \
 		"the root of this project on the host machine"
+	exit 1
+fi
+
+if [[ -z "${CONTAINER_REG}" ]]; then
+	echo "ERROR: CONTAINER_REG environment variable is not set " \
+		"(e.g. \"<registry_addr>/<org_name>/<package_name>\")."
 	exit 1
 fi
 
@@ -84,7 +90,7 @@ for file in $files; do
 		./build-image.sh ${OS}-${OS_VER}
 		popd
 
-		# Check if the image has to be pushed to Docker Hub
+		# Check if the image has to be pushed to ${CONTAINER_REG}.
 		# (i.e. the build is triggered by commits to the $GITHUB_REPO
 		# repository's stable-* or master branch, and the CI build is not
 		# of the "pull_request" type). In that case, create the empty
@@ -94,10 +100,10 @@ for file in $files; do
 			&& $CI_EVENT_TYPE != "pull_request" \
 			&& $PUSH_IMAGE == "1" ]]
 		then
-			echo "The image will be pushed to Docker Hub"
+			echo "The image will be pushed to the Container Registry: ${CONTAINER_REG}"
 			touch $CI_FILE_PUSH_IMAGE_TO_REPO
 		else
-			echo "Skip pushing the image to Docker Hub"
+			echo "Skip pushing the image to the Container Registry."
 		fi
 
 		exit 0
@@ -105,5 +111,5 @@ for file in $files; do
 done
 
 # Getting here means rebuilding the Docker image is not required.
-# Pull the image from Docker Hub.
-docker pull ${DOCKERHUB_REPO}:${TAG}
+echo "Pull the image '${CONTAINER_REG}:${TAG}' from the Container Registry."
+docker pull ${CONTAINER_REG}:${TAG}
