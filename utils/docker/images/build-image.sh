@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright 2016-2019, Intel Corporation
+# Copyright 2016-2021, Intel Corporation
 
 #
 # build-image.sh <OS-OS_VER> - prepares a Docker image with <OS>-based
@@ -30,6 +30,12 @@ if [[ -z "$1" ]]; then
 	exit 1
 fi
 
+if [[ -z "${CONTAINER_REG}" ]]; then
+	echo "ERROR: CONTAINER_REG environment variable is not set " \
+		"(e.g. \"<registry_addr>/<org_name>/<package_name>\")."
+	exit 1
+fi
+
 # Check if the file Dockerfile.OS-OS_VER exists
 if [[ ! -f "Dockerfile.$OS__OS_VER" ]]; then
 	echo "Error: Dockerfile.$OS__OS_VER does not exist."
@@ -38,8 +44,8 @@ if [[ ! -f "Dockerfile.$OS__OS_VER" ]]; then
 	exit 1
 fi
 
-# Build a Docker image tagged with ${DOCKERHUB_REPO}:${TAG}
-docker build -t ${DOCKERHUB_REPO}:${TAG} \
+echo "Build a Docker image tagged with: ${CONTAINER_REG}:${TAG}"
+docker build -t ${CONTAINER_REG}:${TAG} \
 	--build-arg http_proxy=$http_proxy \
 	--build-arg https_proxy=$https_proxy \
 	-f Dockerfile.${OS__OS_VER} .
