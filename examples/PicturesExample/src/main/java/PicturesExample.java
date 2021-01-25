@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-/* Copyright 2020, Intel Corporation */
+/* Copyright 2020-2021, Intel Corporation */
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -132,7 +132,7 @@ public class PicturesExample extends Canvas {
 		String pmemkvSize = System.getenv("PmemkvSize");
 
 		System.out.println("Parameters:");
-		System.out.println("InputDir" + input_dir);
+		System.out.println("InputDir: " + input_dir);
 		System.out.println("Path: " + pmemkvPath);
 		System.out.println("Size: " + pmemkvSize);
 
@@ -147,12 +147,12 @@ public class PicturesExample extends Canvas {
 		} else if (pmemkvPath != null) {
 			m = new PicturesExample(pmemkvPath);
 		} else {
-			System.out.println("Provide at least PmemkvPath parameter. See examples' README for usage");
+			System.out.println("Provide at least PmemkvPath parameter. See examples' README for usage.");
 			System.exit(0);
 		}
 
 		if (input_dir != null) {
-			System.out.println("Loading files from " + input_dir + " to pmemkv database");
+			System.out.println("Loading files from " + input_dir + " to pmemkv database.");
 			m.putAllPicturesFromDirectory(input_dir);
 		}
 		JFrame f = new JFrame();
