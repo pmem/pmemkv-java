@@ -30,5 +30,4 @@ Publish package and make it official:
 
 Later, for major/minor release:
 - bump version of Docker images ("TAG" variable in build.sh, build-image.sh, push-image.sh, pull-or-rebuild-image.sh) to $VER+1 on master branch
-- add new branch to valid-branches.sh on stable-$VER branch
 - once gh-pages contains new documentation, add $VER entry in docs links and in "Releases' support status" table (and update any status if needed) on gh-pages
