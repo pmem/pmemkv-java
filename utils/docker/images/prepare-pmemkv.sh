@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright 2019-2020, Intel Corporation
+# Copyright 2019-2021, Intel Corporation
 
 #
 # prepare-pmemkv.sh <package_type> - prepare pmemkv packages
@@ -11,17 +11,20 @@ set -e
 PREFIX=/usr
 PACKAGE_TYPE=$1
 
-# master: Remove VERSION file; 29.05.2020
-current_pmemkv_version="244c3b0c45f5700f6880fa9dbb0fbc41d7857a33"
+# master: Merge pull request #883 from JanDorniak99/parameterize...; 26.01.2021
+current_pmemkv_version="10344338dbc30270fca280b3e8b80e236b013f50"
 
-# stable-1.0: Merge pull request #686 from lukaszstolarczuk/fix-m...; 20.05.2020
-stable_1_pmemkv_version="5a11aee01b2206e519004baae1d26a41d328762c"
+# stable-1.0: 1.0.3 release; 06.10.2020
+stable_1_pmemkv_version="77ae3ef23dc2b2db9c012dc343b125a785a0ffbc"
 
-# stable-1.1: Merge pull request #661 from lukaszstolarczuk/fix-g...; 17.04.2020
-stable_1_1_pmemkv_version="d4de10fa09d0ce99eb15d53f7311f1b4e7c56d47"
+# stable-1.1: 1.1 release; 31.01.2020
+stable_1_1_pmemkv_version="2f719305afb0f44103734851cfe825e1b1d73dbf"
 
-# stable-1.2: Version 1.2; 29.05.2020
-stable_1_2_pmemkv_version="1.2"
+# stable-1.2: 1.2 release; 29.05.2020
+stable_1_2_pmemkv_version="1a9dccfd4b7c7437534838aaec7e5f3e38300dd6"
+
+# stable-1.3: 1.3 release; 02.10.2020
+stable_1_3_pmemkv_version="6f79229fd195310f4a45321e86e312e358fe481a"
 
 if [ "${SKIP_PMEMKV_BUILD}" ]; then
 	echo "Variable 'SKIP_PMEMKV_BUILD' is set; skipping building of pmemkv"
@@ -52,6 +55,7 @@ prepare_pmemkv "$current_pmemkv_version" "pmemkv-master"
 prepare_pmemkv "$stable_1_pmemkv_version" "pmemkv-stable-1.0"
 prepare_pmemkv "$stable_1_1_pmemkv_version" "pmemkv-stable-1.1"
 prepare_pmemkv "$stable_1_2_pmemkv_version" "pmemkv-stable-1.2"
+prepare_pmemkv "$stable_1_3_pmemkv_version" "pmemkv-stable-1.3"
 
 cd ..
 rm -r pmemkv
