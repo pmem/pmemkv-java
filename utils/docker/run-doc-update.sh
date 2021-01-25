@@ -12,16 +12,23 @@ set -e
 
 source $(dirname ${0})/valid-branches.sh
 
+if [[ -z "${DOC_UPDATE_GITHUB_TOKEN}" || -z "${DOC_UPDATE_BOT_NAME}" || -z "${DOC_REPO_OWNER}" ]]; then
+	echo "To build documentation and upload it as a Github pull request, variables " \
+		"'DOC_UPDATE_BOT_NAME', 'DOC_REPO_OWNER' and 'DOC_UPDATE_GITHUB_TOKEN' have to " \
+		"be provided. For more details please read CONTRIBUTING.md"
+	exit 0
+fi
+
 # Set up required variables
-BOT_NAME="pmem-bot"
-USER_NAME="pmem"
-REPO_NAME="pmemkv-java"
-export GITHUB_TOKEN=${GITHUB_TOKEN} # export for hub command
+BOT_NAME=${DOC_UPDATE_BOT_NAME}
+DOC_REPO_OWNER=${DOC_REPO_OWNER}
+REPO_NAME=${REPO:-"pmemkv-java"}
+export GITHUB_TOKEN=${DOC_UPDATE_GITHUB_TOKEN} # export for hub command
 REPO_DIR=$(mktemp -d -t pmemkvjava-XXX)
 ARTIFACTS_DIR=$(mktemp -d -t ARTIFACTS-XXX)
 
 ORIGIN="https://${GITHUB_TOKEN}@github.com/${BOT_NAME}/${REPO_NAME}"
-UPSTREAM="https://github.com/${USER_NAME}/${REPO_NAME}"
+UPSTREAM="https://github.com/${DOC_REPO_OWNER}/${REPO_NAME}"
 # master or stable-* branch
 TARGET_BRANCH=${CI_BRANCH}
 TARGET_DOCS_DIR=${TARGET_BRANCHES[$TARGET_BRANCH]}
@@ -69,7 +76,7 @@ git push -f ${ORIGIN} ${GH_PAGES_NAME}
 
 echo "Make or update pull request:"
 # When there is already an open PR or there are no changes an error is thrown, which we ignore.
-hub pull-request -f -b ${USER_NAME}:gh-pages -h ${BOT_NAME}:${GH_PAGES_NAME} \
+hub pull-request -f -b ${DOC_REPO_OWNER}:gh-pages -h ${BOT_NAME}:${GH_PAGES_NAME} \
 	-m "doc: automatic gh-pages update for ${TARGET_BRANCH}" && true
 
 popd

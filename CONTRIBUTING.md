@@ -3,13 +3,14 @@
 - [Opening New Issues](#opening-new-issues)
 - [Code Style](#code-style)
 - [Submitting Pull Requests](#submitting-pull-requests)
+- [Configuring Github fork](#configuring-github-fork)
 
 ## Opening New Issues
 
 Please log bugs or suggestions as [GitHub issues](https://github.com/pmem/pmemkv-java/issues).
 Details such as OS and pmemkv version are always appreciated.
 
-# Code Style
+## Code Style
 
 We use code style as defined in the Eclipse formatter settings.
 
@@ -67,3 +68,20 @@ to use your real name (not an alias) when committing your changes to pmemkv-java
 ```
 Author: Random J Developer <random@developer.example.org>
 ```
+
+## Configuring Github fork
+
+To build and submit documentation as an automatically generated pull request,
+the repository has to be properly configured.
+
+* [Personal access token](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token) for Github account has to be generated.
+  * Such personal access token has to be set in in GitHub repository's
+  [secrets](https://docs.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets)
+  as `DOC_UPDATE_GITHUB_TOKEN` variable.
+
+* `DOC_UPDATE_BOT_NAME` secret variable has to be set. In most cases it will be
+  the same as Github account name.
+
+* `DOC_REPO_OWNER` secret variable has to be set. Name of Github account,
+  which will be target to make an automatic pull request with documentation.
+  In most cases it will be the same as Github account name.
