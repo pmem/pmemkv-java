@@ -3,13 +3,16 @@
 # Copyright 2016-2021, Intel Corporation
 
 #
-# push-image.sh - pushes the Docker image tagged with OS-VER to the ${CONTAINER_REG}.
+# push-image.sh - pushes the Docker image tagged as described in
+#		./build-image.sh, to the ${CONTAINER_REG}.
 #
 # The script utilizes ${CONTAINER_REG_USER} and ${CONTAINER_REG_PASS} variables to
 # log in to the ${CONTAINER_REG}.
 #
 
 set -e
+IMG_VER=${IMG_VER:-devel}
+TAG="${OS}-${OS_VER}-${IMG_VER}"
 
 if [[ -z "${OS}" || -z "${OS_VER}" ]]; then
 	echo "ERROR: The variables OS and OS_VER have to be set " \
@@ -29,8 +32,6 @@ if [[ -z "${CONTAINER_REG_USER}" || -z "${CONTAINER_REG_PASS}" ]]; then
 		"have to be set properly to allow login to the Container Registry."
 	exit 1
 fi
-
-TAG="1.1-${OS}-${OS_VER}"
 
 echo "Check if the image tagged with ${CONTAINER_REG}:${TAG} exists locally"
 if [[ ! $(docker images -a | awk -v pattern="^${CONTAINER_REG}:${TAG}\$" \

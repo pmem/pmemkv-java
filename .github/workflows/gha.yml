@@ -15,6 +15,7 @@ env:
     HOST_WORKDIR:   ${{ github.workspace }}
     WORKDIR:        utils/docker
     FORCE_IMAGE_ACTION:   ${{ secrets.FORCE_IMAGE_ACTION }}
+    IMG_VER:        "1.0"
 
 jobs:
   linux:
