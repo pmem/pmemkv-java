@@ -14,6 +14,7 @@ env:
     DOC_REPO_OWNER:            ${{ secrets.DOC_REPO_OWNER }}
     HOST_WORKDIR:   ${{ github.workspace }}
     WORKDIR:        utils/docker
+    FORCE_IMAGE_ACTION:   ${{ secrets.FORCE_IMAGE_ACTION }}
 
 jobs:
   linux:
@@ -37,8 +38,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Pull or rebuild the image
-        run: cd $WORKDIR && ${{ matrix.CONFIG }} ./pull-or-rebuild-image.sh
+      - name: Pull the image or rebuild
+        run: cd $WORKDIR && ${{ matrix.CONFIG }} ./pull-or-rebuild-image.sh rebuild
 
       - name: Run the build
         run: cd $WORKDIR && ${{ matrix.CONFIG }} ./build.sh
