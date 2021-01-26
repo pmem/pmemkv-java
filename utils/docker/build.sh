@@ -18,6 +18,7 @@
 set -e
 
 source $(dirname $0)/set-ci-vars.sh
+IMG_VER=${IMG_VER:-devel}
 
 if [[ "$CI_EVENT_TYPE" != "cron" && "$CI_BRANCH" != "coverity_scan" \
 	&& "$TYPE" == "coverity" ]]; then
@@ -51,7 +52,7 @@ if [[ -z "${CONTAINER_REG}" ]]; then
 	exit 1
 fi
 
-TAG="1.1-${OS}-${OS_VER}"
+TAG="${OS}-${OS_VER}-${IMG_VER}"
 IMAGE_NAME=${CONTAINER_REG}:${TAG}
 containerName=pmemkv-java-${OS}-${OS_VER}
 
