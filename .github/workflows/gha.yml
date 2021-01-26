@@ -14,6 +14,7 @@ env:
     DOC_REPO_OWNER:            ${{ secrets.DOC_REPO_OWNER }}
     HOST_WORKDIR:   /home/runner/work/pmemkv-java/pmemkv-java
     WORKDIR:        utils/docker
+    FORCE_IMAGE_ACTION:   ${{ secrets.FORCE_IMAGE_ACTION }}
 
 jobs:
   linux:
@@ -37,8 +38,9 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Pull or rebuild the image
-        run: cd $WORKDIR && ${{ matrix.CONFIG }} ./pull-or-rebuild-image.sh
+      # "pull" or "rebuild" can be passed to a secret FORCE_IMAGE_ACTION to override default action
+      - name: Pull the image or rebuild
+        run: cd $WORKDIR && ${{ matrix.CONFIG }} ./pull-or-rebuild-image.sh $FORCE_IMAGE_ACTION
 
       - name: Run the build
         run: cd $WORKDIR && ${{ matrix.CONFIG }} ./build.sh
