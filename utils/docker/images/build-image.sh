@@ -3,16 +3,16 @@
 # Copyright 2016-2021, Intel Corporation
 
 #
-# build-image.sh - prepares a Docker image with <OS>-based
-#                           environment for testing pmemkv-java, according
-#                           to the Dockerfile.<OS-OS_VER> file located
-#                           in the same directory.
-#
-# The script can be run locally.
+# build-image.sh - prepares a Docker image with <OS>-based environment for
+#		testing (or dev) purpose, tagged with ${CONTAINER_REG}:${OS}-${OS_VER}-${IMG_VER},
+#		according to the Dockerfile.${OS}-${OS_VER} file located in the same directory.
+#		IMG_VER is a version of docker image (it usually relates to project's release tag)
+#		and it defaults to "devel".
 #
 
 set -e
-TAG="1.1-${OS}-${OS_VER}"
+IMG_VER=${IMG_VER:-devel}
+TAG="${OS}-${OS_VER}-${IMG_VER}"
 
 if [[ -z "${OS}" || -z "${OS_VER}" ]]; then
 	echo "ERROR: The variables OS and OS_VER have to be set " \

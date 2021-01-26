@@ -15,6 +15,7 @@ env:
     HOST_WORKDIR:   /home/runner/work/pmemkv-java/pmemkv-java
     WORKDIR:        utils/docker
     FORCE_IMAGE_ACTION:   ${{ secrets.FORCE_IMAGE_ACTION }}
+    IMG_VER:        latest
 
 jobs:
   linux:
