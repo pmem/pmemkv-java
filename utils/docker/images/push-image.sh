@@ -11,13 +11,9 @@
 
 set -e
 
-if [[ -z "$OS" ]]; then
-	echo "OS environment variable is not set"
-	exit 1
-fi
-
-if [[ -z "$OS_VER" ]]; then
-	echo "OS_VER environment variable is not set"
+if [[ -z "${OS}" || -z "${OS_VER}" ]]; then
+	echo "ERROR: The variables OS and OS_VER have to be set " \
+		"(e.g. OS=fedora, OS_VER=32)."
 	exit 1
 fi
 
