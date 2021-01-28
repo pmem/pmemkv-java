@@ -9,11 +9,15 @@
 		<artifactId>pmemkv-root</artifactId>
 		<version>1.0.0</version>
 	</parent>
-	<groupId>io.pmem</groupId>
+
 	<artifactId>pmemkv</artifactId>
+	<description>Java code and main package for pmemkv Java binding</description>
 	<name>pmemkv-binding</name>
 	<packaging>jar</packaging>
-	<description>Java code and main package for pmemkv Java binding</description>
+
+	<properties>
+		<main.utilsParent>${project.parent.basedir}</main.utilsParent>
+	</properties>
 
 	<build>
 		<resources>
@@ -45,22 +49,6 @@
 					<useSystemClassLoader>false</useSystemClassLoader>
 					<argLine>-Djava.library.path=../jni-binding/target/ -Dfile.encoding=UTF-8</argLine>
 				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>net.revelc.code.formatter</groupId>
-				<artifactId>formatter-maven-plugin</artifactId>
-				<version>2.11.0</version>
-				<configuration>
-					<configFile>${project.parent.basedir}/utils/eclipse-formatter-config.xml</configFile>
-					<lineEnding>LF</lineEnding>
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>validate</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 		</plugins>
 	</build>
