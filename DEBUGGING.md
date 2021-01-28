@@ -20,8 +20,8 @@ echo 0 > /proc/sys/kernel/yama/ptrace_scope
 * let's debug basic example:
 
 ```sh
-gdb --args java -ea -Xms1G -cp .:../src/main/target/pmemkv-1.0.0.jar -Djava.library.path=../src/main/cpp/target MixedTypesExample
-(gdb) handle SIGSEGV nostop noprint pass  <- JVM is handling segfault on it's own, so need to disable it in gdb
+gdb --args java -ea -Xms1G -jar MixedTypesExample/target/MixedTypesExample-1.0.0-jar-with-dependencies.jar
+(gdb) handle SIGSEGV nostop noprint pass  <- JVM is handling segfault on its own, so need to disable it in gdb
 (gdb) break jni_function_to_debug
 ```
 
@@ -30,12 +30,13 @@ gdb --args java -ea -Xms1G -cp .:../src/main/target/pmemkv-1.0.0.jar -Djava.libr
 Build example with debug information
 
 ```sh
-javac -g -cp ../target/*.jar BasicExample.java
-jdb -classpath .:../src/main/target/pmemkv-1.0.0.jar -Djava.library.path=../src/main/cpp/target MixedTypesExample
+cd MixedTypesExample
+javac -g -cp target/*jar-with-dependencies.jar src/main/java/MixedTypesExample.java
+jdb -classpath ../target/*.jar:../../pmemkv-binding/target/pmemkv-1.0.0.jar -Djava.library.path=../../jni-binding/target MixedTypesExample
 ```
 
 # Generating jni header
 
 ```sh
-javac -h src/main/cpp/ -cp src/main/target/pmemkv-1.0.0.jar src/main/java/io/pmem/pmemkv/Database.java
+javac -h jni-binding/ -cp pmemkv-binding/target/pmemkv-1.0.0.jar pmemkv-binding/src/main/java/io/pmem/pmemkv/Database.java
 ```
