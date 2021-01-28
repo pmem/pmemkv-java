@@ -10,9 +10,9 @@
         <version>1.0.0</version>
     </parent>
 
-    <groupId>io.pmem</groupId>
     <artifactId>StringExample</artifactId>
-    <version>1.0.0</version>
+    <name>StringExample</name>
+    <packaging>jar</packaging>
 
     <build>
         <plugins>

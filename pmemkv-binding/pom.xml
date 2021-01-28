@@ -9,11 +9,11 @@
 		<artifactId>pmemkv-root</artifactId>
 		<version>1.0.0</version>
 	</parent>
-	<groupId>io.pmem</groupId>
+
 	<artifactId>pmemkv</artifactId>
+	<description>Java code and main package for pmemkv Java binding</description>
 	<name>pmemkv-binding</name>
 	<packaging>jar</packaging>
-	<description>Java code and main package for pmemkv Java binding</description>
 
 	<build>
 		<resources>

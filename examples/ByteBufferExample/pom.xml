@@ -10,7 +10,6 @@
         <version>1.0.0</version>
     </parent>
 
-    <groupId>io.pmem</groupId>
     <artifactId>ByteBufferExample</artifactId>
     <name>ByteBufferExample</name>
     <packaging>jar</packaging>
