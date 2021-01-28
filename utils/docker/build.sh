@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright 2017-2020, Intel Corporation
+# Copyright 2017-2021, Intel Corporation
 
 #
 # build.sh - runs a Docker container from a Docker image with environment
@@ -18,8 +18,7 @@
 set -e
 
 source $(dirname $0)/set-ci-vars.sh
-source $(dirname $0)/set-vars.sh
-source $(dirname $0)/valid-branches.sh
+IMG_VER=${IMG_VER:-devel}
 
 if [[ "$CI_EVENT_TYPE" != "cron" && "$CI_BRANCH" != "coverity_scan" \
 	&& "$TYPE" == "coverity" ]]; then
@@ -47,8 +46,14 @@ if [[ -z "$HOST_WORKDIR" ]]; then
 	exit 1
 fi
 
-TAG="1.1-${OS}-${OS_VER}"
-imageName=${DOCKERHUB_REPO}:${TAG}
+if [[ -z "${CONTAINER_REG}" ]]; then
+	echo "ERROR: CONTAINER_REG environment variable is not set " \
+		"(e.g. \"<registry_addr>/<org_name>/<package_name>\")."
+	exit 1
+fi
+
+TAG="${OS}-${OS_VER}-${IMG_VER}"
+IMAGE_NAME=${CONTAINER_REG}:${TAG}
 containerName=pmemkv-java-${OS}-${OS_VER}
 
 if [[ "$command" == "" ]]; then
@@ -106,4 +111,4 @@ docker run --privileged=true --name=$containerName -i $TTY \
 	-v $HOST_WORKDIR:$WORKDIR \
 	-v /etc/localtime:/etc/localtime \
 	-w $SCRIPTSDIR \
-	$imageName $command
+	${IMAGE_NAME} $command

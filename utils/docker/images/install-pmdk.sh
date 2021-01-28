@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright 2019-2020, Intel Corporation
+# Copyright 2019-2021, Intel Corporation
 
 #
 # install-pmdk.sh <package_type> - installs PMDK
@@ -11,8 +11,8 @@ set -e
 PREFIX=/usr
 PACKAGE_TYPE=$1
 
-# master: Version 1.8; 31.01.2020
-PMDK_VERSION="1.8"
+# master: 1.9, 03.07.2020
+PMDK_VERSION="1.9"
 
 if [ "${SKIP_PMDK_BUILD}" ]; then
 	echo "Variable 'SKIP_PMDK_BUILD' is set; skipping building of PMDK"
