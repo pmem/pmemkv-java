@@ -71,14 +71,25 @@
 
     <developers>
         <developer>
-            <id>szyrom</id>
-            <name>Szymon Romik</name>
-            <email>szymon.romik@intel.com</email>
-            <url>https://github.com/szyrom</url>
+            <id>igchor</id>
+            <name>Igor Chorążewicz</name>
+            <email>igor.chorazewicz@intel.com</email>
+            <url>https://github.com/igchor</url>
             <organization>Intel</organization>
-            <organizationUrl>https://intel.com</organizationUrl>
+            <organizationUrl>https://pmem.io</organizationUrl>
             <roles>
                 <role>architect</role>
+                <role>developer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>karczex</id>
+            <name>Paweł Karczewski</name>
+            <email>pawel.karczewski@intel.com</email>
+            <url>https://github.com/karczex</url>
+            <organization>Intel</organization>
+            <organizationUrl>https://pmem.io</organizationUrl>
+            <roles>
                 <role>developer</role>
             </roles>
         </developer>
@@ -88,7 +99,18 @@
             <email>krzysztof.filipek@intel.com</email>
             <url>https://github.com/kfilipek</url>
             <organization>Intel</organization>
-            <organizationUrl>https://intel.com</organizationUrl>
+            <organizationUrl>https://pmem.io</organizationUrl>
+            <roles>
+                <role>developer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>lukaszstolarczuk</id>
+            <name>Łukasz Stolarczuk</name>
+            <email>lukasz.stolarczuk@intel.com</email>
+            <url>https://github.com/lukaszstolarczuk</url>
+            <organization>Intel</organization>
+            <organizationUrl>https://pmem.io</organizationUrl>
             <roles>
                 <role>developer</role>
             </roles>
