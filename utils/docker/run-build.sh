@@ -50,10 +50,3 @@ run_example ByteBufferExample
 run_example MixedTypesExample
 # PicturesExample is a GUI application, so just test compilation.
 run_example PicturesExample
-
-# Trigger auto doc update
-if [[ "${AUTO_DOC_UPDATE}" == "1" ]]; then
-	echo "Running auto doc update"
-	cd ${WORKDIR}
-	${SCRIPTSDIR}/run-doc-update.sh
-fi

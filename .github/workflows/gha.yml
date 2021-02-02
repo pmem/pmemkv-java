@@ -6,21 +6,23 @@ env:
     REPO:           pmemkv-java
     GITHUB_REPO:    pmem/pmemkv-java
     CONTAINER_REG:  ghcr.io/pmem/pmemkv-java
-    # use org's Private Access Token to log in to GitHub Container Registry
-    CONTAINER_REG_USER:   ${{ secrets.GH_CR_USER }}
-    CONTAINER_REG_PASS:   ${{ secrets.GH_CR_PAT }}
     DOC_UPDATE_GITHUB_TOKEN:   ${{ secrets.DOC_UPDATE_GITHUB_TOKEN }}
     DOC_UPDATE_BOT_NAME:       ${{ secrets.DOC_UPDATE_BOT_NAME }}
     DOC_REPO_OWNER:            ${{ secrets.DOC_REPO_OWNER }}
     HOST_WORKDIR:   ${{ github.workspace }}
     WORKDIR:        utils/docker
-    FORCE_IMAGE_ACTION:   ${{ secrets.FORCE_IMAGE_ACTION }}
     IMG_VER:        "1.0"
 
 jobs:
   linux:
     name: Linux
     runs-on: ubuntu-latest
+    env:
+      # use org's Private Access Token to log in to GitHub Container Registry
+      CONTAINER_REG_USER:   ${{ secrets.GH_CR_USER }}
+      CONTAINER_REG_PASS:   ${{ secrets.GH_CR_PAT }}
+      FORCE_IMAGE_ACTION:   ${{ secrets.FORCE_IMAGE_ACTION }}
+      TYPE:     normal
     strategy:
       matrix:
         CONFIG: ["OS=ubuntu OS_VER=20.04 PMEMKV=master PUSH_IMAGE=1",
@@ -28,7 +30,7 @@ jobs:
                  "OS=ubuntu OS_VER=20.04 PMEMKV=stable-1.1",
                  "OS=ubuntu OS_VER=20.04 PMEMKV=stable-1.2",
                  "OS=ubuntu OS_VER=20.04 PMEMKV=stable-1.3",
-                 "OS=fedora OS_VER=32 PMEMKV=master PUSH_IMAGE=1 AUTO_DOC_UPDATE=1",
+                 "OS=fedora OS_VER=32 PMEMKV=master PUSH_IMAGE=1",
                  "OS=fedora OS_VER=32 PMEMKV=stable-1.0",
                  "OS=fedora OS_VER=32 PMEMKV=stable-1.1",
                  "OS=fedora OS_VER=32 PMEMKV=stable-1.2",
@@ -41,6 +43,28 @@ jobs:
 
       - name: Pull the image or rebuild and push it
         run: cd $WORKDIR && ${{ matrix.CONFIG }} ./pull-or-rebuild-image.sh rebuild
+
+      - name: Run the build
+        run: cd $WORKDIR && ${{ matrix.CONFIG }} ./build.sh
+  doc:
+    name: build and publish docs
+    runs-on: ubuntu-latest
+    needs: linux
+    env:
+      DOC_UPDATE_GITHUB_TOKEN:   ${{ secrets.DOC_UPDATE_GITHUB_TOKEN }}
+      DOC_UPDATE_BOT_NAME:       ${{ secrets.DOC_UPDATE_BOT_NAME }}
+      DOC_REPO_OWNER:            ${{ secrets.DOC_REPO_OWNER }}
+    if:
+      github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/stable-')
+    strategy:
+      matrix:
+        CONFIG: ["TYPE=doc OS=fedora OS_VER=32"]
+    steps:
+      - name: Clone the git repo
+        uses: actions/checkout@v2
+
+      - name: Pull the image
+        run: cd $WORKDIR && ${{ matrix.CONFIG }} ./pull-or-rebuild-image.sh pull
 
       - name: Run the build
         run: cd $WORKDIR && ${{ matrix.CONFIG }} ./build.sh

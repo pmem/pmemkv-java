@@ -15,7 +15,8 @@
 # - set env var 'CONTAINER_REG' to container registry address
 #	[and possibly user/org name, and package name], e.g. "<CR_addr>/pmem/pmemkv-java",
 # - set env var 'DNS_SERVER' if you use one,
-# - set env var 'COMMAND' to execute specific command within Docker container.
+# - set env var 'COMMAND' to execute specific command within Docker container or
+#	env var 'TYPE' to pick command based on one of the predefined types of build (see below).
 # - set env var 'PMEMKV' to a pmemkv's branch (e.g. 'master') with which java tests
 #	should be run. Directory '/opt/pmemkv-${PMEMKV}' with libpmemkv packages has to exist.
 #
@@ -50,7 +51,19 @@ fi
 
 # Set command to execute in the Docker container
 if [[ -z "$COMMAND" ]]; then
-	COMMAND="./run-build.sh ${PMEMKV}";
+	echo "COMMAND will be based on the type of build: ${TYPE}"
+	case ${TYPE} in
+	normal)
+		COMMAND="./run-build.sh ${PMEMKV}";
+		;;
+	doc)
+		COMMAND="./run-doc-update.sh";
+		;;
+	*)
+		echo "ERROR: wrong build TYPE"
+		exit 1
+		;;
+	esac
 fi
 echo "COMMAND to execute within Docker container: ${COMMAND}"
 
@@ -59,11 +72,6 @@ if [ "${COVERAGE}" == "1" ]; then
 fi
 
 if [ -n "${DNS_SERVER}" ]; then DOCKER_OPTS="${DOCKER_OPTS} --dns=${DNS_SERVER} "; fi
-
-# Only run doc update on ${GITHUB_REPO} master or stable branch
-if [[ -z "${CI_BRANCH}" || -z "${TARGET_BRANCHES[${CI_BRANCH}]}" || "${CI_EVENT_TYPE}" == "pull_request" || "${CI_REPO_SLUG}" != "${GITHUB_REPO}" ]]; then
-	AUTO_DOC_UPDATE=0
-fi
 
 # Check if we are running on a CI (Travis or GitHub Actions)
 [ -n "${GITHUB_ACTIONS}" -o -n "${TRAVIS}" ] && CI_RUN="YES" || CI_RUN="NO"
@@ -100,7 +108,6 @@ docker run --privileged=true --name=${CONTAINER_NAME} -i \
 	--env COVERITY_SCAN_TOKEN=${COVERITY_SCAN_TOKEN} \
 	--env COVERITY_SCAN_NOTIFICATION_EMAIL=${COVERITY_SCAN_NOTIFICATION_EMAIL} \
 	--env COVERAGE=${COVERAGE} \
-	--env AUTO_DOC_UPDATE=${AUTO_DOC_UPDATE} \
 	--env TZ='Europe/Warsaw' \
 	--shm-size=4G \
 	-v ${HOST_WORKDIR}:${WORKDIR} \
