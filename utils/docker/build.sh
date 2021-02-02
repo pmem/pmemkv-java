@@ -87,28 +87,32 @@ echo Building on ${OS}-${OS_VER}
 #  - host directory containing source mounted (-v)
 #  - working directory set (-w)
 docker run --privileged=true --name=$containerName -i $TTY \
-	$DNS_SETTING \
+	${DNS_SETTING} \
 	${docker_opts} \
-	--env http_proxy=$http_proxy \
-	--env https_proxy=$https_proxy \
-	--env WORKDIR=$WORKDIR \
-	--env SCRIPTSDIR=$SCRIPTSDIR \
-	--env COVERAGE=$COVERAGE \
-	--env AUTO_DOC_UPDATE=$AUTO_DOC_UPDATE \
-	--env CI_RUN=$CI_RUN \
-	--env TRAVIS=$TRAVIS \
-	--env GITHUB_REPO=$GITHUB_REPO \
-	--env GITHUB_TOKEN=$GITHUB_TOKEN \
-	--env CI_COMMIT_RANGE=$CI_COMMIT_RANGE \
-	--env CI_COMMIT=$CI_COMMIT \
-	--env CI_REPO_SLUG=$CI_REPO_SLUG \
-	--env CI_BRANCH=$CI_BRANCH \
-	--env CI_EVENT_TYPE=$CI_EVENT_TYPE \
-	--env COVERITY_SCAN_TOKEN=$COVERITY_SCAN_TOKEN \
-	--env COVERITY_SCAN_NOTIFICATION_EMAIL=$COVERITY_SCAN_NOTIFICATION_EMAIL \
+	--env http_proxy=${http_proxy} \
+	--env https_proxy=${https_proxy} \
+	--env TERM=xterm-256color \
+	--env WORKDIR=${WORKDIR} \
+	--env SCRIPTSDIR=${SCRIPTSDIR} \
+	--env GITHUB_REPO=${GITHUB_REPO} \
+	--env CI_RUN=${CI_RUN} \
+	--env TRAVIS=${TRAVIS} \
+	--env GITHUB_ACTIONS=${GITHUB_ACTIONS} \
+	--env CI_COMMIT=${CI_COMMIT} \
+	--env CI_COMMIT_RANGE=${CI_COMMIT_RANGE} \
+	--env CI_BRANCH=${CI_BRANCH} \
+	--env CI_EVENT_TYPE=${CI_EVENT_TYPE} \
+	--env CI_REPO_SLUG=${CI_REPO_SLUG} \
+	--env DOC_UPDATE_GITHUB_TOKEN=${DOC_UPDATE_GITHUB_TOKEN} \
+	--env DOC_UPDATE_BOT_NAME=${DOC_UPDATE_BOT_NAME} \
+	--env DOC_REPO_OWNER=${DOC_REPO_OWNER} \
+	--env COVERITY_SCAN_TOKEN=${COVERITY_SCAN_TOKEN} \
+	--env COVERITY_SCAN_NOTIFICATION_EMAIL=${COVERITY_SCAN_NOTIFICATION_EMAIL} \
+	--env COVERAGE=${COVERAGE} \
+	--env AUTO_DOC_UPDATE=${AUTO_DOC_UPDATE} \
 	--env TZ='Europe/Warsaw' \
 	--shm-size=4G \
-	-v $HOST_WORKDIR:$WORKDIR \
+	-v ${HOST_WORKDIR}:${WORKDIR} \
 	-v /etc/localtime:/etc/localtime \
-	-w $SCRIPTSDIR \
-	${IMAGE_NAME} $command
+	-w ${SCRIPTSDIR} \
+	${IMAGE_NAME} ${command}
