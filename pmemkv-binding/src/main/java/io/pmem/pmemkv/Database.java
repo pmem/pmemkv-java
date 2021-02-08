@@ -7,7 +7,6 @@ import io.pmem.pmemkv.internal.*;
 
 import java.io.*;
 import java.nio.ByteBuffer;
-import java.nio.file.Path;
 
 /**
  * Main Java binding pmemkv class, which is a local/embedded key-value datastore

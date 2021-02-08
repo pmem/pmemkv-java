@@ -3,10 +3,6 @@
 
 package io.pmem.pmemkv;
 
-import io.pmem.pmemkv.Database;
-import io.pmem.pmemkv.ByteBufferConverter;
-
-import org.junit.Assert;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
@@ -14,7 +10,6 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static junit.framework.TestCase.fail;
 
 public class DatabaseTest {
 
@@ -45,7 +40,6 @@ public class DatabaseTest {
 		Database<ByteBuffer, ByteBuffer> db = buildDB("blackhole");
 		assertEquals(db.countAll(), 0);
 		assertFalse(db.exists(stringToByteBuffer("key1")));
-		ByteBuffer ret = db.getCopy(stringToByteBuffer("key1"));
 		assertNull(db.getCopy(stringToByteBuffer("key1")));
 		db.put(stringToByteBuffer("key1"), stringToByteBuffer("value1"));
 		assertEquals(db.countAll(), 0);

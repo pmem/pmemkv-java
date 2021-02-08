@@ -3,9 +3,6 @@
 
 package io.pmem.pmemkv;
 
-import io.pmem.pmemkv.ByteBufferConverter;
-import io.pmem.pmemkv.Database;
-import io.pmem.pmemkv.DatabaseException;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -19,7 +16,6 @@ import static org.junit.Assert.*;
 public class CmapTest {
 
 	private final String ENGINE = "cmap";
-	private Database<ByteBuffer, ByteBuffer> db;
 
 	@Rule
 	public TemporaryFolder folder = new TemporaryFolder();
