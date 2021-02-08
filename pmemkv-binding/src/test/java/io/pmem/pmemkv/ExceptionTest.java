@@ -1,9 +1,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
-/* Copyright 2020, Intel Corporation */
+/* Copyright 2020-2021, Intel Corporation */
 
 package io.pmem.pmemkv;
-
-import io.pmem.pmemkv.*;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -15,9 +13,6 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.List;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static junit.framework.TestCase.fail;
 
 @SuppressWarnings("serial")
 class CustomException extends RuntimeException {
@@ -64,9 +59,7 @@ public class ExceptionTest {
 		Database<ByteBuffer, ByteBuffer> db = null;
 		boolean exception_occured = false;
 		try {
-			db = new Database.Builder<ByteBuffer, ByteBuffer>(ENGINE)
-					.setSize(1073741824)
-					.build();
+			db = new Database.Builder<ByteBuffer, ByteBuffer>(ENGINE).setSize(1073741824).build();
 			Assert.fail();
 		} catch (InvalidArgumentException kve) {
 			exception_occured = true;
@@ -82,9 +75,7 @@ public class ExceptionTest {
 		Database<ByteBuffer, ByteBuffer> db = null;
 		boolean exception_occured = false;
 		try {
-			db = new Database.Builder<ByteBuffer, ByteBuffer>(ENGINE)
-					.setPath("/dev/shm")
-					.build();
+			db = new Database.Builder<ByteBuffer, ByteBuffer>(ENGINE).setPath("/dev/shm").build();
 			Assert.fail();
 		} catch (InvalidArgumentException kve) {
 			exception_occured = true;
@@ -116,10 +107,8 @@ public class ExceptionTest {
 		Database<ByteBuffer, ByteBuffer> db = null;
 		boolean exception_occured = false;
 		try {
-			db = new Database.Builder<ByteBuffer, ByteBuffer>(ENGINE)
-					.setSize(1073741824)
-					.setPath("/tmp/123/234/345/456/567/678/nope.nope")
-					.build();
+			db = new Database.Builder<ByteBuffer, ByteBuffer>(ENGINE).setSize(1073741824)
+					.setPath("/tmp/123/234/345/456/567/678/nope.nope").build();
 			Assert.fail();
 			/*
 			 * It should be InvalidArgumentException, but:
@@ -139,10 +128,7 @@ public class ExceptionTest {
 		Database<ByteBuffer, ByteBuffer> db = null;
 		boolean exception_occured = false;
 		try {
-			db = new Database.Builder<ByteBuffer, ByteBuffer>(ENGINE)
-					.setSize(1073741824)
-					.setPath("1234")
-					.build();
+			db = new Database.Builder<ByteBuffer, ByteBuffer>(ENGINE).setSize(1073741824).setPath("1234").build();
 			Assert.fail();
 			/*
 			 * It's not a valid path, so it should be InvalidArgumentException, but:
@@ -226,10 +212,10 @@ public class ExceptionTest {
 	@Test(expected = RuntimeException.class)
 	public void exceptionsHierarchy() {
 		/* All engines should derive from DatabaseException class */
-		List<DatabaseException> exceptions = Arrays.asList(new DatabaseException(""),
-				new NotFoundException(""), new NotSupportedException(""), new InvalidArgumentException(""),
-				new BuilderException(""), new StoppedByCallbackException(""), new OutOfMemoryException(""),
-				new WrongEngineNameException(""), new TransactionScopeException(""));
+		List<DatabaseException> exceptions = Arrays.asList(new DatabaseException(""), new NotFoundException(""),
+				new NotSupportedException(""), new InvalidArgumentException(""), new BuilderException(""),
+				new StoppedByCallbackException(""), new OutOfMemoryException(""), new WrongEngineNameException(""),
+				new TransactionScopeException(""));
 
 		/* We just make sure DBException is of RuntimeException class */
 		throw new DatabaseException("");

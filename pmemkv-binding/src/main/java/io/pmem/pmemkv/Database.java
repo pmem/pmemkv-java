@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-/* Copyright 2017-2020, Intel Corporation */
+/* Copyright 2017-2021, Intel Corporation */
 
 package io.pmem.pmemkv;
 
@@ -7,7 +7,6 @@ import io.pmem.pmemkv.internal.*;
 
 import java.io.*;
 import java.nio.ByteBuffer;
-import java.nio.file.Path;
 
 /**
  * Main Java binding pmemkv class, which is a local/embedded key-value datastore
