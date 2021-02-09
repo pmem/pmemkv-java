@@ -58,6 +58,7 @@ git remote update
 git checkout -B ${TARGET_BRANCH} upstream/${TARGET_BRANCH}
 
 echo "Build docs:"
+mvn install -Dmaven.test.skip=true -e
 mvn javadoc:javadoc -e
 cp -r ${REPO_DIR}/pmemkv-binding/target/site/apidocs ${ARTIFACTS_DIR}/
 
