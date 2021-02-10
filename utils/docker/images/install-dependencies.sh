@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright 2019-2020, Intel Corporation
+# Copyright 2019-2021, Intel Corporation
 
 #
 # install-dependencies.sh - install Java dependencies
@@ -16,6 +16,11 @@ PMEMKV_VERSION="1.2"
 
 # common: release 1.0, 30.06.2020
 JAVA_VERSION="1.0"
+
+if [ "${SKIP_PMDK_BUILD}" ]; then
+	echo "Variable 'SKIP_DEPENDENCIES_BUILD' is set; skipping building dependencies"
+	exit
+fi
 
 #
 # Build and install PMEMKV - JNI will need it
