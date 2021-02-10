@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright 2019-2020, Intel Corporation
+# Copyright 2019-2021, Intel Corporation
 
 #
 # install-dependencies.sh - install Java dependencies
@@ -8,6 +8,11 @@
 #
 
 set -e
+
+if [ "${SKIP_DEPENDENCIES_BUILD}" ]; then
+	echo "Variable 'SKIP_DEPENDENCIES_BUILD' is set; skipping building dependencies"
+	exit
+fi
 
 PREFIX=/usr
 

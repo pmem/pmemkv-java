@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright 2016-2020, Intel Corporation
+# Copyright 2016-2021, Intel Corporation
 
 #
 # Dockerfile - a 'recipe' for Docker to build an image of ubuntu-based
@@ -21,6 +21,7 @@ ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
 ARG SKIP_PMDK_BUILD
 ARG SKIP_LIBPMEMOBJ_CPP_BUILD
 ARG SKIP_PMEMKV_BUILD
+ARG SKIP_DEPENDENCIES_BUILD
 
 # Update the Apt cache and install basic tools
 RUN apt-get update
@@ -69,7 +70,7 @@ RUN ./install-libpmemobj-cpp.sh DEB
 COPY prepare-pmemkv.sh prepare-pmemkv.sh
 RUN ./prepare-pmemkv.sh DEB
 
-# Install dependencies
+# Install dependencies for the java binding so it can be built offline
 COPY install-dependencies.sh install-dependencies.sh
 RUN ./install-dependencies.sh DEB
 
