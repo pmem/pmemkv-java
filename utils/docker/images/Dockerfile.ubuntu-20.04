@@ -22,6 +22,7 @@ ARG SKIP_PMDK_BUILD
 ARG SKIP_LIBPMEMOBJ_CPP_BUILD
 ARG SKIP_PMEMKV_BUILD
 ARG SKIP_DEPENDENCIES_BUILD
+ARG SKIP_MAVEN_RUNTIME_SETUP
 
 # Update the Apt cache and install basic tools
 RUN apt-get update
@@ -69,6 +70,12 @@ RUN ./install-libpmemobj-cpp.sh DEB
 # Prepare pmemkv
 COPY prepare-pmemkv.sh prepare-pmemkv.sh
 RUN ./prepare-pmemkv.sh DEB
+
+# Prepare extra maven params
+# It's executed and its result is exported within 'install-dependencies.sh'
+# To avoid setting this script up also in users' .bashrc,
+# for a container runtime, set 'SKIP_MAVEN_RUNTIME_SETUP'
+COPY setup-maven-settings.sh /opt/setup-maven-settings.sh
 
 # Install dependencies for the java binding so it can be built offline
 COPY install-dependencies.sh install-dependencies.sh

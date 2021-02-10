@@ -24,6 +24,7 @@ REPO_NAME=${REPO:-"pmemkv-java"}
 export GITHUB_TOKEN=${DOC_UPDATE_GITHUB_TOKEN} # export for hub command
 REPO_DIR=$(mktemp -d -t pmemkvjava-XXX)
 ARTIFACTS_DIR=$(mktemp -d -t ARTIFACTS-XXX)
+MVN_PARAMS="${PMEMKV_MVN_PARAMS}"
 
 # Only 'master' or 'stable-*' branches are valid; determine docs location dir on gh-pages branch
 TARGET_BRANCH=${CI_BRANCH}
@@ -58,8 +59,8 @@ git remote update
 git checkout -B ${TARGET_BRANCH} upstream/${TARGET_BRANCH}
 
 echo "Build docs:"
-mvn install -Dmaven.test.skip=true -e
-mvn javadoc:javadoc -e
+mvn install -Dmaven.test.skip=true -e ${MVN_PARAMS}
+mvn javadoc:javadoc -e ${MVN_PARAMS}
 cp -r ${REPO_DIR}/pmemkv-binding/target/site/apidocs ${ARTIFACTS_DIR}/
 
 # Checkout gh-pages and copy docs

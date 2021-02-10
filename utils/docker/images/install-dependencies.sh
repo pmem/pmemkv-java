@@ -14,11 +14,20 @@ if [ "${SKIP_DEPENDENCIES_BUILD}" ]; then
 	exit
 fi
 
-PREFIX=/usr
+# Include setup of extra maven parameters...
+source /opt/setup-maven-settings.sh
 
+# ...and set the same script as an entrypoint for all users (newly defined in future)
+if [ -z "${SKIP_MAVEN_RUNTIME_SETUP}" ]; then
+	echo "source /opt/setup-maven-settings.sh" >> /etc/skel/.bashrc
+fi
+
+MVN_PARAMS="${PMEMKV_MVN_PARAMS}"
+echo "Extra mvn params (taken from env): ${MVN_PARAMS}"
+
+PREFIX=/usr
 # common: release 1.2, 29.05.2020
 PMEMKV_VERSION="1.2"
-
 # common: release 1.0, 30.06.2020
 JAVA_VERSION="1.0"
 
@@ -52,9 +61,10 @@ deps_dir=$(mktemp -d)
 git clone https://github.com/pmem/pmemkv-java.git ${deps_dir}
 pushd ${deps_dir}
 git checkout ${JAVA_VERSION}
-mvn install -Dmaven.test.skip=true
-mvn javadoc:javadoc
-mvn dependency:go-offline
+
+mvn install -Dmaven.test.skip=true ${MVN_PARAMS}
+mvn javadoc:javadoc ${MVN_PARAMS}
+mvn dependency:go-offline ${MVN_PARAMS}
 mv -v ~/.m2/repository /opt/java/
 
 popd
