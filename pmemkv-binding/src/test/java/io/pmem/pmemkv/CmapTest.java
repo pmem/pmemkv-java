@@ -3,9 +3,6 @@
 
 package io.pmem.pmemkv;
 
-import io.pmem.pmemkv.ByteBufferConverter;
-import io.pmem.pmemkv.Database;
-import io.pmem.pmemkv.DatabaseException;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -19,7 +16,6 @@ import static org.junit.Assert.*;
 public class CmapTest {
 
 	private final String ENGINE = "cmap";
-	private Database<ByteBuffer, ByteBuffer> db;
 
 	@Rule
 	public TemporaryFolder folder = new TemporaryFolder();
@@ -76,15 +72,44 @@ public class CmapTest {
 	public void throwsExceptionOnStartWhenOpeningNonExistentFile() {
 		String file = folder.getRoot() + File.pathSeparator + "testfile";
 
+		assertThrows(DatabaseException.class, () -> {
+			Database<ByteBuffer, ByteBuffer> db = openDB(ENGINE, file);
+		});
+	}
+
+	@Test
+	public void testConfigRelease() {
 		Database<ByteBuffer, ByteBuffer> db = null;
-
+		String file = folder.getRoot() + File.pathSeparator + "testfile";
+		long size = 8388608;
+		boolean startError = false;
 		try {
-			db = openDB(ENGINE, file);
-			Assert.fail();
+			db = new Database.Builder<ByteBuffer, ByteBuffer>(ENGINE)
+					.setSize(size)
+					.setPath(file)
+					.setKeyConverter(new ByteBufferConverter())
+					.setValueConverter(new ByteBufferConverter())
+					.build();
 		} catch (DatabaseException e) {
-
+			startError = true;
 		}
-
-		assertNull(db);
+		if (startError) {
+			startError = false;
+			try {
+				db = new Database.Builder<ByteBuffer, ByteBuffer>(ENGINE)
+						.setSize(size)
+						.setPath(file)
+						.setKeyConverter(new ByteBufferConverter())
+						.setValueConverter(new ByteBufferConverter())
+						.setForceCreate(true)
+						.build();
+			} catch (DatabaseException e) {
+				startError = true;
+			}
+		}
+		assertFalse(startError);
+		assertFalse(db == null);
+		db.stop();
+		assertTrue(db.stopped());
 	}
 }
