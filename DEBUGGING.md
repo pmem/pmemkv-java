@@ -2,12 +2,12 @@
 
 * Build jni with debug symbols
 
-Add debug compilation flag in src/main/cpp/pom.xml in compilerEndOptions section
+Add debug compilation flag in jni-binding/pom.xml in compilerEndOptions section
 
 ```xml
 <!-- in native-maven-plugin -->
 <compilerEndOptions>
-  <compilerEndOption>-g</compilerEndOptions>
+  <compilerEndOption>-g</compilerEndOption>
 </compilerEndOptions>
 ```
 

@@ -23,19 +23,11 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.5</version>
-            </plugin>
-            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>native-maven-plugin</artifactId>
                 <version>1.0-alpha-11</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <compilerProvider>generic-classic</compilerProvider>
-                    <compilerExecutable>c++</compilerExecutable>
-                    <linkerExecutable>c++</linkerExecutable>
                     <linkerFinalNameExt>${project.packaging}.${soversion}</linkerFinalNameExt>
                     <linkerSecondaryOutputExtensions>${project.packaging}</linkerSecondaryOutputExtensions>
                     <workingDirectory>${basedir}</workingDirectory>
@@ -53,11 +45,11 @@
                         <compilerStartOption>-I ${JAVA_HOME}/include/linux/</compilerStartOption>
                     </compilerStartOptions>
                     <compilerEndOptions>
-                        <compilerEndOptions>-Wall</compilerEndOptions>
-                        <compilerEndOptions>-Werror</compilerEndOptions>
-                        <compilerEndOptions>-O3</compilerEndOptions>
-                        <compilerEndOptions>-fPIC</compilerEndOptions>
-                        <compilerEndOptions>-shared</compilerEndOptions>
+                        <compilerEndOption>-Wall</compilerEndOption>
+                        <compilerEndOption>-Werror</compilerEndOption>
+                        <compilerEndOption>-O3</compilerEndOption>
+                        <compilerEndOption>-fPIC</compilerEndOption>
+                        <compilerEndOption>-shared</compilerEndOption>
                         <compilerEndOption>-std=gnu++11</compilerEndOption>
                     </compilerEndOptions>
                     <linkerStartOptions>
