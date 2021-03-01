@@ -10,6 +10,7 @@
 set -e
 
 source `dirname $0`/prepare-for-build.sh
+MVN_PARAMS="${PMEMKV_MVN_PARAMS}"
 
 function run_example() {
 	example_name=$1
@@ -38,7 +39,7 @@ echo "###########################################################"
 cd $WORKDIR
 mkdir -p ~/.m2/repository
 cp -r /opt/java/repository ~/.m2/
-mvn install -e
+mvn install -e ${MVN_PARAMS}
 
 echo
 echo "###########################################################"
