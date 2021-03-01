@@ -403,10 +403,13 @@ public class Database<K, V> {
 
 		public Builder(String engine) {
 			config = config_new();
-
 			this.engine = engine;
 		}
 
+		/**
+		 * Frees underlying resources.
+		 *
+		 */
 		@Override
 		public void finalize() {
 			if (config != 0) {
@@ -459,12 +462,8 @@ public class Database<K, V> {
 		 * @return instance of pmemkv Database.
 		 */
 		public Database<K, V> build() {
-			Database<K, V> db = new Database<K, V>(this);
-
-			/* After open, db takes ownership of the config */
-			config = 0;
-
-			return db;
+			/* Engine takes config ownership */
+			return new Database<K, V>(this);
 		}
 
 		/**
@@ -552,7 +551,9 @@ public class Database<K, V> {
 	private Database(Builder<K, V> builder) {
 		keyConverter = builder.keyConverter;
 		valueConverter = builder.valueConverter;
-		pointer = database_start(builder.engine, builder.config);
+		long config = builder.config;
+		builder.config = 0;
+		pointer = database_start(builder.engine, config);
 	}
 
 	private final long pointer;
