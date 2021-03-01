@@ -396,15 +396,6 @@ public class Database<K, V> {
 		return database_remove_buffer(pointer, direct_key.position(), direct_key);
 	}
 
-	private Database(Builder<K, V> builder) {
-		keyConverter = builder.keyConverter;
-		valueConverter = builder.valueConverter;
-		pointer = database_start(builder.engine, builder.config);
-	}
-
-	private final long pointer;
-	private boolean stopped;
-
 	/**
 	 * Builder is used to build instances of pmemkv Database class.
 	 * <p>
@@ -424,10 +415,12 @@ public class Database<K, V> {
 
 		public Builder(String engine) {
 			config = config_new();
-
 			this.engine = engine;
 		}
 
+		/**
+		 * Frees underlying resources.
+		 */
 		@Override
 		public void finalize() {
 			if (config != 0) {
@@ -442,7 +435,6 @@ public class Database<K, V> {
 		 * @param size
 		 *            size of the pmemkv datastore.
 		 * @return this builder object.
-		 *
 		 */
 		public Builder<K, V> setSize(long size) {
 			config_put_int(config, "size", size);
@@ -480,12 +472,8 @@ public class Database<K, V> {
 		 * @return instance of pmemkv Database.
 		 */
 		public Database<K, V> build() {
-			Database<K, V> db = new Database<K, V>(this);
-
-			/* After open, db takes ownership of the config */
-			config = 0;
-
-			return db;
+			/* Engine takes config's ownership */
+			return new Database<K, V>(this);
 		}
 
 		/**
@@ -572,7 +560,18 @@ public class Database<K, V> {
 		}
 	}
 
-	// JNI DATABASE METHODS
+	private Database(Builder<K, V> builder) {
+		keyConverter = builder.keyConverter;
+		valueConverter = builder.valueConverter;
+		long config = builder.config;
+		builder.config = 0;
+		pointer = database_start(builder.engine, config);
+	}
+
+	private final long pointer;
+	private boolean stopped;
+
+	// JNI METHODS
 	// --------------------------------------------------------------------------------
 	private native long database_start(String engine, long config);
 
