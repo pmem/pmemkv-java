@@ -403,12 +403,14 @@ public class Database<K, V> {
 
 		public Builder(String engine) {
 			config = config_new();
-
 			this.engine = engine;
 		}
 
-		@Override
-		public void finalize() {
+		/**
+		 * Frees underlying resources.
+		 *
+		 */
+		public void release() {
 			if (config != 0) {
 				config_delete(config);
 				config = 0;
@@ -459,12 +461,8 @@ public class Database<K, V> {
 		 * @return instance of pmemkv Database.
 		 */
 		public Database<K, V> build() {
-			Database<K, V> db = new Database<K, V>(this);
-
-			/* After open, db takes ownership of the config */
-			config = 0;
-
-			return db;
+			/* Engine takes config ownership */
+			return new Database<K, V>(this);
 		}
 
 		/**
