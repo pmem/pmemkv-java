@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-/* Copyright 2017-2020, Intel Corporation */
+/* Copyright 2017-2021, Intel Corporation */
 
 package io.pmem.pmemkv;
 
@@ -7,7 +7,6 @@ import io.pmem.pmemkv.internal.*;
 
 import java.io.*;
 import java.nio.ByteBuffer;
-import java.nio.file.Path;
 
 /**
  * Main Java binding pmemkv class, which is a local/embedded key-value datastore
@@ -403,10 +402,12 @@ public class Database<K, V> {
 
 		public Builder(String engine) {
 			config = config_new();
-
 			this.engine = engine;
 		}
 
+		/**
+		 * Frees underlying resources.
+		 */
 		@Override
 		public void finalize() {
 			if (config != 0) {
@@ -421,7 +422,6 @@ public class Database<K, V> {
 		 * @param size
 		 *            size of the pmemkv datastore.
 		 * @return this builder object.
-		 *
 		 */
 		public Builder<K, V> setSize(long size) {
 			config_put_int(config, "size", size);
@@ -459,12 +459,8 @@ public class Database<K, V> {
 		 * @return instance of pmemkv Database.
 		 */
 		public Database<K, V> build() {
-			Database<K, V> db = new Database<K, V>(this);
-
-			/* After open, db takes ownership of the config */
-			config = 0;
-
-			return db;
+			/* Engine takes config's ownership */
+			return new Database<K, V>(this);
 		}
 
 		/**
@@ -552,7 +548,9 @@ public class Database<K, V> {
 	private Database(Builder<K, V> builder) {
 		keyConverter = builder.keyConverter;
 		valueConverter = builder.valueConverter;
-		pointer = database_start(builder.engine, builder.config);
+		long config = builder.config;
+		builder.config = 0;
+		pointer = database_start(builder.engine, config);
 	}
 
 	private final long pointer;
