@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-/* Copyright 2017-2020, Intel Corporation */
+/* Copyright 2017-2021, Intel Corporation */
 
 #include <cstring>
 #include <string>
@@ -66,12 +66,11 @@ extern "C" JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_Database_database_1start
 
     pmemkv_db *db;
     auto status = pmemkv_open(cengine, (pmemkv_config*) config, &db);
-
     env->ReleaseStringUTFChars(engine, cengine);
 
-    if (status != PMEMKV_STATUS_OK)
+    if (status != PMEMKV_STATUS_OK) {
             PmemkvJavaException(env).ThrowException(status);
-
+    }
     return (jlong) db;
 }
 
@@ -98,8 +97,8 @@ struct Context {
 
 void Callback_get_value_buffer(const char* v, size_t vb, void *arg) {
     const auto c = static_cast<Context*>(arg);
-    // OutOfMemoryError may Occurr
-    if( jobject valuebuf = c->env->NewDirectByteBuffer(const_cast<char*>(v), vb)) {
+    // OutOfMemoryError may occurr
+    if (jobject valuebuf = c->env->NewDirectByteBuffer(const_cast<char*>(v), vb)) {
         // Rerise exception
         c->env->CallVoidMethod(c->callback, c->mid, vb, valuebuf);
         c->env->DeleteLocalRef(valuebuf);
@@ -109,7 +108,7 @@ void Callback_get_value_buffer(const char* v, size_t vb, void *arg) {
 int Callback_get_keys_buffer(const char* k, size_t kb, const char* v, size_t vb, void *arg) {
     const auto c = static_cast<Context*>(arg);
     Callback_get_value_buffer(k, kb, arg);
-    if( c->env->ExceptionOccurred()) {
+    if (c->env->ExceptionOccurred()) {
         return 1;
     }
     return 0;
