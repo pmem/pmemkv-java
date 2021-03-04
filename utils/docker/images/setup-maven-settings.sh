@@ -9,8 +9,6 @@
 #			these extra params for run-*.sh scripts.
 #
 
-set -e
-
 # Split proxies into host & port; remove possible leftover "/"
 if [[ -n "${http_proxy}" ]]; then
 	http_proxy_ip=$(echo ${http_proxy} | cut -d: -f2 | sed 's/\///g')
