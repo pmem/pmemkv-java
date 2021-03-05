@@ -5,7 +5,6 @@
 #include <string>
 #include <jni.h>
 #include <libpmemkv.h>
-#include <libpmemkv_json_config.h>
 #include <unordered_map>
 #include <iostream>
 
