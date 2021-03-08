@@ -26,6 +26,9 @@ stable_1_2_pmemkv_version="1a9dccfd4b7c7437534838aaec7e5f3e38300dd6"
 # stable-1.3: 1.3 release; 02.10.2020
 stable_1_3_pmemkv_version="6f79229fd195310f4a45321e86e312e358fe481a"
 
+# stable-1.4: 1.4 release; 15.02.2021
+stable_1_4_pmemkv_version="ecb8fd65c5b07ed002d1018418ef809ab50d4e18"
+
 if [ "${SKIP_PMEMKV_BUILD}" ]; then
 	echo "Variable 'SKIP_PMEMKV_BUILD' is set; skipping building of pmemkv"
 	exit
@@ -56,6 +59,7 @@ prepare_pmemkv "$stable_1_pmemkv_version" "pmemkv-stable-1.0"
 prepare_pmemkv "$stable_1_1_pmemkv_version" "pmemkv-stable-1.1"
 prepare_pmemkv "$stable_1_2_pmemkv_version" "pmemkv-stable-1.2"
 prepare_pmemkv "$stable_1_3_pmemkv_version" "pmemkv-stable-1.3"
+prepare_pmemkv "$stable_1_4_pmemkv_version" "pmemkv-stable-1.4"
 
 cd ..
 rm -r pmemkv
