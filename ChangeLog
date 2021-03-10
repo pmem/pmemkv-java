@@ -1,3 +1,15 @@
+Tue Jan 19 2021 Krzysztof Filipek <krzysztof.filipek@intel.com>
+
+	* Version 1.0.1
+
+	Improvements:
+	- simplify compilation
+	- generated JAR file includes dependencies
+	- every example is compiled to runnable JAR
+	- remove oleaster-matcher dependency
+	- change Maven modules paths
+	- disable javadoc generation for examples
+
 Tue Jun 30 2020 Szymon Romik <szymon.romik@intel.com>
 
 	* Version 1.0
