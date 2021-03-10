@@ -408,10 +408,14 @@ public class Database<K, V> {
 		}
 
 		@Override
-		public void finalize() {
-			if (config != 0) {
-				config_delete(config);
-				config = 0;
+		public void finalize() throws Throwable {
+			try {
+				if (config != 0) {
+					config_delete(config);
+					config = 0;
+				}
+			} finally {
+				super.finalize();
 			}
 		}
 
