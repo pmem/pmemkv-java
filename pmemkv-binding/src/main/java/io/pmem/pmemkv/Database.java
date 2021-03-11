@@ -18,7 +18,8 @@ import java.nio.ByteBuffer;
  * In most cases user needs to implement Converter interface, which provides
  * functionality of converting between key and value types, and ByteBuffer.
  *
- * @see <a href= "https://github.com/pmem/pmemkv/">Pmemkv</a>
+ * @see <a href= "https://github.com/pmem/pmemkv/">Pmemkv</a> library
+ *      description.
  *
  * @param <K>
  *            the type of key stored in the pmemkv datastore
@@ -251,6 +252,7 @@ public class Database<K, V> {
 	 * @param callback
 	 *            Function to be called for each specified key/value pair.
 	 * @throws DatabaseException
+	 * @since 1.0
 	 */
 	public void getAbove(K key, KeyValueCallback<K, V> callback) throws DatabaseException {
 		ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
@@ -277,6 +279,7 @@ public class Database<K, V> {
 	 * @param callback
 	 *            Function to be called for each specified key/value pair.
 	 * @throws DatabaseException
+	 * @since 1.0
 	 */
 	public void getBelow(K key, KeyValueCallback<K, V> callback) throws DatabaseException {
 		ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
@@ -304,6 +307,7 @@ public class Database<K, V> {
 	 * @param callback
 	 *            Function to be called for each specified key/value pair.
 	 * @throws DatabaseException
+	 * @since 1.0
 	 */
 	public void getBetween(K key1, K key2, KeyValueCallback<K, V> callback) throws DatabaseException {
 		ByteBuffer direct_key1 = getDirectBuffer(keyConverter.toByteBuffer(key1));
@@ -325,6 +329,7 @@ public class Database<K, V> {
 	 *            key to query for.
 	 * @return true if key exists in the datastore, false otherwise
 	 * @throws DatabaseException
+	 * @since 1.0
 	 */
 	public boolean exists(K key) throws DatabaseException {
 		ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
@@ -339,6 +344,7 @@ public class Database<K, V> {
 	 * @param callback
 	 *            Function to be called for each specified key/value pair.
 	 * @throws DatabaseException
+	 * @since 1.0
 	 */
 	public void get(K key, ValueCallback<V> callback) throws DatabaseException {
 		ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
@@ -356,6 +362,7 @@ public class Database<K, V> {
 	 *            key to query for.
 	 * @return Copy of value associated with the given key or null if not found.
 	 * @throws DatabaseException
+	 * @since 1.0
 	 */
 	public V getCopy(K key) throws DatabaseException {
 		byte value[];
@@ -378,6 +385,7 @@ public class Database<K, V> {
 	 * @param value
 	 *            data to be inserted for the specified key.
 	 * @throws DatabaseException
+	 * @since 1.0
 	 */
 	public void put(K key, V value) throws DatabaseException {
 		ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
@@ -394,6 +402,7 @@ public class Database<K, V> {
 	 * @return true if element was removed, false if element didn't exist before
 	 *         removal.
 	 * @throws DatabaseException
+	 * @since 1.0
 	 */
 	public boolean remove(K key) throws DatabaseException {
 		ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
@@ -439,8 +448,10 @@ public class Database<K, V> {
 		 * @param size
 		 *            size of the pmemkv datastore.
 		 * @return this builder object.
+		 * @throws BuilderException
+		 * @since 1.0
 		 */
-		public Builder<K, V> setSize(long size) {
+		public Builder<K, V> setSize(long size) throws BuilderException {
 			config_put_int(config, "size", size);
 			return this;
 		}
@@ -451,8 +462,10 @@ public class Database<K, V> {
 		 * @param forceCreate
 		 *            specify force_create engine's parameter.
 		 * @return this builder object.
+		 * @throws BuilderException
+		 * @since 1.0
 		 */
-		public Builder<K, V> setForceCreate(boolean forceCreate) {
+		public Builder<K, V> setForceCreate(boolean forceCreate) throws BuilderException {
 			config_put_int(config, "force_create", forceCreate ? 1 : 0);
 			return this;
 		}
@@ -462,9 +475,11 @@ public class Database<K, V> {
 		 *
 		 * @param path
 		 *            specify path engine's parameter.
-		 * @return this builder.
+		 * @return this builder object.
+		 * @throws BuilderException
+		 * @since 1.0
 		 */
-		public Builder<K, V> setPath(String path) {
+		public Builder<K, V> setPath(String path) throws BuilderException {
 			config_put_string(config, "path", path);
 			return this;
 		}
@@ -474,6 +489,7 @@ public class Database<K, V> {
 		 * within this builder.
 		 *
 		 * @return instance of pmemkv Database.
+		 * @since 1.0
 		 */
 		public Database<K, V> build() {
 			/* Engine takes config's ownership */
@@ -490,7 +506,8 @@ public class Database<K, V> {
 		 *
 		 * @param newKeyConverter
 		 *            Converter object from K type to ByteBuffer.
-		 * @return this builder.
+		 * @return this builder object.
+		 * @since 1.0
 		 */
 		public Builder<K, V> setKeyConverter(Converter<K> newKeyConverter) {
 			this.keyConverter = newKeyConverter;
@@ -508,7 +525,8 @@ public class Database<K, V> {
 		 * @param newValueConverter
 		 *            Converter object from V type to ByteBuffer.
 		 *
-		 * @return this builder.
+		 * @return this builder object.
+		 * @since 1.0
 		 */
 		public Builder<K, V> setValueConverter(Converter<V> newValueConverter) {
 			this.valueConverter = newValueConverter;
