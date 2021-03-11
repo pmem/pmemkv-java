@@ -10,6 +10,8 @@
 
 set -e
 
+source `dirname $0`/prepare-for-build.sh
+
 if [[ -z "${DOC_UPDATE_GITHUB_TOKEN}" || -z "${DOC_UPDATE_BOT_NAME}" || -z "${DOC_REPO_OWNER}" ]]; then
 	echo "To build documentation and upload it as a Github pull request, variables " \
 		"'DOC_UPDATE_BOT_NAME', 'DOC_REPO_OWNER' and 'DOC_UPDATE_GITHUB_TOKEN' have to " \
@@ -57,6 +59,17 @@ hub config --global hub.protocol https
 
 git remote update
 git checkout -B ${TARGET_BRANCH} upstream/${TARGET_BRANCH}
+
+echo "Install pmemkv:"
+cd /opt/pmemkv-master/
+if [ "${PACKAGE_MANAGER}" = "deb" ]; then
+	sudo_password dpkg -i libpmemkv*.deb
+elif [ "${PACKAGE_MANAGER}" = "rpm" ]; then
+	sudo_password rpm -i libpmemkv*.rpm
+else
+	echo "PACKAGE_MANAGER env variable not set or set improperly ('deb' or 'rpm' supported)."
+	exit 1
+fi
 
 echo "Build docs:"
 mvn install -Dmaven.test.skip=true -e ${MVN_PARAMS}
