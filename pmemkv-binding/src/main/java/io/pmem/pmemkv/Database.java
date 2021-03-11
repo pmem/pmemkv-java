@@ -153,9 +153,10 @@ public class Database<K, V> {
 	 * Returns number of key/value pairs currently stored in the pmemkv datastore.
 	 *
 	 * @return Total number of elements in the datastore.
+	 * @throws DatabaseException
 	 * @since 1.0
 	 */
-	public long countAll() {
+	public long countAll() throws DatabaseException {
 		return database_count_all(pointer);
 	}
 
@@ -170,9 +171,10 @@ public class Database<K, V> {
 	 *            Sets the lower bound for querying.
 	 * @return Number of key/value pairs in the datastore, whose keys are greater
 	 *         than the given key.
+	 * @throws DatabaseException
 	 * @since 1.0
 	 */
-	public long countAbove(K key) {
+	public long countAbove(K key) throws DatabaseException {
 		ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
 		return database_count_above_buffer(pointer, direct_key.position(), direct_key);
 	}
@@ -188,9 +190,10 @@ public class Database<K, V> {
 	 *            Sets the upper bound for querying.
 	 * @return Number of key/value pairs in the datastore, whose keys are less than
 	 *         the given key.
+	 * @throws DatabaseException
 	 * @since 1.0
 	 */
-	public long countBelow(K key) {
+	public long countBelow(K key) throws DatabaseException {
 		ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
 		return database_count_below_buffer(pointer, direct_key.position(), direct_key);
 	}
@@ -207,9 +210,10 @@ public class Database<K, V> {
 	 * @param key2
 	 *            Sets the upper bound for querying.
 	 * @return Number of key/value pairs in the datastore, between given keys.
+	 * @throws DatabaseException
 	 * @since 1.0
 	 */
-	public long countBetween(K key1, K key2) {
+	public long countBetween(K key1, K key2) throws DatabaseException {
 		ByteBuffer direct_key1 = getDirectBuffer(keyConverter.toByteBuffer(key1));
 		ByteBuffer direct_key2 = getDirectBuffer(keyConverter.toByteBuffer(key2));
 		return database_count_between_buffer(pointer, direct_key1.position(), direct_key1, direct_key2.position(),
