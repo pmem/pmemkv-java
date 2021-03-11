@@ -1,14 +1,20 @@
-Tue Jan 19 2021 Krzysztof Filipek <krzysztof.filipek@intel.com>
+Fri Mar 12 2021 Krzysztof Filipek <krzysztof.filipek@intel.com>
 
 	* Version 1.0.1
 
 	Improvements:
 	- simplify compilation
-	- generated JAR file includes dependencies
+	- generated JAR files include dependencies
 	- every example is compiled to runnable JAR
 	- remove oleaster-matcher dependency
 	- change Maven modules paths
 	- disable javadoc generation for examples
+	- add throws clauses to Database methods
+
+	Bug fixes:
+	- fix occasional crash in finalize method
+	- add error handling for count* methods
+	- remove unnecessary dependency to libpmemkv_json_config
 
 Tue Jun 30 2020 Szymon Romik <szymon.romik@intel.com>
 
