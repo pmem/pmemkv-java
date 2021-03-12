@@ -5,9 +5,6 @@ This document contains all the steps required to make a new release of pmemkv-ja
 \#define $VERSION = current full version (e.g. 1.0.2); $VER = major+minor only version (e.g. 1.0)
 
 Make a release locally:
-- for major/minor release:
-  - change version of Docker images (IMG_VER) in gha.yml to $VER
-  - and change "$FORCE_IMAGE_ACTION" flag for pull-or-rebuild.sh to "rebuild"
 - add an entry to ChangeLog, remember to change the day of the week in the release date
   - for major/minor releases mention compatibility with the previous release
 - update "pmemkv-java" project's version in all pom.xml files
@@ -16,12 +13,11 @@ Make a release locally:
 
 Make a package:
 - mvn package
-- verify created packages: jar (with java code) and so (JNI, C++ code)
+- verify created packages: .jar's (with java code and docs) and .so (JNI, C++ code)
 
-Undo temporary release changes:
+Create release branch:
 - for major/minor release:
   - create stable-$VER branch now: git checkout -b stable-$VER
-  - and on **master** branch, change back gha.yml (set IMG_VER to "latest"; and swap "rebuild" to "$FORCE_IMAGE_ACTION" again)
 
 Publish changes:
 - for major/minor release:
