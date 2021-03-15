@@ -10,7 +10,7 @@
 
 set -e
 
-source `dirname $0`/prepare-for-build.sh
+source $(dirname ${0})/prepare-for-build.sh
 
 if [[ -z "${DOC_UPDATE_GITHUB_TOKEN}" || -z "${DOC_UPDATE_BOT_NAME}" || -z "${DOC_REPO_OWNER}" ]]; then
 	echo "To build documentation and upload it as a Github pull request, variables " \
@@ -47,6 +47,8 @@ fi
 ORIGIN="https://${GITHUB_TOKEN}@github.com/${BOT_NAME}/${REPO_NAME}"
 UPSTREAM="https://github.com/${DOC_REPO_OWNER}/${REPO_NAME}"
 
+install_pmemkv master
+
 pushd ${REPO_DIR}
 echo "Clone repo:"
 git clone ${ORIGIN} ${REPO_DIR}
@@ -60,18 +62,8 @@ hub config --global hub.protocol https
 git remote update
 git checkout -B ${TARGET_BRANCH} upstream/${TARGET_BRANCH}
 
-echo "Install pmemkv:"
-cd /opt/pmemkv-master/
-if [ "${PACKAGE_MANAGER}" = "deb" ]; then
-	sudo_password dpkg -i libpmemkv*.deb
-elif [ "${PACKAGE_MANAGER}" = "rpm" ]; then
-	sudo_password rpm -i libpmemkv*.rpm
-else
-	echo "PACKAGE_MANAGER env variable not set or set improperly ('deb' or 'rpm' supported)."
-	exit 1
-fi
-
 echo "Build docs:"
+use_preinstalled_java_deps
 mvn install -Dmaven.test.skip=true -e ${MVN_PARAMS}
 mvn javadoc:javadoc -e ${MVN_PARAMS}
 cp -r ${REPO_DIR}/pmemkv-binding/target/site/apidocs ${ARTIFACTS_DIR}/

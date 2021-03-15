@@ -9,37 +9,19 @@
 
 set -e
 
-source `dirname $0`/prepare-for-build.sh
+source $(dirname ${0})/prepare-for-build.sh
 MVN_PARAMS="${PMEMKV_MVN_PARAMS}"
 
-function run_example() {
-	example_name=${1}
-	# Find current pmemkv-binding package and path to example's jar
-	jar_path=$(find ../pmemkv-binding/target/ | grep -E "pmemkv-([0-9.]+).jar")
-	example_path=$(find . | grep -E "${example_name}-([0-9.]+).jar$")
-
-	java -ea -Xms1G -cp ${jar_path}:${example_path} ${example_name}
-}
-
 # install pmemkv
-pmemkv_version=$1
-cd /opt/pmemkv-$pmemkv_version/
-if [ "${PACKAGE_MANAGER}" = "deb" ]; then
-	sudo_password dpkg -i libpmemkv*.deb
-elif [ "${PACKAGE_MANAGER}" = "rpm" ]; then
-	sudo_password rpm -i libpmemkv*.rpm
-else
-	echo "PACKAGE_MANAGER env variable not set or set improperly ('deb' or 'rpm' supported)."
-	exit 1
-fi
+pmemkv_version=${1}
+install_pmemkv ${pmemkv_version}
 
 echo
 echo "###########################################################"
 echo "### Verifying building and installing of the java bindings"
 echo "###########################################################"
-cd $WORKDIR
-mkdir -p ~/.m2/repository
-cp -r /opt/java/repository ~/.m2/
+use_preinstalled_java_deps
+cd ${WORKDIR}
 mvn install -e ${MVN_PARAMS}
 
 echo
