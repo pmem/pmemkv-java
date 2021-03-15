@@ -13,10 +13,11 @@ source `dirname $0`/prepare-for-build.sh
 MVN_PARAMS="${PMEMKV_MVN_PARAMS}"
 
 function run_example() {
-	example_name=$1
-	jar_path=../pmemkv-binding/target/pmemkv-1.0.0.jar
-	# Find path to a jar with specific example name
-	example_path=`find .. | grep -P '\b(?!pmemkv)\b([a-zA-Z]+)\-([0-9.]+)\.jar' | grep ${example_name}`
+	example_name=${1}
+	# Find current pmemkv-binding package and path to example's jar
+	jar_path=$(find ../pmemkv-binding/target/ | grep -E "pmemkv-([0-9.]+).jar")
+	example_path=$(find . | grep -E "${example_name}-([0-9.]+).jar$")
+
 	java -ea -Xms1G -cp ${jar_path}:${example_path} ${example_name}
 }
 

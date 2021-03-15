@@ -78,7 +78,7 @@ To execute them, run e.g.:
 ```sh
 cd examples
 mvn package
-PMEM_IS_PMEM_FORCE=1 java -ea -Xms1G -jar StringExample/target/StringExample-1.0.0-jar-with-dependencies.jar
+PMEM_IS_PMEM_FORCE=1 java -ea -Xms1G -jar StringExample/target/StringExample-*-jar-with-dependencies.jar
 ```
 
 ## Contributing

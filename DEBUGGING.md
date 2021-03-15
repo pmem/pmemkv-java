@@ -23,7 +23,7 @@ Now let's debug basic example:
 
 ```sh
 cd examples
-gdb --args java -ea -Xms1G -jar MixedTypesExample/target/MixedTypesExample-1.0.0-jar-with-dependencies.jar
+gdb --args java -ea -Xms1G -jar MixedTypesExample/target/MixedTypesExample-*-jar-with-dependencies.jar
 (gdb) handle SIGSEGV nostop noprint pass  <- JVM is handling segfault on its own, so need to disable it in gdb
 (gdb) break jni_function_to_debug
 ```
@@ -34,8 +34,8 @@ Build example with debug information
 
 ```sh
 cd MixedTypesExample/target
-javac -g -cp MixedTypesExample-1.0.0-jar-with-dependencies.jar ../src/main/java/MixedTypesExample.java
-jdb -classpath MixedTypesExample-1.0.0-jar-with-dependencies.jar MixedTypesExample
+javac -g -cp MixedTypesExample-*-jar-with-dependencies.jar ../src/main/java/MixedTypesExample.java
+jdb -classpath MixedTypesExample-*-jar-with-dependencies.jar MixedTypesExample
 ```
 
 # Generating JNI header(s)
@@ -43,5 +43,5 @@ jdb -classpath MixedTypesExample-1.0.0-jar-with-dependencies.jar MixedTypesExamp
 To generate JNI header e.g. for Database class, run:
 
 ```sh
-javac -h jni-binding/ -cp pmemkv-binding/target/pmemkv-1.0.0.jar pmemkv-binding/src/main/java/io/pmem/pmemkv/Database.java
+javac -h jni-binding/ -cp pmemkv-binding/target/pmemkv-*.jar pmemkv-binding/src/main/java/io/pmem/pmemkv/Database.java
 ```
