@@ -26,10 +26,10 @@ MVN_PARAMS="${PMEMKV_MVN_PARAMS}"
 echo "Extra mvn params (taken from env): ${MVN_PARAMS}"
 
 PREFIX=/usr
-# common: release 1.2, 29.05.2020
-PMEMKV_VERSION="1.2"
-# common: release 1.0, 30.06.2020
-JAVA_VERSION="1.0"
+# common: release 1.4, 15.02.2021
+PMEMKV_VERSION="ecb8fd65c5b07ed002d1018418ef809ab50d4e18"
+# common: release 1.0.1, 11.03.2021
+JAVA_VERSION="827f911c977d475511ca9b29cdec3c12425a3936"
 
 echo "Build and install PMEMKV (JNI needs it)"
 git clone https://github.com/pmem/pmemkv.git
