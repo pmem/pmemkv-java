@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-/* Copyright 2017-2020, Intel Corporation */
+/* Copyright 2017-2021, Intel Corporation */
 
 package io.pmem.pmemkv;
 
@@ -7,7 +7,6 @@ import io.pmem.pmemkv.internal.*;
 
 import java.io.*;
 import java.nio.ByteBuffer;
-import java.nio.file.Path;
 
 /**
  * Main Java binding pmemkv class, which is a local/embedded key-value datastore
@@ -19,7 +18,8 @@ import java.nio.file.Path;
  * In most cases user needs to implement Converter interface, which provides
  * functionality of converting between key and value types, and ByteBuffer.
  *
- * @see <a href= "https://github.com/pmem/pmemkv/">Pmemkv</a>
+ * @see <a href= "https://github.com/pmem/pmemkv/">Pmemkv library
+ *      description</a>
  *
  * @param <K>
  *            the type of key stored in the pmemkv datastore
@@ -66,9 +66,11 @@ public class Database<K, V> {
 	 *
 	 * @param callback
 	 *            Function to be called for each key.
+	 * @throws DatabaseException
+	 *             with pmemkv return status.
 	 * @since 1.0
 	 */
-	public void getKeys(KeyCallback<K> callback) {
+	public void getKeys(KeyCallback<K> callback) throws DatabaseException {
 		database_get_keys_buffer(pointer, (int kb, ByteBuffer k) -> {
 			k.rewind().limit(kb);
 			K processed_object = keyConverter.fromByteBuffer(k);
@@ -87,9 +89,11 @@ public class Database<K, V> {
 	 *            Sets the lower bound for querying.
 	 * @param callback
 	 *            Function to be called for each key.
+	 * @throws DatabaseException
+	 *             with pmemkv return status.
 	 * @since 1.0
 	 */
-	public void getKeysAbove(K key, KeyCallback<K> callback) {
+	public void getKeysAbove(K key, KeyCallback<K> callback) throws DatabaseException {
 		ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
 		database_get_keys_above_buffer(pointer, direct_key.position(), direct_key, (int kb, ByteBuffer k) -> {
 			k.rewind().limit(kb);
@@ -109,9 +113,11 @@ public class Database<K, V> {
 	 *            Sets the upper bound for querying.
 	 * @param callback
 	 *            Function to be called for each key.
+	 * @throws DatabaseException
+	 *             with pmemkv return status.
 	 * @since 1.0
 	 */
-	public void getKeysBelow(K key, KeyCallback<K> callback) {
+	public void getKeysBelow(K key, KeyCallback<K> callback) throws DatabaseException {
 		ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
 		database_get_keys_below_buffer(pointer, direct_key.position(), direct_key, (int kb, ByteBuffer k) -> {
 			k.rewind().limit(kb);
@@ -133,9 +139,11 @@ public class Database<K, V> {
 	 *            Sets the upper bound for querying.
 	 * @param callback
 	 *            Function to be called for each key.
+	 * @throws DatabaseException
+	 *             with pmemkv return status.
 	 * @since 1.0
 	 */
-	public void getKeysBetween(K key1, K key2, KeyCallback<K> callback) {
+	public void getKeysBetween(K key1, K key2, KeyCallback<K> callback) throws DatabaseException {
 		ByteBuffer direct_key1 = getDirectBuffer(keyConverter.toByteBuffer(key1));
 		ByteBuffer direct_key2 = getDirectBuffer(keyConverter.toByteBuffer(key2));
 		database_get_keys_between_buffer(pointer, direct_key1.position(), direct_key1, direct_key2.position(),
@@ -150,9 +158,11 @@ public class Database<K, V> {
 	 * Returns number of key/value pairs currently stored in the pmemkv datastore.
 	 *
 	 * @return Total number of elements in the datastore.
+	 * @throws DatabaseException
+	 *             with pmemkv return status.
 	 * @since 1.0
 	 */
-	public long countAll() {
+	public long countAll() throws DatabaseException {
 		return database_count_all(pointer);
 	}
 
@@ -167,9 +177,11 @@ public class Database<K, V> {
 	 *            Sets the lower bound for querying.
 	 * @return Number of key/value pairs in the datastore, whose keys are greater
 	 *         than the given key.
+	 * @throws DatabaseException
+	 *             with pmemkv return status.
 	 * @since 1.0
 	 */
-	public long countAbove(K key) {
+	public long countAbove(K key) throws DatabaseException {
 		ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
 		return database_count_above_buffer(pointer, direct_key.position(), direct_key);
 	}
@@ -185,9 +197,11 @@ public class Database<K, V> {
 	 *            Sets the upper bound for querying.
 	 * @return Number of key/value pairs in the datastore, whose keys are less than
 	 *         the given key.
+	 * @throws DatabaseException
+	 *             with pmemkv return status.
 	 * @since 1.0
 	 */
-	public long countBelow(K key) {
+	public long countBelow(K key) throws DatabaseException {
 		ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
 		return database_count_below_buffer(pointer, direct_key.position(), direct_key);
 	}
@@ -204,9 +218,11 @@ public class Database<K, V> {
 	 * @param key2
 	 *            Sets the upper bound for querying.
 	 * @return Number of key/value pairs in the datastore, between given keys.
+	 * @throws DatabaseException
+	 *             with pmemkv return status.
 	 * @since 1.0
 	 */
-	public long countBetween(K key1, K key2) {
+	public long countBetween(K key1, K key2) throws DatabaseException {
 		ByteBuffer direct_key1 = getDirectBuffer(keyConverter.toByteBuffer(key1));
 		ByteBuffer direct_key2 = getDirectBuffer(keyConverter.toByteBuffer(key2));
 		return database_count_between_buffer(pointer, direct_key1.position(), direct_key1, direct_key2.position(),
@@ -219,9 +235,11 @@ public class Database<K, V> {
 	 *
 	 * @param callback
 	 *            Function to be called for each key/value pair.
+	 * @throws DatabaseException
+	 *             with pmemkv return status.
 	 * @since 1.0
 	 */
-	public void getAll(KeyValueCallback<K, V> callback) {
+	public void getAll(KeyValueCallback<K, V> callback) throws DatabaseException {
 		database_get_all_buffer(pointer, (int kb, ByteBuffer k, int vb, ByteBuffer v) -> {
 			k.rewind().limit(kb);
 			K processed_key = keyConverter.fromByteBuffer(k);
@@ -242,8 +260,11 @@ public class Database<K, V> {
 	 *            Sets the lower bound for querying.
 	 * @param callback
 	 *            Function to be called for each specified key/value pair.
+	 * @throws DatabaseException
+	 *             with pmemkv return status.
+	 * @since 1.0
 	 */
-	public void getAbove(K key, KeyValueCallback<K, V> callback) {
+	public void getAbove(K key, KeyValueCallback<K, V> callback) throws DatabaseException {
 		ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
 		database_get_above_buffer(pointer, direct_key.position(), direct_key,
 				(int kb, ByteBuffer k, int vb, ByteBuffer v) -> {
@@ -267,8 +288,11 @@ public class Database<K, V> {
 	 *            Sets the upper bound for querying.
 	 * @param callback
 	 *            Function to be called for each specified key/value pair.
+	 * @throws DatabaseException
+	 *             with pmemkv return status.
+	 * @since 1.0
 	 */
-	public void getBelow(K key, KeyValueCallback<K, V> callback) {
+	public void getBelow(K key, KeyValueCallback<K, V> callback) throws DatabaseException {
 		ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
 		database_get_below_buffer(pointer, direct_key.position(), direct_key,
 				(int kb, ByteBuffer k, int vb, ByteBuffer v) -> {
@@ -293,8 +317,11 @@ public class Database<K, V> {
 	 *            Sets the upper bound for querying.
 	 * @param callback
 	 *            Function to be called for each specified key/value pair.
+	 * @throws DatabaseException
+	 *             with pmemkv return status.
+	 * @since 1.0
 	 */
-	public void getBetween(K key1, K key2, KeyValueCallback<K, V> callback) {
+	public void getBetween(K key1, K key2, KeyValueCallback<K, V> callback) throws DatabaseException {
 		ByteBuffer direct_key1 = getDirectBuffer(keyConverter.toByteBuffer(key1));
 		ByteBuffer direct_key2 = getDirectBuffer(keyConverter.toByteBuffer(key2));
 		database_get_between_buffer(pointer, direct_key1.position(), direct_key1, direct_key2.position(), direct_key2,
@@ -313,8 +340,11 @@ public class Database<K, V> {
 	 * @param key
 	 *            key to query for.
 	 * @return true if key exists in the datastore, false otherwise
+	 * @throws DatabaseException
+	 *             with pmemkv return status.
+	 * @since 1.0
 	 */
-	public boolean exists(K key) {
+	public boolean exists(K key) throws DatabaseException {
 		ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
 		return database_exists_buffer(pointer, direct_key.position(), direct_key);
 	}
@@ -326,8 +356,11 @@ public class Database<K, V> {
 	 *            key to query for.
 	 * @param callback
 	 *            Function to be called for each specified key/value pair.
+	 * @throws DatabaseException
+	 *             with pmemkv return status.
+	 * @since 1.0
 	 */
-	public void get(K key, ValueCallback<V> callback) {
+	public void get(K key, ValueCallback<V> callback) throws DatabaseException {
 		ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
 		database_get_buffer_with_callback(pointer, direct_key.position(), direct_key, (int vb, ByteBuffer v) -> {
 			v.rewind().limit(vb);
@@ -342,8 +375,11 @@ public class Database<K, V> {
 	 * @param key
 	 *            key to query for.
 	 * @return Copy of value associated with the given key or null if not found.
+	 * @throws DatabaseException
+	 *             with pmemkv return status.
+	 * @since 1.0
 	 */
-	public V getCopy(K key) {
+	public V getCopy(K key) throws DatabaseException {
 		byte value[];
 		ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
 		try {
@@ -363,8 +399,11 @@ public class Database<K, V> {
 	 *            the key.
 	 * @param value
 	 *            data to be inserted for the specified key.
+	 * @throws DatabaseException
+	 *             with pmemkv return status.
+	 * @since 1.0
 	 */
-	public void put(K key, V value) {
+	public void put(K key, V value) throws DatabaseException {
 		ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
 		ByteBuffer direct_value = getDirectBuffer(valueConverter.toByteBuffer(value));
 
@@ -378,8 +417,11 @@ public class Database<K, V> {
 	 *            key to query for, to be removed.
 	 * @return true if element was removed, false if element didn't exist before
 	 *         removal.
+	 * @throws DatabaseException
+	 *             with pmemkv return status.
+	 * @since 1.0
 	 */
-	public boolean remove(K key) {
+	public boolean remove(K key) throws DatabaseException {
 		ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
 		return database_remove_buffer(pointer, direct_key.position(), direct_key);
 	}
@@ -403,10 +445,12 @@ public class Database<K, V> {
 
 		public Builder(String engine) {
 			config = config_new();
-
 			this.engine = engine;
 		}
 
+		/**
+		 * Frees underlying resources.
+		 */
 		@Override
 		public void finalize() throws Throwable {
 			try {
@@ -425,9 +469,11 @@ public class Database<K, V> {
 		 * @param size
 		 *            size of the pmemkv datastore.
 		 * @return this builder object.
-		 *
+		 * @throws BuilderException
+		 *             with pmemkv's config return status.
+		 * @since 1.0
 		 */
-		public Builder<K, V> setSize(long size) {
+		public Builder<K, V> setSize(long size) throws BuilderException {
 			config_put_int(config, "size", size);
 			return this;
 		}
@@ -438,8 +484,11 @@ public class Database<K, V> {
 		 * @param forceCreate
 		 *            specify force_create engine's parameter.
 		 * @return this builder object.
+		 * @throws BuilderException
+		 *             with pmemkv's config return status.
+		 * @since 1.0
 		 */
-		public Builder<K, V> setForceCreate(boolean forceCreate) {
+		public Builder<K, V> setForceCreate(boolean forceCreate) throws BuilderException {
 			config_put_int(config, "force_create", forceCreate ? 1 : 0);
 			return this;
 		}
@@ -449,9 +498,12 @@ public class Database<K, V> {
 		 *
 		 * @param path
 		 *            specify path engine's parameter.
-		 * @return this builder.
+		 * @return this builder object.
+		 * @throws BuilderException
+		 *             with pmemkv's config return status.
+		 * @since 1.0
 		 */
-		public Builder<K, V> setPath(String path) {
+		public Builder<K, V> setPath(String path) throws BuilderException {
 			config_put_string(config, "path", path);
 			return this;
 		}
@@ -461,14 +513,11 @@ public class Database<K, V> {
 		 * within this builder.
 		 *
 		 * @return instance of pmemkv Database.
+		 * @since 1.0
 		 */
 		public Database<K, V> build() {
-			Database<K, V> db = new Database<K, V>(this);
-
-			/* After open, db takes ownership of the config */
-			config = 0;
-
-			return db;
+			/* Engine takes config's ownership */
+			return new Database<K, V>(this);
 		}
 
 		/**
@@ -481,7 +530,8 @@ public class Database<K, V> {
 		 *
 		 * @param newKeyConverter
 		 *            Converter object from K type to ByteBuffer.
-		 * @return this builder.
+		 * @return this builder object.
+		 * @since 1.0
 		 */
 		public Builder<K, V> setKeyConverter(Converter<K> newKeyConverter) {
 			this.keyConverter = newKeyConverter;
@@ -499,13 +549,16 @@ public class Database<K, V> {
 		 * @param newValueConverter
 		 *            Converter object from V type to ByteBuffer.
 		 *
-		 * @return this builder.
+		 * @return this builder object.
+		 * @since 1.0
 		 */
 		public Builder<K, V> setValueConverter(Converter<V> newValueConverter) {
 			this.valueConverter = newValueConverter;
 			return this;
 		}
 
+		// JNI DATABASE BUILDER METHODS
+		// --------------------------------------------------------------------------------
 		private long config = 0;
 		private String engine;
 
@@ -556,13 +609,15 @@ public class Database<K, V> {
 	private Database(Builder<K, V> builder) {
 		keyConverter = builder.keyConverter;
 		valueConverter = builder.valueConverter;
-		pointer = database_start(builder.engine, builder.config);
+		long config = builder.config;
+		builder.config = 0;
+		pointer = database_start(builder.engine, config);
 	}
 
 	private final long pointer;
 	private boolean stopped;
 
-	// JNI METHODS
+	// JNI DATABASE METHODS
 	// --------------------------------------------------------------------------------
 	private native long database_start(String engine, long config);
 

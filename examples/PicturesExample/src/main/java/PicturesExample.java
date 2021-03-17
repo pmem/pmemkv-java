@@ -1,20 +1,19 @@
 // SPDX-License-Identifier: BSD-3-Clause
-/* Copyright 2020, Intel Corporation */
-
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import javax.swing.JFrame;
-import java.io.File;
-import javax.imageio.ImageIO;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+/* Copyright 2020-2021, Intel Corporation */
 
 import io.pmem.pmemkv.Database;
 import io.pmem.pmemkv.Converter;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.InputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicInteger;
+import javax.imageio.ImageIO;
+import javax.swing.JFrame;
 
 class ByteBufferBackedInputStream extends InputStream {
 
@@ -25,10 +24,12 @@ class ByteBufferBackedInputStream extends InputStream {
 		this.buff.rewind();
 	}
 
+	@Override
 	public int read() {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public int read(byte[] bytes, int off, int len)
 			throws IOException {
 		if (!buff.hasRemaining()) {
@@ -75,13 +76,13 @@ class ImageConverter implements Converter<BufferedImage> {
 	}
 }
 
-public class PicturesExample extends Canvas {
-
+/* Add Pmemkv superpowers to the Canvas class */
+class PmemkvPicture extends Canvas {
+	private static final long serialVersionUID = 705612541135496879L;
 	private Database<String, BufferedImage> db;
 	private String engine = "cmap";
-	static final long serialVersionUID = 9101254512891724823L;
 
-	public PicturesExample(String Path, int size) {
+	public PmemkvPicture(String Path, int size) {
 		System.out.println("Creating new database in path: " + Path + " with size: " + size);
 		db = new Database.Builder<String, BufferedImage>(engine)
 				.setSize(size)
@@ -92,7 +93,7 @@ public class PicturesExample extends Canvas {
 				.build();
 	}
 
-	public PicturesExample(String Path) {
+	public PmemkvPicture(String Path) {
 		System.out.println("Using already existing database: " + Path);
 		db = new Database.Builder<String, BufferedImage>(engine)
 				.setPath(Path)
@@ -116,44 +117,51 @@ public class PicturesExample extends Canvas {
 		}
 	}
 
+	@Override
 	public void paint(Graphics g) {
 		System.out.println("Draw images from pmemkv database");
 		AtomicInteger yPosition = new AtomicInteger(0);
 		db.getAll((k, v) -> {
-			System.out.println("\tDraw" + k);
-			Graphics2D g2 = (Graphics2D) g;
+			System.out.println("\tDraw " + k);
 			g.drawImage(v, 0, yPosition.getAndAdd(v.getHeight()), null);
 		});
 	}
+}
 
+public class PicturesExample {
 	public static void main(String[] args) {
-		String input_dir = System.getenv("InputDir");
-		String pmemkvPath = System.getenv("PmemkvPath");
-		String pmemkvSize = System.getenv("PmemkvSize");
+		String inputDirEnv = System.getenv("InputDir");
+		String pmemkvPathEnv = System.getenv("PmemkvPath");
+		String pmemkvSizeEnv = System.getenv("PmemkvSize");
+		int pmemkvSize = 0;
 
-		System.out.println("Parameters:");
-		System.out.println("InputDir" + input_dir);
-		System.out.println("Path: " + pmemkvPath);
-		System.out.println("Size: " + pmemkvSize);
-
-		PicturesExample m = null;
-		if (pmemkvSize != null && pmemkvPath != null) {
-			try {
-				m = new PicturesExample(pmemkvPath, Integer.parseInt(pmemkvSize));
-			} catch (NumberFormatException e) {
-				System.out.println("Wrong size: " + e);
-				System.exit(1);
-			}
-		} else if (pmemkvPath != null) {
-			m = new PicturesExample(pmemkvPath);
-		} else {
-			System.out.println("Provide at least PmemkvPath parameter. See examples' README for usage");
+		/* PmemkvPath is obligatory for this example */
+		if (pmemkvPathEnv == null) {
+			System.out.println("Provide at least PmemkvPath parameter. See examples' README for usage.");
 			System.exit(0);
 		}
 
-		if (input_dir != null) {
-			System.out.println("Loading files from " + input_dir + " to pmemkv database");
-			m.putAllPicturesFromDirectory(input_dir);
+		try {
+			pmemkvSize = Integer.parseInt(pmemkvSizeEnv);
+		} catch (NumberFormatException e) {
+			System.out.println("Wrong size: " + e);
+			System.exit(1);
+		}
+
+		System.out.println("Parameters:");
+		System.out.println("InputDir: " + inputDirEnv);
+		System.out.println("Path: " + pmemkvPathEnv);
+		System.out.println("Size: " + pmemkvSizeEnv);
+
+		PmemkvPicture m = null;
+		if (pmemkvSize != 0) {
+			m = new PmemkvPicture(pmemkvPathEnv, pmemkvSize);
+		} else {
+			m = new PmemkvPicture(pmemkvPathEnv);
+		}
+		if (inputDirEnv != null) {
+			System.out.println("Loading files from " + inputDirEnv + " to pmemkv database.");
+			m.putAllPicturesFromDirectory(inputDirEnv);
 		}
 		JFrame f = new JFrame();
 		f.add(m);

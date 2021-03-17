@@ -6,9 +6,9 @@
 
     <groupId>io.pmem</groupId>
     <artifactId>pmemkv-root</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <name>pmemkv-root</name>
-    <description>Java bindings for pmemkv (top-level, parent artifact)</description>
+    <description>Java binding for pmemkv (top-level, parent artifact)</description>
     <url>https://github.com/pmem/pmemkv-java</url>
     <packaging>pom</packaging>
 
@@ -18,7 +18,9 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <main.utilsParent>${project.basedir}</main.utilsParent>
     </properties>
+
     <modules>
         <module>jni-binding</module> <!-- pom for jni part -->
         <module>pmemkv-binding</module> <!-- pom for java part -->
@@ -32,7 +34,7 @@
                 <artifactId>formatter-maven-plugin</artifactId>
                 <version>2.11.0</version>
                 <configuration>
-                    <configFile>${pom.basedir}/utils/eclipse-formatter-config.xml</configFile>
+                    <configFile>${main.utilsParent}/utils/eclipse-formatter-config.xml</configFile>
                     <lineEnding>LF</lineEnding>
                 </configuration>
                 <executions>
@@ -47,14 +49,17 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
-
-    <issueManagement>
-        <system>GitHub</system>
-        <url>https://github.com/pmem/pmemkv-java/issues</url>
-    </issueManagement>
 
     <licenses>
         <license>
@@ -66,14 +71,25 @@
 
     <developers>
         <developer>
-            <id>szyrom</id>
-            <name>Szymon Romik</name>
-            <email>szymon.romik@intel.com</email>
-            <url>https://github.com/szyrom</url>
+            <id>igchor</id>
+            <name>Igor Chorążewicz</name>
+            <email>igor.chorazewicz@intel.com</email>
+            <url>https://github.com/igchor</url>
             <organization>Intel</organization>
-            <organizationUrl>https://intel.com</organizationUrl>
+            <organizationUrl>https://pmem.io</organizationUrl>
             <roles>
                 <role>architect</role>
+                <role>developer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>karczex</id>
+            <name>Paweł Karczewski</name>
+            <email>pawel.karczewski@intel.com</email>
+            <url>https://github.com/karczex</url>
+            <organization>Intel</organization>
+            <organizationUrl>https://pmem.io</organizationUrl>
+            <roles>
                 <role>developer</role>
             </roles>
         </developer>
@@ -83,7 +99,18 @@
             <email>krzysztof.filipek@intel.com</email>
             <url>https://github.com/kfilipek</url>
             <organization>Intel</organization>
-            <organizationUrl>https://intel.com</organizationUrl>
+            <organizationUrl>https://pmem.io</organizationUrl>
+            <roles>
+                <role>developer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>lukaszstolarczuk</id>
+            <name>Łukasz Stolarczuk</name>
+            <email>lukasz.stolarczuk@intel.com</email>
+            <url>https://github.com/lukaszstolarczuk</url>
+            <organization>Intel</organization>
+            <organizationUrl>https://pmem.io</organizationUrl>
             <roles>
                 <role>developer</role>
             </roles>
@@ -98,6 +125,11 @@
     <scm>
         <connection>scm:git:git@github.com:pmem/pmemkv-java.git</connection>
         <developerConnection>scm:git:git@github.com:pmem/pmemkv-java.git</developerConnection>
-        <url>scm:git:git@github.com:pmem/pmemkv-java.git</url>
+        <url>https://github.com/pmem/pmemkv-java</url>
     </scm>
+
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/pmem/pmemkv-java/issues</url>
+    </issueManagement>
 </project>

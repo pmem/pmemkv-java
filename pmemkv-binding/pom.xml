@@ -7,13 +7,17 @@
 	<parent>
 		<groupId>io.pmem</groupId>
 		<artifactId>pmemkv-root</artifactId>
-		<version>1.0.0</version>
+		<version>1.0.1</version>
 	</parent>
-	<groupId>io.pmem</groupId>
+
 	<artifactId>pmemkv</artifactId>
+	<description>Java code and main package for pmemkv Java binding</description>
 	<name>pmemkv-binding</name>
 	<packaging>jar</packaging>
-	<description>Java code and main package for pmemkv Java binding</description>
+
+	<properties>
+		<main.utilsParent>${project.parent.basedir}</main.utilsParent>
+	</properties>
 
 	<build>
 		<resources>
@@ -47,17 +51,14 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<groupId>net.revelc.code.formatter</groupId>
-				<artifactId>formatter-maven-plugin</artifactId>
-				<version>2.11.0</version>
-				<configuration>
-					<configFile>${project.parent.basedir}/utils/eclipse-formatter-config.xml</configFile>
-					<lineEnding>LF</lineEnding>
-				</configuration>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>3.2.1</version>
 				<executions>
 					<execution>
+						<id>attach-sources</id>
 						<goals>
-							<goal>validate</goal>
+							<goal>jar</goal>
 						</goals>
 					</execution>
 				</executions>

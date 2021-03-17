@@ -51,10 +51,12 @@ mvn install
 If dependencies (pmemkv, libpmemobj-cpp, pmdk, etc.) are installed in non-standard
 location(s) it may be also necessary to set up:
 **CPLUS_INCLUDE_PATH** and **LIBRARY_PATH** for compiling and linking JNI code (gcc env. variables),
-**LD_LIBRARY_PATH** for examples/tests execution.
+**LD_LIBRARY_PATH** for examples and tests build/execution.
 
 ```sh
-CPLUS_INCLUDE_PATH=<path_to_includes> LIBRARY_PATH=<path_to_libs> LD_LIBRARY_PATH=<path_to_libs> mvn install
+CPLUS_INCLUDE_PATH=<path_to_includes> \
+LIBRARY_PATH=<path_to_libs> \
+LD_LIBRARY_PATH=<path_to_libs> mvn install
 ```
 
 ## Testing
@@ -67,8 +69,7 @@ LD_LIBRARY_PATH=<path_to_libs> mvn test
 
 ## Examples
 
-We are using `/dev/shm` to
-[emulate persistent memory](https://pmem.io/2016/02/22/pm-emulation.html)
+We use `/dev/shm` with [emulated persistent memory](https://pmem.io/2016/02/22/pm-emulation.html)
 in examples.
 
 Examples can be found within this repository in [examples directory](https://github.com/pmem/pmemkv-java/tree/master/examples).
@@ -77,10 +78,19 @@ To execute them, run e.g.:
 ```sh
 cd examples
 mvn package
-PMEM_IS_PMEM_FORCE=1 java -ea -Xms1G -jar StringExample/StringExample-1.0.0-jar-with-dependencies.jar
+PMEM_IS_PMEM_FORCE=1 java -ea -Xms1G -jar StringExample/target/StringExample-*-jar-with-dependencies.jar
 ```
 
-## Documentation
+## Contributing
+
+Any contributions are welcome. Process, hints and good practices
+are described in [CONTRIBUTING.md](./CONTRIBUTING.md).
+
+### Debugging
+
+Debugging process is described in [DEBUGGING.md](./DEBUGGING.md).
+
+### Documentation
 
 Docs can be generated using mvn by executing commands:
 
@@ -88,6 +98,9 @@ Docs can be generated using mvn by executing commands:
 mvn javadoc:javadoc
 ```
 
-## Debugging
+## Contact us
 
-Debugging process is described in [DEBUGGING.md](./DEBUGGING.md)
+For more information about **pmemkv** and java bindings, contact Igor Chorążewicz (igor.chorazewicz@intel.com),
+Piotr Balcer (piotr.balcer@intel.com) or post on our **#pmem** Slack channel using
+[this invite link](https://join.slack.com/t/pmem-io/shared_invite/enQtNzU4MzQ2Mzk3MDQwLWQ1YThmODVmMGFkZWI0YTdhODg4ODVhODdhYjg3NmE4N2ViZGI5NTRmZTBiNDYyOGJjYTIyNmZjYzQxODcwNDg)
+or [Google group](https://groups.google.com/group/pmem).

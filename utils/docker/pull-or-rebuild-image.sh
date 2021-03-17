@@ -1,109 +1,125 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright 2016-2020, Intel Corporation
+# Copyright 2016-2021, Intel Corporation
 
 #
 # pull-or-rebuild-image.sh - rebuilds the Docker image used in the
-#                            current CI build if necessary.
+#		current build (if necessary) or pulls it from the Container Registry.
+#		Docker image is tagged as described in ./images/build-image.sh,
+#		but IMG_VER defaults in this script to "latest" (just in case it's
+#		used locally without building any images).
 #
-# The script rebuilds the Docker image if the Dockerfile for the current
-# OS version (Dockerfile.${OS}-${OS_VER}) or any .sh script from the directory
-# with Dockerfiles were modified and committed.
+# If Docker was rebuilt and all requirements are fulfilled (more details in
+# push_image function below) image will be pushed to the ${CONTAINER_REG}.
 #
-# If the Travis build is not of the "pull_request" type (i.e. in case of
-# merge after pull_request) and it succeed, the Docker image should be pushed
-# to the Docker Hub repository. An empty file is created to signal that to
-# further scripts.
+# The script rebuilds the Docker image if:
+# 1. the Dockerfile for the current OS version (Dockerfile.${OS}-${OS_VER})
+#    or any .sh script in the Dockerfiles directory were modified and committed, or
+# 2. "rebuild" param was passed as a first argument to this script.
 #
-# If the Docker image does not have to be rebuilt, it will be pulled from
-# Docker Hub.
+# The script pulls the Docker image if:
+# 1. it does not have to be rebuilt (based on commited changes), or
+# 2. "pull" param was passed as a first argument to this script.
 #
 
 set -e
 
 source $(dirname $0)/set-ci-vars.sh
-source $(dirname $0)/set-vars.sh
 
-if [[ "$CI_EVENT_TYPE" != "cron" && "$CI_BRANCH" != "coverity_scan" \
-	&& "$TYPE" == "coverity" ]]; then
-	echo "INFO: Skip Coverity scan job if build is triggered neither by " \
-		"'cron' nor by a push to 'coverity_scan' branch"
-	exit 0
-fi
+IMG_VER=${IMG_VER:-latest}
+TAG="${OS}-${OS_VER}-${IMG_VER}"
+IMAGES_DIR_NAME=images
+BASE_DIR=utils/docker/${IMAGES_DIR_NAME}
 
-if [[ ( "$CI_EVENT_TYPE" == "cron" || "$CI_BRANCH" == "coverity_scan" )\
-	&& "$TYPE" != "coverity" ]]; then
-	echo "INFO: Skip regular jobs if build is triggered either by 'cron'" \
-		" or by a push to 'coverity_scan' branch"
-	exit 0
-fi
-
-if [[ -z "$OS" || -z "$OS_VER" ]]; then
-	echo "ERROR: The variables OS and OS_VER have to be set properly " \
-             "(eg. OS=fedora, OS_VER=31)."
+if [[ -z "${OS}" || -z "${OS_VER}" ]]; then
+	echo "ERROR: The variables OS and OS_VER have to be set " \
+		"(e.g. OS=fedora, OS_VER=32)."
 	exit 1
 fi
 
-if [[ -z "$HOST_WORKDIR" ]]; then
-	echo "ERROR: The variable HOST_WORKDIR has to contain a path to " \
-		"the root of this project on the host machine"
+if [[ -z "${CONTAINER_REG}" ]]; then
+	echo "ERROR: CONTAINER_REG environment variable is not set " \
+		"(e.g. \"<registry_addr>/<org_name>/<package_name>\")."
 	exit 1
 fi
 
-TAG="1.1-${OS}-${OS_VER}"
+function build_image() {
+	echo "Building the Docker image for the Dockerfile.${OS}-${OS_VER}"
+	pushd ${IMAGES_DIR_NAME}
+	./build-image.sh
+	popd
+}
 
-# Find all the commits for the current build
-if [ -n "$CI_COMMIT_RANGE" ]; then
-	commits=$(git rev-list $CI_COMMIT_RANGE)
+function pull_image() {
+	echo "Pull the image '${CONTAINER_REG}:${TAG}' from the Container Registry."
+	docker pull ${CONTAINER_REG}:${TAG}
+}
+
+function push_image {
+	# Check if the image has to be pushed to the Container Registry:
+	# - only upstream (not forked) repository,
+	# - stable-* or master branch,
+	# - not a pull_request event,
+	# - and PUSH_IMAGE flag was set for current build.
+	if [[ "${CI_REPO_SLUG}" == "${GITHUB_REPO}" \
+		&& (${CI_BRANCH} == stable-* || ${CI_BRANCH} == master) \
+		&& ${CI_EVENT_TYPE} != "pull_request" \
+		&& ${PUSH_IMAGE} == "1" ]]
+	then
+		echo "The image will be pushed to the Container Registry: ${CONTAINER_REG}"
+		pushd ${IMAGES_DIR_NAME}
+		./push-image.sh
+		popd
+	else
+		echo "Skip pushing the image to the Container Registry."
+	fi
+}
+
+# If "rebuild" or "pull" are passed to the script as param, force rebuild/pull.
+if [[ "${1}" == "rebuild" ]]; then
+	build_image
+	push_image
+	exit 0
+elif [[ "${1}" == "pull" ]]; then
+	pull_image
+	exit 0
+fi
+
+# Determine if we need to rebuild the image or just pull it from
+# the Container Registry, based on commited changes.
+if [ -n "${CI_COMMIT_RANGE}" ]; then
+	commits=$(git rev-list ${CI_COMMIT_RANGE})
 else
-	commits=$CI_COMMIT
+	commits=${CI_COMMIT}
+fi
+
+if [[ -z "${commits}" ]]; then
+	echo "'commits' variable is empty. Docker image will be pulled."
 fi
 
 echo "Commits in the commit range:"
-for commit in $commits; do echo $commit; done
+for commit in ${commits}; do echo ${commit}; done
 
-# Get the list of files modified by the commits
-files=$(for commit in $commits; do git diff-tree --no-commit-id --name-only \
-	-r $commit; done | sort -u)
 echo "Files modified within the commit range:"
-for file in $files; do echo $file; done
-
-# Path to directory with Dockerfiles and image building scripts
-images_dir_name=images
-base_dir=utils/docker/$images_dir_name
+files=$(for commit in ${commits}; do git diff-tree --no-commit-id --name-only \
+	-r ${commit}; done | sort -u)
+for file in ${files}; do echo ${file}; done
 
 # Check if committed file modifications require the Docker image to be rebuilt
-for file in $files; do
+for file in ${files}; do
 	# Check if modified files are relevant to the current build
-	if [[ $file =~ ^($base_dir)\/Dockerfile\.($OS)-($OS_VER)$ ]] \
-		|| [[ $file =~ ^($base_dir)\/.*\.sh$ ]]
+	if [[ ${file} =~ ^(${BASE_DIR})\/Dockerfile\.(${OS})-(${OS_VER})$ ]] \
+		|| [[ ${file} =~ ^(${BASE_DIR})\/.*\.sh$ ]]
 	then
-		# Rebuild Docker image for the current OS version
-		echo "Rebuilding the Docker image for the Dockerfile.$OS-$OS_VER"
-		pushd $images_dir_name
-		./build-image.sh ${OS}-${OS_VER}
-		popd
-
-		# Check if the image has to be pushed to Docker Hub
-		# (i.e. the build is triggered by commits to the $GITHUB_REPO
-		# repository's stable-* or master branch, and the CI build is not
-		# of the "pull_request" type). In that case, create the empty
-		# file.
-		if [[ "$CI_REPO_SLUG" == "$GITHUB_REPO" \
-			&& ($CI_BRANCH == stable-* || $CI_BRANCH == master) \
-			&& $CI_EVENT_TYPE != "pull_request" \
-			&& $PUSH_IMAGE == "1" ]]
-		then
-			echo "The image will be pushed to Docker Hub"
-			touch $CI_FILE_PUSH_IMAGE_TO_REPO
-		else
-			echo "Skip pushing the image to Docker Hub"
-		fi
-
+		build_image
+		push_image
 		exit 0
 	fi
 done
 
-# Getting here means rebuilding the Docker image is not required.
-# Pull the image from Docker Hub.
-docker pull ${DOCKERHUB_REPO}:${TAG}
+# Getting here means rebuilding the Docker image isn't required (based on changed files).
+# Pull the image from the Container Registry or rebuild anyway, if pull fails.
+if ! pull_image; then
+	build_image
+	push_image
+fi

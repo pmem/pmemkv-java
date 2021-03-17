@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright 2019-2020, Intel Corporation
+# Copyright 2019-2021, Intel Corporation
 
 #
 # prepare-pmemkv.sh <package_type> - prepare pmemkv packages
@@ -8,39 +8,49 @@
 
 set -e
 
-PREFIX=/usr
-PACKAGE_TYPE=$1
-
-# master: Remove VERSION file; 29.05.2020
-current_pmemkv_version="244c3b0c45f5700f6880fa9dbb0fbc41d7857a33"
-
-# stable-1.0: Merge pull request #686 from lukaszstolarczuk/fix-m...; 20.05.2020
-stable_1_pmemkv_version="5a11aee01b2206e519004baae1d26a41d328762c"
-
-# stable-1.1: Merge pull request #661 from lukaszstolarczuk/fix-g...; 17.04.2020
-stable_1_1_pmemkv_version="d4de10fa09d0ce99eb15d53f7311f1b4e7c56d47"
-
-# stable-1.2: Version 1.2; 29.05.2020
-stable_1_2_pmemkv_version="1.2"
-
 if [ "${SKIP_PMEMKV_BUILD}" ]; then
 	echo "Variable 'SKIP_PMEMKV_BUILD' is set; skipping building of pmemkv"
 	exit
 fi
 
+PREFIX=/usr
+PACKAGE_TYPE=${1}
+echo "PACKAGE_TYPE: ${PACKAGE_TYPE}"
+if [ -z "${PACKAGE_TYPE}" ]; then
+	echo "PACKAGE_TYPE is not set"
+	exit 1
+fi
+
+# master: Merge pull request #952 from karczex/dram_cmap_engine; 05.03.2021
+current_pmemkv_version="e135a8c757a8deb9a58d826954780d9eaf1ec5ab"
+
+# stable-1.0: 1.0.3 release; 06.10.2020
+stable_1_pmemkv_version="77ae3ef23dc2b2db9c012dc343b125a785a0ffbc"
+
+# stable-1.1: 1.1 release; 31.01.2020
+stable_1_1_pmemkv_version="2f719305afb0f44103734851cfe825e1b1d73dbf"
+
+# stable-1.2: 1.2 release; 29.05.2020
+stable_1_2_pmemkv_version="1a9dccfd4b7c7437534838aaec7e5f3e38300dd6"
+
+# stable-1.3: 1.3 release; 02.10.2020
+stable_1_3_pmemkv_version="6f79229fd195310f4a45321e86e312e358fe481a"
+
+# stable-1.4: 1.4 release; 15.02.2021
+stable_1_4_pmemkv_version="ecb8fd65c5b07ed002d1018418ef809ab50d4e18"
+
 prepare_pmemkv () {
-	pmemkv_version="$1"
-	version_name="$2"
-	git checkout "$pmemkv_version"
-	mkdir /opt/"$version_name"
+	pmemkv_version="${1}"
+	version_name="${2}"
+	git checkout "${pmemkv_version}"
+	mkdir /opt/"${version_name}"
 	mkdir build
 	cd build
-	cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-		-DCMAKE_INSTALL_PREFIX=$PREFIX \
-		-DCPACK_GENERATOR=$PACKAGE_TYPE \
-		-DBUILD_TESTS=OFF
+	# turn off all redundant components
+	cmake .. -DCPACK_GENERATOR="${PACKAGE_TYPE}" -DCMAKE_INSTALL_PREFIX=${PREFIX} \
+		-DBUILD_EXAMPLES=OFF -DBUILD_TESTS=OFF -DBUILD_DOC=OFF
 	make -j$(nproc) package
-	mv * /opt/"$version_name"
+	mv * /opt/"${version_name}"
 	cd ..
 	rm -rf build
 }
@@ -48,10 +58,12 @@ prepare_pmemkv () {
 git clone https://github.com/pmem/pmemkv
 cd pmemkv
 
-prepare_pmemkv "$current_pmemkv_version" "pmemkv-master"
-prepare_pmemkv "$stable_1_pmemkv_version" "pmemkv-stable-1.0"
-prepare_pmemkv "$stable_1_1_pmemkv_version" "pmemkv-stable-1.1"
-prepare_pmemkv "$stable_1_2_pmemkv_version" "pmemkv-stable-1.2"
+prepare_pmemkv "${current_pmemkv_version}" "pmemkv-master"
+prepare_pmemkv "${stable_1_pmemkv_version}" "pmemkv-stable-1.0"
+prepare_pmemkv "${stable_1_1_pmemkv_version}" "pmemkv-stable-1.1"
+prepare_pmemkv "${stable_1_2_pmemkv_version}" "pmemkv-stable-1.2"
+prepare_pmemkv "${stable_1_3_pmemkv_version}" "pmemkv-stable-1.3"
+prepare_pmemkv "${stable_1_4_pmemkv_version}" "pmemkv-stable-1.4"
 
 cd ..
 rm -r pmemkv

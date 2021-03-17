@@ -7,35 +7,27 @@
     <parent>
         <groupId>io.pmem</groupId>
         <artifactId>pmemkv-root</artifactId>
-        <version>1.0.0</version>
-        <relativePath>../pom.xml</relativePath>
+        <version>1.0.1</version>
     </parent>
-    <groupId>io.pmem</groupId>
+
     <artifactId>libpmemkv-jni</artifactId>
+    <description>JNI layer for pmemkv Java binding</description>
     <name>pmemkv-jni</name>
     <packaging>so</packaging>
-    <description>JNI layer for pmemkv Java bindings</description>
 
     <properties>
       <soversion>1</soversion>
+      <main.utilsParent>${project.parent.basedir}</main.utilsParent>
     </properties>
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.5</version>
-            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>native-maven-plugin</artifactId>
                 <version>1.0-alpha-11</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <compilerProvider>generic-classic</compilerProvider>
-                    <compilerExecutable>c++</compilerExecutable>
-                    <linkerExecutable>c++</linkerExecutable>
                     <linkerFinalNameExt>${project.packaging}.${soversion}</linkerFinalNameExt>
                     <linkerSecondaryOutputExtensions>${project.packaging}</linkerSecondaryOutputExtensions>
                     <workingDirectory>${basedir}</workingDirectory>
@@ -53,11 +45,11 @@
                         <compilerStartOption>-I ${JAVA_HOME}/include/linux/</compilerStartOption>
                     </compilerStartOptions>
                     <compilerEndOptions>
-                        <compilerEndOptions>-Wall</compilerEndOptions>
-                        <compilerEndOptions>-Werror</compilerEndOptions>
-                        <compilerEndOptions>-O3</compilerEndOptions>
-                        <compilerEndOptions>-fPIC</compilerEndOptions>
-                        <compilerEndOptions>-shared</compilerEndOptions>
+                        <compilerEndOption>-Wall</compilerEndOption>
+                        <compilerEndOption>-Werror</compilerEndOption>
+                        <compilerEndOption>-O3</compilerEndOption>
+                        <compilerEndOption>-fPIC</compilerEndOption>
+                        <compilerEndOption>-shared</compilerEndOption>
                         <compilerEndOption>-std=gnu++11</compilerEndOption>
                     </compilerEndOptions>
                     <linkerStartOptions>
@@ -66,9 +58,6 @@
                         <linkerStartOption>-Wl,--version-script,${basedir}/libpmemkv_jni.map</linkerStartOption>
                         <linkerStartOption>-fPIC</linkerStartOption>
                         <linkerStartOption>-O3</linkerStartOption>
-                        <linkerStartOption>-I ${JAVA_HOME}/include/</linkerStartOption>
-                        <linkerStartOption>-I ${JAVA_HOME}/include/linux/</linkerStartOption>
-                        <linkerStartOption>-I ${JAVA_HOME}/lib/</linkerStartOption>
                     </linkerStartOptions>
                     <linkerEndOptions>
                         <linkerEndOption>-lpmemkv</linkerEndOption>
@@ -96,14 +85,5 @@
                 </executions>
             </plugin>
         </plugins>
-        <resources>
-            <resource>
-                <directory>${basedir}/../resources</directory>
-                <includes>
-                    <include>version.properties</include>
-                </includes>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
     </build>
 </project>

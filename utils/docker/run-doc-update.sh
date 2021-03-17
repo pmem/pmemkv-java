@@ -10,26 +10,44 @@
 
 set -e
 
-source $(dirname ${0})/valid-branches.sh
+source $(dirname ${0})/prepare-for-build.sh
+
+if [[ -z "${DOC_UPDATE_GITHUB_TOKEN}" || -z "${DOC_UPDATE_BOT_NAME}" || -z "${DOC_REPO_OWNER}" ]]; then
+	echo "To build documentation and upload it as a Github pull request, variables " \
+		"'DOC_UPDATE_BOT_NAME', 'DOC_REPO_OWNER' and 'DOC_UPDATE_GITHUB_TOKEN' have to " \
+		"be provided. For more details please read CONTRIBUTING.md"
+	exit 0
+fi
 
 # Set up required variables
-BOT_NAME="pmem-bot"
-USER_NAME="pmem"
-REPO_NAME="pmemkv-java"
-export GITHUB_TOKEN=${GITHUB_TOKEN} # export for hub command
+BOT_NAME=${DOC_UPDATE_BOT_NAME}
+DOC_REPO_OWNER=${DOC_REPO_OWNER}
+REPO_NAME=${REPO:-"pmemkv-java"}
+export GITHUB_TOKEN=${DOC_UPDATE_GITHUB_TOKEN} # export for hub command
 REPO_DIR=$(mktemp -d -t pmemkvjava-XXX)
 ARTIFACTS_DIR=$(mktemp -d -t ARTIFACTS-XXX)
+MVN_PARAMS="${PMEMKV_MVN_PARAMS}"
 
-ORIGIN="https://${GITHUB_TOKEN}@github.com/${BOT_NAME}/${REPO_NAME}"
-UPSTREAM="https://github.com/${USER_NAME}/${REPO_NAME}"
-# master or stable-* branch
+# Only 'master' or 'stable-*' branches are valid; determine docs location dir on gh-pages branch
 TARGET_BRANCH=${CI_BRANCH}
-TARGET_DOCS_DIR=${TARGET_BRANCHES[$TARGET_BRANCH]}
-
-if [ -z $TARGET_DOCS_DIR ]; then
-	echo "Target location for branch ${TARGET_BRANCH} is not defined."
+if [[ "${TARGET_BRANCH}" == "master" ]]; then
+	TARGET_DOCS_DIR="master"
+elif [[ ${TARGET_BRANCH} == stable-* ]]; then
+	TARGET_DOCS_DIR=v$(echo ${TARGET_BRANCH} | cut -d"-" -f2 -s)
+else
+	echo "Skipping docs build, this script should be run only on master or stable-* branches."
+	echo "TARGET_BRANCH is set to: \'${TARGET_BRANCH}\'."
+	exit 0
+fi
+if [ -z "${TARGET_DOCS_DIR}" ]; then
+	echo "ERROR: Target docs location for branch: ${TARGET_BRANCH} is not set."
 	exit 1
 fi
+
+ORIGIN="https://${GITHUB_TOKEN}@github.com/${BOT_NAME}/${REPO_NAME}"
+UPSTREAM="https://github.com/${DOC_REPO_OWNER}/${REPO_NAME}"
+
+install_pmemkv master
 
 pushd ${REPO_DIR}
 echo "Clone repo:"
@@ -45,7 +63,9 @@ git remote update
 git checkout -B ${TARGET_BRANCH} upstream/${TARGET_BRANCH}
 
 echo "Build docs:"
-mvn javadoc:javadoc -e
+use_preinstalled_java_deps
+mvn install -Dmaven.test.skip=true -e ${MVN_PARAMS}
+mvn javadoc:javadoc -e ${MVN_PARAMS}
 cp -r ${REPO_DIR}/pmemkv-binding/target/site/apidocs ${ARTIFACTS_DIR}/
 
 # Checkout gh-pages and copy docs
@@ -69,7 +89,7 @@ git push -f ${ORIGIN} ${GH_PAGES_NAME}
 
 echo "Make or update pull request:"
 # When there is already an open PR or there are no changes an error is thrown, which we ignore.
-hub pull-request -f -b ${USER_NAME}:gh-pages -h ${BOT_NAME}:${GH_PAGES_NAME} \
+hub pull-request -f -b ${DOC_REPO_OWNER}:gh-pages -h ${BOT_NAME}:${GH_PAGES_NAME} \
 	-m "doc: automatic gh-pages update for ${TARGET_BRANCH}" && true
 
 popd

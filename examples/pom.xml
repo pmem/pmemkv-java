@@ -7,13 +7,18 @@
     <parent>
         <groupId>io.pmem</groupId>
         <artifactId>pmemkv-root</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.1</version>
     </parent>
 
-    <groupId>io.pmem</groupId>
     <artifactId>examples</artifactId>
-    <version>1.0.0</version>
+    <description>Examples for pmemkv Java binding</description>
     <packaging>pom</packaging>
+
+    <properties>
+        <maven.javadoc.skip>true</maven.javadoc.skip>
+        <!-- utilsParent will be inherited into each example -->
+        <main.utilsParent>${project.parent.basedir}/..</main.utilsParent>
+    </properties>
 
     <modules>
         <module>ByteBufferExample</module>
@@ -25,30 +30,59 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>net.revelc.code.formatter</groupId>
-                <artifactId>formatter-maven-plugin</artifactId>
-                <version>2.11.0</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
                 <configuration>
-                    <configFile>${project.parent.basedir}/../utils/eclipse-formatter-config.xml</configFile>
-                    <lineEnding>LF</lineEnding>
+                    <showWarnings>true</showWarnings>
+                    <failOnWarning>false</failOnWarning>
+                    <compilerArgs>
+                        <arg>-Xlint:all</arg>
+                    </compilerArgs>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <mainClass>${project.artifactId}</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
                 <executions>
                     <execution>
+                        <phase>package</phase>
                         <goals>
-                            <goal>validate</goal>
+                            <goal>single</goal>
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <archive>
+                        <manifest>
+                            <mainClass>${project.artifactId}</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
             </plugin>
         </plugins>
     </build>
 
-    <properties>
-        <!-- use Java in ver. 8 and UTF-8 encoding -->
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.javadoc.skip>true</maven.javadoc.skip>
-    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>io.pmem</groupId>
+            <artifactId>pmemkv</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
 </project>

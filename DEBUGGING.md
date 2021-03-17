@@ -1,41 +1,47 @@
-# [Debugging jni with gdb](https://medium.com/@pirogov.alexey/gdb-debug-native-part-of-java-application-c-c-libraries-and-jdk-6593af3b4f3f)
+# Debugging JNI with gdb
 
-* Build jni with debug symbols
+As a starting point, we recommend good description of [how to debug JNI code using gdb](https://medium.com/@pirogov.alexey/gdb-debug-native-part-of-java-application-c-c-libraries-and-jdk-6593af3b4f3f).
 
-Add debug compilation flag in src/main/cpp/pom.xml in compilerEndOptions section
+To build our JNI code with debug symbols - add extra debug compilation
+flag in `jni-binding/pom.xml`, in `compilerEndOptions` section:
 
 ```xml
 <!-- in native-maven-plugin -->
 <compilerEndOptions>
-  <compilerEndOption>-g</compilerEndOptions>
+  <compilerEndOption>-g</compilerEndOption>
+  ...
 </compilerEndOptions>
 ```
 
-* It may be needed to disable [ptrace security options](https://www.kernel.org/doc/Documentation/security/Yama.txt)
+It may be needed to disable [ptrace security options](https://www.kernel.org/doc/Documentation/security/Yama.txt):
 
 ```sh
 echo 0 > /proc/sys/kernel/yama/ptrace_scope
 ```
 
-* let's debug basic example:
+Now let's debug basic example:
 
 ```sh
-gdb --args java -ea -Xms1G -cp .:../src/main/target/pmemkv-1.0.0.jar -Djava.library.path=../src/main/cpp/target MixedTypesExample
-(gdb) handle SIGSEGV nostop noprint pass  <- JVM is handling segfault on it's own, so need to disable it in gdb
+cd examples
+gdb --args java -ea -Xms1G -jar MixedTypesExample/target/MixedTypesExample-*-jar-with-dependencies.jar
+(gdb) handle SIGSEGV nostop noprint pass  <- JVM is handling segfault on its own, so need to disable it in gdb
 (gdb) break jni_function_to_debug
 ```
 
-# Debuging with jdb
+# Debugging with jdb
 
 Build example with debug information
 
 ```sh
-javac -g -cp ../target/*.jar BasicExample.java
-jdb -classpath .:../src/main/target/pmemkv-1.0.0.jar -Djava.library.path=../src/main/cpp/target MixedTypesExample
+cd MixedTypesExample/target
+javac -g -cp MixedTypesExample-*-jar-with-dependencies.jar ../src/main/java/MixedTypesExample.java
+jdb -classpath MixedTypesExample-*-jar-with-dependencies.jar MixedTypesExample
 ```
 
-# Generating jni header
+# Generating JNI header(s)
+
+To generate JNI header e.g. for Database class, run:
 
 ```sh
-javac -h src/main/cpp/ -cp src/main/target/pmemkv-1.0.0.jar src/main/java/io/pmem/pmemkv/Database.java
+javac -h jni-binding/ -cp pmemkv-binding/target/pmemkv-*.jar pmemkv-binding/src/main/java/io/pmem/pmemkv/Database.java
 ```
