@@ -7,6 +7,7 @@ import io.pmem.pmemkv.internal.*;
 
 import java.io.*;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 
 /**
  * Main Java binding pmemkv class, which is a local/embedded key-value datastore
@@ -30,13 +31,39 @@ public class Database<K, V> {
 	Converter<K> keyConverter;
 	Converter<V> valueConverter;
 
-	private ByteBuffer getDirectBuffer(ByteBuffer buf) {
+	private static class ThreadDirectBuffers {
+		private final ArrayList<ThreadLocal<ByteBuffer>> buffers = new ArrayList<>(2);
+
+		public ThreadDirectBuffers() {
+			for (int i = 0; i < 2; ++i) {
+				buffers.add(new ThreadLocal<ByteBuffer>() {
+					@Override
+					protected ByteBuffer initialValue() {
+						return ByteBuffer.allocateDirect(10000); // max size of key/value
+					}
+				});
+			}
+		}
+
+		public ByteBuffer get(int number) {
+			return buffers.get(number).get();
+		}
+	}
+
+	private static final ThreadDirectBuffers directBuffers = new ThreadDirectBuffers();
+
+	private ByteBuffer getDirectBuffer(ByteBuffer buf, int number) {
 		if (buf.isDirect()) {
 			return buf;
 		}
-		ByteBuffer directBuffer = ByteBuffer.allocateDirect(buf.capacity());
+		ByteBuffer directBuffer = directBuffers.get(number);
+		directBuffer.position(0);
 		directBuffer.put(buf);
 		return directBuffer;
+	}
+
+	private ByteBuffer getDirectBuffer(ByteBuffer buf) {
+		return getDirectBuffer(buf, 0);
 	}
 
 	/**
@@ -140,8 +167,8 @@ public class Database<K, V> {
 	 * @since 1.0
 	 */
 	public void getKeysBetween(K key1, K key2, KeyCallback<K> callback) throws DatabaseException {
-		ByteBuffer direct_key1 = getDirectBuffer(keyConverter.toByteBuffer(key1));
-		ByteBuffer direct_key2 = getDirectBuffer(keyConverter.toByteBuffer(key2));
+		ByteBuffer direct_key1 = getDirectBuffer(keyConverter.toByteBuffer(key1), 0);
+		ByteBuffer direct_key2 = getDirectBuffer(keyConverter.toByteBuffer(key2), 1);
 		database_get_keys_between_buffer(pointer, direct_key1.position(), direct_key1, direct_key2.position(),
 				direct_key2, (int kb, ByteBuffer k) -> {
 					k.rewind().limit(kb);
@@ -215,8 +242,8 @@ public class Database<K, V> {
 	 * @since 1.0
 	 */
 	public long countBetween(K key1, K key2) throws DatabaseException {
-		ByteBuffer direct_key1 = getDirectBuffer(keyConverter.toByteBuffer(key1));
-		ByteBuffer direct_key2 = getDirectBuffer(keyConverter.toByteBuffer(key2));
+		ByteBuffer direct_key1 = getDirectBuffer(keyConverter.toByteBuffer(key1), 0);
+		ByteBuffer direct_key2 = getDirectBuffer(keyConverter.toByteBuffer(key2), 1);
 		return database_count_between_buffer(pointer, direct_key1.position(), direct_key1, direct_key2.position(),
 				direct_key2);
 	}
@@ -310,8 +337,8 @@ public class Database<K, V> {
 	 * @since 1.0
 	 */
 	public void getBetween(K key1, K key2, KeyValueCallback<K, V> callback) throws DatabaseException {
-		ByteBuffer direct_key1 = getDirectBuffer(keyConverter.toByteBuffer(key1));
-		ByteBuffer direct_key2 = getDirectBuffer(keyConverter.toByteBuffer(key2));
+		ByteBuffer direct_key1 = getDirectBuffer(keyConverter.toByteBuffer(key1), 0);
+		ByteBuffer direct_key2 = getDirectBuffer(keyConverter.toByteBuffer(key2), 1);
 		database_get_between_buffer(pointer, direct_key1.position(), direct_key1, direct_key2.position(), direct_key2,
 				(int kb, ByteBuffer k, int vb, ByteBuffer v) -> {
 					k.rewind().limit(kb);
@@ -388,8 +415,8 @@ public class Database<K, V> {
 	 * @since 1.0
 	 */
 	public void put(K key, V value) throws DatabaseException {
-		ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key));
-		ByteBuffer direct_value = getDirectBuffer(valueConverter.toByteBuffer(value));
+		ByteBuffer direct_key = getDirectBuffer(keyConverter.toByteBuffer(key), 0);
+		ByteBuffer direct_value = getDirectBuffer(valueConverter.toByteBuffer(value), 1);
 
 		database_put_buffer(pointer, direct_key.position(), direct_key, direct_value.position(), direct_value);
 	}
