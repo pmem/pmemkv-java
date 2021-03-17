@@ -445,4 +445,115 @@ public class DatabaseTest {
 		db.put(ByteBuffer.wrap(keyb), ByteBuffer.wrap(valb));
 		db.get(ByteBuffer.wrap(keyb), (ByteBuffer v) -> assertTrue(v.isDirect()));
 	}
+
+	@Test
+	public void usesGetMultiThreadedTest() {
+		final int threadsNumber = 16;
+		final int numberOfElements = 100;
+
+		Database<ByteBuffer, ByteBuffer> db = buildDB(ENGINE);
+
+		for (int i = 0; i < numberOfElements; ++i) {
+			db.put(stringToByteBuffer(Integer.toString(i)), stringToByteBuffer(Integer.toString(i + 1)));
+		}
+
+		runParallel(threadsNumber, () -> {
+			for (int j = 0; j < numberOfElements; ++j) {
+				final int x = j;
+				db.get(stringToByteBuffer(Integer.toString(x)), (ByteBuffer v) -> {
+					assertEquals(byteBufferToString(v), Integer.toString(x + 1));
+				});
+			}
+		}, () -> {
+			for (int j = numberOfElements - 1; j >= 0; --j) {
+				final int x = j;
+				db.get(stringToByteBuffer(Integer.toString(x)), (ByteBuffer v) -> {
+					assertEquals(byteBufferToString(v), Integer.toString(x + 1));
+				});
+			}
+		});
+
+		db.stop();
+	}
+
+	@Test
+	public void usesGetAllMultiThreadedTest() {
+		final int threadsNumber = 16;
+		final int numberOfElements = 100;
+
+		Database<ByteBuffer, ByteBuffer> db = buildDB(ENGINE);
+
+		for (int i = 0; i < numberOfElements; ++i) {
+			db.put(stringToByteBuffer(Integer.toString(i)), stringToByteBuffer(Integer.toString(i + 1)));
+		}
+
+		final AtomicInteger cnt = new AtomicInteger(0);
+
+		runParallel(threadsNumber, () -> {
+			db.getAll((ByteBuffer k, ByteBuffer v) -> {
+				assertEquals(Integer.parseInt(byteBufferToString(k)) + 1,
+						Integer.parseInt(byteBufferToString(v)));
+			});
+		}, () -> {
+			db.getAll((ByteBuffer k, ByteBuffer v) -> {
+				cnt.getAndIncrement();
+			});
+		});
+
+		assertEquals(cnt.get(), threadsNumber / 2 * numberOfElements);
+
+		db.stop();
+	}
+
+	@Test
+	public void usesNotDefaultCacheBuffersTest() {
+		Database<ByteBuffer, ByteBuffer> db = createDB(ENGINE, "/dev/shm", new ByteBufferConverter(), 5, 5);
+
+		/* cache buffers should be used */
+		db.put(stringToByteBuffer("A"), stringToByteBuffer("A"));
+		db.get(stringToByteBuffer("A"), (ByteBuffer v) -> {
+			assertEquals(byteBufferToString(v), "A");
+		});
+
+		/* key size > key cache buffer size */
+		db.put(stringToByteBuffer("AAAAAAAAAAAAAAAAA"), stringToByteBuffer("A"));
+		db.get(stringToByteBuffer("AAAAAAAAAAAAAAAAA"), (ByteBuffer v) -> {
+			assertEquals(byteBufferToString(v), "A");
+		});
+
+		/* value size > value cache buffer size */
+		db.put(stringToByteBuffer("B"), stringToByteBuffer("AAAAAAAAAAAAAAAAA"));
+		db.get(stringToByteBuffer("B"), (ByteBuffer v) -> {
+			assertEquals(byteBufferToString(v), "AAAAAAAAAAAAAAAAA");
+		});
+
+		/* both sizes are bigger than their cache buffers */
+		db.put(stringToByteBuffer("BBBBBBBBBBBBBBBBB"), stringToByteBuffer("BBBBBBBBBBBBBBBBB"));
+		db.get(stringToByteBuffer("BBBBBBBBBBBBBBBBB"), (ByteBuffer v) -> {
+			assertEquals(byteBufferToString(v), "BBBBBBBBBBBBBBBBB");
+		});
+
+		db.stop();
+	}
+
+	@Test
+	public void usesInvalidCacheBuffersSizeTest() {
+		boolean exception_caught = false;
+		try {
+			Database<ByteBuffer, ByteBuffer> db = createDB(ENGINE, "/dev/shm", new ByteBufferConverter(), -5, 5);
+		} catch (IllegalArgumentException e) {
+			exception_caught = true;
+			assertEquals(e.getMessage(), "Buffer size must be > 0");
+		}
+		assertTrue(exception_caught);
+
+		exception_caught = false;
+		try {
+			Database<ByteBuffer, ByteBuffer> db = createDB(ENGINE, "/dev/shm", new ByteBufferConverter(), 5, -5);
+		} catch (IllegalArgumentException e) {
+			exception_caught = true;
+			assertEquals(e.getMessage(), "Buffer size must be > 0");
+		}
+		assertTrue(exception_caught);
+	}
 }
