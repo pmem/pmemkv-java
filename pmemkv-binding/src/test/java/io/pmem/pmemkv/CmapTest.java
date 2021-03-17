@@ -87,4 +87,81 @@ public class CmapTest {
 
 		db.stop();
 	}
+
+	/* Test the DB on multiple threads */
+	@Test
+	public void multipleThreadsDBTest() {
+		final int threadsNumber = 8;
+		final int numberOfElements = 100;
+
+		String file = folder.getRoot() + File.pathSeparator + "testfile";
+		final Database<ByteBuffer, ByteBuffer> db = createDB(ENGINE, file, new ByteBufferConverter());
+
+		runParallel(threadsNumber, () -> {
+			for (int j = 0; j < numberOfElements; ++j) {
+				final int x = j;
+				db.put(stringToByteBuffer(Integer.toString(x)),
+						stringToByteBuffer(Integer.toString(x + 1)));
+			}
+		});
+
+		runParallel(threadsNumber, () -> {
+			for (int j = 0; j < numberOfElements; ++j) {
+				final int x = j;
+				assertTrue(db.exists(stringToByteBuffer(Integer.toString(x))));
+			}
+		});
+
+		runParallel(threadsNumber, () -> {
+			for (int j = numberOfElements - 1; j >= 0; --j) {
+				final int x = j;
+				db.get(stringToByteBuffer(Integer.toString(x)), (ByteBuffer v) -> {
+					assertEquals(byteBufferToString(v), Integer.toString(x + 1));
+				});
+			}
+		});
+
+		db.stop();
+	}
+
+	/* Use 2 different DBs simultaneously. */
+	@Test
+	public void multipleDBTypesTest() {
+		final int threadsNumber = 8;
+		final int numberOfElements = 200;
+
+		String file1 = folder.getRoot() + File.pathSeparator + "testfile1";
+		final Database<String, String> dbString = createDB(ENGINE, file1, new StringConverter(), 300, 300);
+		final StringBuilder sb = new StringBuilder(numberOfElements + 1);
+		sb.append('x');
+		for (int i = 0; i < numberOfElements; ++i) {
+			sb.append('x');
+			dbString.put(sb.substring(0, i), sb.substring(0, i + 1));
+		}
+
+		String file2 = folder.getRoot() + File.pathSeparator + "testfile2";
+		final Database<ByteBuffer, ByteBuffer> dbByteBuffer = createDB(ENGINE, file2, new ByteBufferConverter(), 200,
+				200);
+		for (int i = 0; i < numberOfElements; ++i) {
+			dbByteBuffer.put(stringToByteBuffer(sb.substring(0, i)), stringToByteBuffer(sb.substring(0, i + 1)));
+		}
+
+		runParallel(threadsNumber, () -> {
+			for (int j = 0; j < numberOfElements; ++j) {
+				final int x = j;
+				dbString.get(sb.substring(0, x), (String v) -> {
+					assertEquals(v, sb.substring(0, x + 1));
+				});
+			}
+		}, () -> {
+			for (int j = 0; j < numberOfElements; ++j) {
+				final int x = j;
+				dbByteBuffer.get(stringToByteBuffer(sb.substring(0, x)), (ByteBuffer v) -> {
+					assertEquals(byteBufferToString(v), sb.substring(0, x + 1));
+				});
+			}
+		});
+		dbByteBuffer.stop();
+		dbString.stop();
+	}
 }
