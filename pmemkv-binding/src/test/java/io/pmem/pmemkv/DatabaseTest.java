@@ -8,6 +8,7 @@ import static org.junit.Assert.*;
 
 import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.ArrayList;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -458,5 +459,98 @@ public class DatabaseTest {
 
 		db.put(ByteBuffer.wrap(keyb), ByteBuffer.wrap(valb));
 		db.get(ByteBuffer.wrap(keyb), (ByteBuffer v) -> assertTrue(v.isDirect()));
+	}
+
+	@Test
+	public void usesGetMultiThreadedTest() {
+		Database<ByteBuffer, ByteBuffer> db = buildDB("vcmap");
+
+		for (int i = 0; i < 100; ++i) {
+			db.put(stringToByteBuffer(Integer.toString(i)), stringToByteBuffer(Integer.toString(i + 1)));
+		}
+
+		ArrayList<Thread> threads = new ArrayList<>();
+		for (int i = 0; i < 8; ++i) {
+			threads.add(new Thread() {
+				public void run() {
+					for (int j = 0; j < 100; ++j) {
+						final int x = j;
+						db.get(stringToByteBuffer(Integer.toString(x)), (ByteBuffer v) -> {
+							assertEquals(byteBufferToString(v), Integer.toString(x + 1));
+						});
+					}
+				}
+			});
+		}
+
+		for (int i = 0; i < 8; ++i) {
+			threads.add(new Thread() {
+				public void run() {
+					for (int j = 99; j >= 0; --j) {
+						final int x = j;
+						db.get(stringToByteBuffer(Integer.toString(x)), (ByteBuffer v) -> {
+							assertEquals(byteBufferToString(v), Integer.toString(x + 1));
+						});
+					}
+				}
+			});
+		}
+
+		for (Thread t : threads) {
+			t.run();
+		}
+
+		for (Thread t : threads) {
+			try {
+				t.join();
+			} catch (Exception e) {
+				assertTrue(false);
+			}
+		}
+
+		db.stop();
+	}
+
+	@Test
+	public void usesGetAllMultiThreadedTest() {
+		/* XXX */
+	}
+
+	@Test
+	public void usesNotDefaultCacheBuffersTest() {
+		Database<ByteBuffer, ByteBuffer> db = new Database.Builder<ByteBuffer, ByteBuffer>("vcmap")
+				.setSize(1073741824)
+				.setPath("/dev/shm")
+				.setKeyConverter(new ByteBufferConverter())
+				.setValueConverter(new ByteBufferConverter())
+				.setKeyBufferSize(5)
+				.setValueBufferSize(5)
+				.build();
+
+		/* cache buffers should be used */
+		db.put(stringToByteBuffer("A"), stringToByteBuffer("A"));
+		db.get(stringToByteBuffer("A"), (ByteBuffer v) -> {
+			assertEquals(byteBufferToString(v), "A");
+		});
+
+		/* key size > key cache buffer size */
+		db.put(stringToByteBuffer("AAAAAAAAAAAAAAAAA"), stringToByteBuffer("A"));
+		db.get(stringToByteBuffer("AAAAAAAAAAAAAAAAA"), (ByteBuffer v) -> {
+			assertEquals(byteBufferToString(v), "A");
+		});
+
+		/* value size > value cache buffer size */
+		db.put(stringToByteBuffer("B"), stringToByteBuffer("AAAAAAAAAAAAAAAAA"));
+		db.get(stringToByteBuffer("B"), (ByteBuffer v) -> {
+			assertEquals(byteBufferToString(v), "AAAAAAAAAAAAAAAAA");
+		});
+
+		/* both sizes are bigger than their cache buffers */
+		db.put(stringToByteBuffer("BBBBBBBBBBBBBBBBB"), stringToByteBuffer("BBBBBBBBBBBBBBBBB"));
+		db.get(stringToByteBuffer("BBBBBBBBBBBBBBBBB"), (ByteBuffer v) -> {
+			assertEquals(byteBufferToString(v), "BBBBBBBBBBBBBBBBB");
+		});
+
+		db.stop();
 	}
 }
