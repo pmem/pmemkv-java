@@ -11,28 +11,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import static io.pmem.pmemkv.TestUtils.*;
+
 public class DatabaseTest {
 
 	private final String ENGINE = "vsmap";
 
 	private Database<ByteBuffer, ByteBuffer> buildDB(String engine) {
-		return new Database.Builder<ByteBuffer, ByteBuffer>(engine)
-				.setSize(1073741824)
-				.setPath("/dev/shm")
-				.setKeyConverter(new ByteBufferConverter())
-				.setValueConverter(new ByteBufferConverter())
-				.build();
-	}
-
-	private static ByteBuffer stringToByteBuffer(String msg) {
-		return ByteBuffer.wrap(msg.getBytes());
-	}
-
-	private static String byteBufferToString(ByteBuffer buffer) {
-		byte[] bytes;
-		bytes = new byte[buffer.capacity()];
-		buffer.get(bytes);
-		return new String(bytes);
+		return createDB(engine, "/dev/shm", new ByteBufferConverter());
 	}
 
 	@Test
