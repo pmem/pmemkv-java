@@ -7,7 +7,7 @@
 #
 
 # Pull base image
-FROM ubuntu:20.04
+FROM registry.hub.docker.com/library/ubuntu:20.04
 MAINTAINER igor.chorazewicz@intel.com
 
 # Set required environment variables
@@ -24,39 +24,60 @@ ARG SKIP_PMEMKV_BUILD
 ARG SKIP_DEPENDENCIES_BUILD
 ARG SKIP_MAVEN_RUNTIME_SETUP
 
-# Update the Apt cache and install basic tools
-RUN apt-get update
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+# Base development packages
+ARG BASE_DEPS="\
+	cmake \
+	build-essential \
+	git"
+
+# Dependencies for compiling pmemkv-java project
+ARG PMEMKV_JAVA_DEPS="\
+	maven \
+	openjdk-8-jdk"
+
+# PMDK's dependencies (optional; libpmemobj-dev package may be used instead)
+ARG PMDK_DEPS="\
 	autoconf \
 	automake \
-	build-essential \
-	clang \
-	cmake \
-	curl \
 	debhelper \
 	devscripts \
-	fakeroot \
-	git \
-	libc6-dbg \
+	gdb \
 	libdaxctl-dev \
-	libgtest-dev \
-	libmemkind-dev \
 	libndctl-dev \
-	libnode-dev \
-	libnuma-dev \
-	libtbb-dev \
-	libtext-diff-perl \
-	libtool \
-	libunwind8-dev \
-	maven \
-	numactl \
-	openjdk-8-jdk \
 	pandoc \
+	python3"
+
+# Dependencies for compiling libpmemobj-cpp project (optional; libpmemobj-cpp-dev package may be used instead)
+ARG LIBPMEMOBJ_CPP_DEPS="\
+	libatomic1 \
+	libtbb-dev \
+	libunwind8-dev"
+
+# Dependencies for compiling pmemkv project (optional; libpmemkv-dev package may be used instead)
+ARG PMEMKV_DEPS="\
+	libmemkind-dev \
+	libtbb-dev \
+	libunwind8-dev \
+	rapidjson-dev"
+
+# Misc for our builds/CI (optional)
+ARG MISC_DEPS="\
+	clang \
 	pkg-config \
-	rapidjson-dev \
 	sudo \
-	wget \
-	whois \
+	whois"
+
+ENV DEBIAN_FRONTEND noninteractive
+
+# Update the Apt cache and install basic tools
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+	${BASE_DEPS} \
+	${PMEMKV_JAVA_DEPS} \
+	${PMDK_DEPS} \
+	${LIBPMEMOBJ_CPP_DEPS} \
+	${PMEMKV_DEPS} \
+	${MISC_DEPS} \
  && rm -rf /var/lib/apt/lists/*
 
 # Install pmdk
