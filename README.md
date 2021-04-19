@@ -32,7 +32,7 @@ It may be necessary to [configure a proxy](https://maven.apache.org/guides/mini/
 and set `JAVA_HOME` environment variable:
 
 ```sh
-export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+export JAVA_HOME=`ls -d1 /usr/lib/jvm/* | grep "1.8.0" | head -n 1`
 ```
 
 Clone the pmemkv-java tree:
