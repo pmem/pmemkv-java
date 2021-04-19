@@ -3,7 +3,7 @@
 # Copyright 2019-2021, Intel Corporation
 
 #
-# install-pmdk.sh [package_type] - installs PMDK
+# install-pmdk.sh [package_type] [install_prefix] - installs PMDK
 #
 
 set -e
@@ -13,19 +13,20 @@ if [ "${SKIP_PMDK_BUILD}" ]; then
 	exit
 fi
 
-PREFIX=/usr
 PACKAGE_TYPE=$1
+PREFIX=${2:-/usr}
 echo "PACKAGE_TYPE: ${PACKAGE_TYPE}"
 
-# master: 1.9.1, 16.09.2020
-PMDK_VERSION="c47fd17daaeee3ab475d87aad70bcf751bb189ef"
+# master: Merge pull request #5150 from kilobyte/rpm-no-lto, 16.02.2021
+# contains fix for packaging
+PMDK_VERSION="7f88d9fae088b81936d2f6d5235169e90e7478c7"
 
-git clone https://github.com/pmem/pmdk --shallow-since=2020-06-01
+git clone https://github.com/pmem/pmdk --shallow-since=2020-12-01
 cd pmdk
 git checkout ${PMDK_VERSION}
 
 if [ "${PACKAGE_TYPE}" = "" ]; then
-	make -j$(nproc) install prefix=$PREFIX
+	make -j$(nproc) install prefix=${PREFIX}
 else
 	make -j$(nproc) BUILD_PACKAGE_CHECK=n ${PACKAGE_TYPE}
 	if [ "${PACKAGE_TYPE}" = "dpkg" ]; then

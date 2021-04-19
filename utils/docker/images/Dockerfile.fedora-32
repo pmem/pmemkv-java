@@ -7,7 +7,7 @@
 #
 
 # Pull base image
-FROM fedora:32
+FROM registry.fedoraproject.org/fedora:32
 MAINTAINER igor.chorazewicz@intel.com
 
 # Set required environment variables
@@ -27,37 +27,62 @@ ARG SKIP_MAVEN_RUNTIME_SETUP
 ARG LIBPMEMOBJ_CPP_DEPS="\
 	libatomic"
 
-# Install basic tools
-RUN dnf update -y \
- && dnf install -y \
-	autoconf \
-	automake \
-	clang \
+# Base development packages
+ARG BASE_DEPS="\
 	cmake \
-	daxctl-devel \
 	gcc \
 	gcc-c++ \
-	gdb \
 	git \
-	gtest-devel \
-	hub \
-	libtool \
-	make \
-	man \
+	make"
+
+# Dependencies for compiling pmemkv-java project
+ARG PMEMKV_JAVA_DEPS="\
 	maven \
-	memkind-devel \
+	java-1.8.0-openjdk-devel"
+
+# PMDK's dependencies (optional; libpmemobj-devel package may be used instead)
+ARG PMDK_DEPS="\
+	autoconf \
+	automake \
+	daxctl-devel \
+	gdb \
+	man \
 	ndctl-devel \
-	numactl-devel \
-	java-1.8.0-openjdk-devel \
 	pandoc \
-	rapidjson-devel \
+	python3 \
 	rpm-build \
-	sudo \
-	tbb-devel \
-	unzip \
-	wget \
-	which \
-	$LIBPMEMOBJ_CPP_DEPS \
+	rpm-build-libs \
+	rpmdevtools \
+	which"
+
+# Dependencies for compiling libpmemobj-cpp project (optional; libpmemobj++-devel package may be used instead)
+ARG LIBPMEMOBJ_CPP_DEPS="\
+	libatomic \
+	tbb-devel"
+
+# Dependencies for compiling pmemkv project (optional; pmemkv-devel package may be used instead)
+ARG PMEMKV_DEPS="\
+	memkind-devel \
+	rapidjson-devel \
+	tbb-devel"
+
+# Misc for our builds/CI (optional)
+ARG MISC_DEPS="\
+	clang \
+	hub \
+	perl-Text-Diff \
+	pkgconf \
+	sudo"
+
+# Update packages and install basic tools
+RUN dnf update -y \
+ && dnf install -y \
+	${BASE_DEPS} \
+	${PMEMKV_JAVA_DEPS} \
+	${PMDK_DEPS} \
+	${LIBPMEMOBJ_CPP_DEPS} \
+	${PMEMKV_DEPS} \
+	${MISC_DEPS} \
 && dnf clean all
 
 # Install glibc-debuginfo
@@ -88,7 +113,7 @@ RUN ./install-dependencies.sh RPM
 # Add user
 ENV USER user
 ENV USERPASS pass
-RUN useradd -m $USER
-RUN echo "$USER:$USERPASS" | chpasswd
-RUN gpasswd wheel -a $USER
+RUN useradd -m $USER \
+ && echo "$USER:$USERPASS" | chpasswd \
+ && gpasswd wheel -a $USER
 USER $USER
