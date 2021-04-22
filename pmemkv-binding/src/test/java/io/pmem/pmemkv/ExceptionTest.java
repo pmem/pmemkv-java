@@ -6,13 +6,18 @@ package io.pmem.pmemkv;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import static org.junit.Assert.*;
 
+import java.io.File;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.List;
+
+import static io.pmem.pmemkv.TestUtils.*;
 
 @SuppressWarnings("serial")
 class CustomException extends RuntimeException {
@@ -24,19 +29,27 @@ class CustomException extends RuntimeException {
 public class ExceptionTest {
 
 	private final String ENGINE = "vsmap";
+	private String DB_DIR = "";
 	private Database<ByteBuffer, ByteBuffer> db;
 
+	/* Helper method, used in most of the tests in this file */
 	private Database<ByteBuffer, ByteBuffer> buildDB(String engine) {
 		return new Database.Builder<ByteBuffer, ByteBuffer>(engine)
-				.setSize(1073741824)
-				.setPath("/dev/shm")
+				.setSize(DEFAULT_DB_SIZE)
+				.setPath(DB_DIR)
 				.setKeyConverter(new ByteBufferConverter())
 				.setValueConverter(new ByteBufferConverter())
 				.build();
 	}
 
+	@Rule
+	public TemporaryFolder testDir = new TemporaryFolder(new File(TEST_DB_DIR));
+
 	@Before
 	public void init() {
+		DB_DIR = testDir.getRoot().toString();
+		assertTrue(DB_DIR != null && !DB_DIR.isEmpty());
+
 		db = buildDB(ENGINE);
 		// Direct ByteBuffer
 		for (int i = 0; i < 0xFF; i++) {
@@ -60,7 +73,7 @@ public class ExceptionTest {
 		boolean exception_occured = false;
 		try {
 			db = new Database.Builder<ByteBuffer, ByteBuffer>(ENGINE)
-					.setSize(1073741824)
+					.setSize(DEFAULT_DB_SIZE)
 					.build();
 			Assert.fail();
 		} catch (InvalidArgumentException kve) {
@@ -78,7 +91,7 @@ public class ExceptionTest {
 		boolean exception_occured = false;
 		try {
 			db = new Database.Builder<ByteBuffer, ByteBuffer>(ENGINE)
-					.setPath("/dev/shm")
+					.setPath(DB_DIR)
 					.build();
 			Assert.fail();
 		} catch (InvalidArgumentException kve) {
@@ -112,7 +125,7 @@ public class ExceptionTest {
 		boolean exception_occured = false;
 		try {
 			db = new Database.Builder<ByteBuffer, ByteBuffer>(ENGINE)
-					.setSize(1073741824)
+					.setSize(DEFAULT_DB_SIZE)
 					.setPath("/tmp/123/234/345/456/567/678/nope.nope")
 					.build();
 			Assert.fail();
@@ -135,7 +148,7 @@ public class ExceptionTest {
 		boolean exception_occured = false;
 		try {
 			db = new Database.Builder<ByteBuffer, ByteBuffer>(ENGINE)
-					.setSize(1073741824)
+					.setSize(DEFAULT_DB_SIZE)
 					.setPath("1234")
 					.build();
 			Assert.fail();
@@ -217,7 +230,8 @@ public class ExceptionTest {
 		assertTrue(exception_occured);
 	}
 
-	/* Other */
+	/* Other exceptions */
+
 	@Test(expected = RuntimeException.class)
 	public void exceptionsHierarchy() {
 		/* All engines should derive from DatabaseException class */

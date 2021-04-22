@@ -4,28 +4,34 @@
 package io.pmem.pmemkv;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.nio.ByteBuffer;
-
-import static org.junit.Assert.*;
 
 import static io.pmem.pmemkv.TestUtils.*;
 
 public class CmapTest {
 
 	private final String ENGINE = "cmap";
+	private String DB_PATH = "";
 
 	@Rule
-	public TemporaryFolder folder = new TemporaryFolder();
+	public TemporaryFolder testDir = new TemporaryFolder(new File(TEST_DB_DIR));
+
+	@Before
+	public void init() {
+		DB_PATH = testDir.getRoot() + File.separator + "testfile";
+		assertTrue(DB_PATH != null && !DB_PATH.isEmpty());
+	}
 
 	@Test
 	public void testCreateAndOpen() {
-		String file = folder.getRoot() + File.pathSeparator + "testfile";
-		Database<ByteBuffer, ByteBuffer> db = createDB(ENGINE, file, new ByteBufferConverter());
+		Database<ByteBuffer, ByteBuffer> db = createDB(ENGINE, DB_PATH, new ByteBufferConverter());
 
 		assertFalse(db.exists(stringToByteBuffer("key1")));
 		db.put(stringToByteBuffer("key1"), stringToByteBuffer("value1"));
@@ -35,7 +41,7 @@ public class CmapTest {
 
 		db.stop();
 
-		db = openDB(ENGINE, file, new ByteBufferConverter());
+		db = openDB(ENGINE, DB_PATH, new ByteBufferConverter());
 		assertTrue(db.exists(stringToByteBuffer("key1")));
 		resBuff = db.getCopy(stringToByteBuffer("key1"));
 		assertEquals(byteBufferToString(resBuff), "value1");
@@ -43,12 +49,10 @@ public class CmapTest {
 
 	@Test
 	public void throwsExceptionOnStartWhenOpeningNonExistentFile() {
-		String file = folder.getRoot() + File.pathSeparator + "testfile";
-
 		Database<ByteBuffer, ByteBuffer> db = null;
 
 		try {
-			db = openDB(ENGINE, file, new ByteBufferConverter());
+			db = openDB(ENGINE, DB_PATH, new ByteBufferConverter());
 			Assert.fail();
 		} catch (DatabaseException e) {
 			/* file doesn't exist, open should throw */
@@ -59,8 +63,7 @@ public class CmapTest {
 
 	@Test
 	public void throwsExceptionOnSortedCountFuncs() {
-		String file = folder.getRoot() + File.pathSeparator + "testfile";
-		Database<ByteBuffer, ByteBuffer> db = createDB(ENGINE, file, new ByteBufferConverter());
+		Database<ByteBuffer, ByteBuffer> db = createDB(ENGINE, DB_PATH, new ByteBufferConverter());
 		ByteBuffer key1 = stringToByteBuffer("key1");
 		ByteBuffer key2 = stringToByteBuffer("key2");
 
@@ -94,8 +97,7 @@ public class CmapTest {
 		final int threadsNumber = 8;
 		final int numberOfElements = 100;
 
-		String file = folder.getRoot() + File.pathSeparator + "testfile";
-		final Database<ByteBuffer, ByteBuffer> db = createDB(ENGINE, file, new ByteBufferConverter());
+		final Database<ByteBuffer, ByteBuffer> db = createDB(ENGINE, DB_PATH, new ByteBufferConverter());
 
 		runParallel(threadsNumber, () -> {
 			for (int j = 0; j < numberOfElements; ++j) {
@@ -130,7 +132,7 @@ public class CmapTest {
 		final int threadsNumber = 8;
 		final int numberOfElements = 200;
 
-		String file1 = folder.getRoot() + File.pathSeparator + "testfile1";
+		String file1 = DB_PATH + "1";
 		final Database<String, String> dbString = createDB(ENGINE, file1, new StringConverter(), 190, 190);
 		final StringBuilder sb = new StringBuilder(numberOfElements + 1);
 		sb.append('x');
@@ -139,7 +141,7 @@ public class CmapTest {
 			dbString.put(sb.substring(0, i), sb.substring(0, i + 1));
 		}
 
-		String file2 = folder.getRoot() + File.pathSeparator + "testfile2";
+		String file2 = DB_PATH + "2";
 		final Database<ByteBuffer, ByteBuffer> dbByteBuffer = createDB(ENGINE, file2, new ByteBufferConverter(), 180,
 				180);
 		for (int i = 0; i < numberOfElements; ++i) {

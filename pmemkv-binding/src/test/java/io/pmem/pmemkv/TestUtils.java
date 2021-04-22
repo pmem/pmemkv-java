@@ -3,9 +3,11 @@
 
 package io.pmem.pmemkv;
 
-import org.junit.Test;
 import static org.junit.Assert.*;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.*;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
@@ -14,7 +16,10 @@ interface Callback {
 }
 
 class TestUtils {
-	private static final long DEFAULT_DB_SIZE = 1073741824;
+	public static final long DEFAULT_DB_SIZE = 1073741824;
+
+	/* Get test dir from command line or use default */
+	public static final String TEST_DB_DIR = System.getProperty("test.db.dir", "/dev/shm");
 
 	public static class StringConverter implements Converter<String> {
 		public ByteBuffer toByteBuffer(String entry) {
