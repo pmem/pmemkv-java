@@ -3,12 +3,14 @@
 
 package io.pmem.pmemkv;
 
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import static org.junit.Assert.*;
 
 import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicInteger;
-
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import static io.pmem.pmemkv.TestUtils.*;
@@ -16,9 +18,20 @@ import static io.pmem.pmemkv.TestUtils.*;
 public class DatabaseTest {
 
 	private final String ENGINE = "vsmap";
+	private String DB_DIR = "";
 
+	/* Helper method, used in most of the tests in this file */
 	private Database<ByteBuffer, ByteBuffer> buildDB(String engine) {
-		return openDB(engine, "/dev/shm", new ByteBufferConverter());
+		return openDB(engine, DB_DIR, new ByteBufferConverter());
+	}
+
+	@Rule
+	public TemporaryFolder testDir = new TemporaryFolder(DEFAULT_DB_DIR);
+
+	@Before
+	public void init() {
+		DB_DIR = testDir.getRoot().toString();
+		assertTrue(DB_DIR != null && !DB_DIR.isEmpty());
 	}
 
 	@Test
@@ -324,7 +337,7 @@ public class DatabaseTest {
 	}
 
 	@Test
-	public void usesGetAllBelowTest() {
+	public void usesGetBelowTest() {
 		Database<ByteBuffer, ByteBuffer> db = buildDB(ENGINE);
 		db.put(stringToByteBuffer("A"), stringToByteBuffer("1"));
 		db.put(stringToByteBuffer("AB"), stringToByteBuffer("2"));
@@ -351,7 +364,7 @@ public class DatabaseTest {
 	}
 
 	@Test
-	public void usesGetAllBetweenTest() {
+	public void usesGetBetweenTest() {
 		Database<ByteBuffer, ByteBuffer> db = buildDB(ENGINE);
 		db.put(stringToByteBuffer("A"), stringToByteBuffer("1"));
 		db.put(stringToByteBuffer("AB"), stringToByteBuffer("2"));
@@ -510,7 +523,7 @@ public class DatabaseTest {
 	/* Test DB with non default cache buffers */
 	@Test
 	public void usesNotDefaultCacheBuffersTest() {
-		Database<ByteBuffer, ByteBuffer> db = createDB(ENGINE, "/dev/shm", new ByteBufferConverter(), 5, 5);
+		Database<ByteBuffer, ByteBuffer> db = createDB(ENGINE, DB_DIR, new ByteBufferConverter(), 5, 5);
 
 		/* cache buffers should be used */
 		db.put(stringToByteBuffer("A"), stringToByteBuffer("A"));
@@ -544,7 +557,7 @@ public class DatabaseTest {
 	public void usesVariousCacheBuffersSizeTest() {
 		boolean exception_caught = false;
 		try {
-			Database<ByteBuffer, ByteBuffer> db = createDB(ENGINE, "/dev/shm", new ByteBufferConverter(), -5, 5);
+			Database<ByteBuffer, ByteBuffer> db = createDB(ENGINE, DB_DIR, new ByteBufferConverter(), -5, 5);
 		} catch (IllegalArgumentException e) {
 			exception_caught = true;
 		}
@@ -552,7 +565,7 @@ public class DatabaseTest {
 
 		exception_caught = false;
 		try {
-			Database<ByteBuffer, ByteBuffer> db = createDB(ENGINE, "/dev/shm", new ByteBufferConverter(), 5, -5);
+			Database<ByteBuffer, ByteBuffer> db = createDB(ENGINE, DB_DIR, new ByteBufferConverter(), 5, -5);
 		} catch (IllegalArgumentException e) {
 			exception_caught = true;
 		}
@@ -560,7 +573,7 @@ public class DatabaseTest {
 
 		exception_caught = false;
 		try {
-			Database<ByteBuffer, ByteBuffer> db = createDB(ENGINE, "/dev/shm", new ByteBufferConverter(), 0, 0);
+			Database<ByteBuffer, ByteBuffer> db = createDB(ENGINE, DB_DIR, new ByteBufferConverter(), 0, 0);
 		} catch (IllegalArgumentException e) {
 			exception_caught = true;
 		}
@@ -568,7 +581,7 @@ public class DatabaseTest {
 
 		exception_caught = false;
 		try {
-			Database<ByteBuffer, ByteBuffer> db = createDB(ENGINE, "/dev/shm", new ByteBufferConverter(),
+			Database<ByteBuffer, ByteBuffer> db = createDB(ENGINE, DB_DIR, new ByteBufferConverter(),
 					Integer.MAX_VALUE, Integer.MAX_VALUE);
 		} catch (IllegalArgumentException e) {
 			exception_caught = true;

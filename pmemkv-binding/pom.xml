@@ -63,6 +63,28 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<version>3.0.0-M2</version>
+				<executions>
+					<execution>
+					<id>enforce-property</id>
+					<goals>
+						<goal>enforce</goal>
+						</goals>
+						<configuration>
+						<rules>
+							<requireProperty>
+							<property>test.db.dir</property>
+							<message>Property test.db.dir was not set! Default test path "/dev/shm" will be used!</message>
+							</requireProperty>
+						</rules>
+						<fail>false</fail>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 

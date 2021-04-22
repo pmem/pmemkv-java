@@ -67,6 +67,12 @@ This library includes a set of automated tests that exercise all functionality.
 LD_LIBRARY_PATH=<path_to_libs> mvn test
 ```
 
+to execute tests on non-default path (`/dev/shm`), setup desired directory, e.g.:
+
+```sh
+LD_LIBRARY_PATH=<path_to_libs> mvn test -Dtest.db.dir=/my/test/dir
+```
+
 ## Examples
 
 We use `/dev/shm` with [emulated persistent memory](https://pmem.io/2016/02/22/pm-emulation.html)
