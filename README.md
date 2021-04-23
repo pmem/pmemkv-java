@@ -17,9 +17,9 @@ Java API is documented with javadocs and can be found as html here:
 
 ## Dependencies
 
-* [pmemkv](https://github.com/pmem/pmemkv) - Key-value Datastore for Persistent Memory
+* [pmemkv](https://github.com/pmem/pmemkv) - Key-Value Datastore for Persistent Memory
   * pmemkv source package (pmemkv-devel or libpmemkv-dev)
-* Java 8
+* Java Development Kit 8
 * gcc-c++ compiler
 * [Apache Maven 3](https://maven.apache.org) - build system
 
@@ -29,10 +29,13 @@ Start by installing [pmemkv](https://github.com/pmem/pmemkv/blob/master/INSTALLI
 (currently at least in version **1.0.2**) in your system.
 
 It may be necessary to [configure a proxy](https://maven.apache.org/guides/mini/guide-proxies.html)
-and set `JAVA_HOME` environment variable:
+and set `JAVA_HOME` environment variable. Set `JAVA_HOME` variable with directory containing
+JDK 8 installed typically in `/usr/lib/jvm/`, command below will set first directory matching to
+1.8.0, but path can differ in some exotic distros:
 
 ```sh
-export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+export JAVA_HOME=`ls -d1 /usr/lib/jvm/* | grep "1.8.0" | head -n 1`
+echo $JAVA_HOME
 ```
 
 Clone the pmemkv-java tree:
