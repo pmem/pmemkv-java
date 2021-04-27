@@ -4,16 +4,18 @@
 #include <cstring>
 #include <string>
 #include <jni.h>
-#include <libpmemkv.h>
+#include <libpmemkv.hpp>
 #include <unordered_map>
 #include <iostream>
+#include <memory>
+#include <utility>
 
 #define DO_LOG 0
 #define LOG(msg) if (DO_LOG) std::cout << "[pmemkv-jni] " << msg << "\n"
 
 class PmemkvJavaException {
 private:
-    static std::unordered_map<int, const char*> PmemkvStatusDispatcher;
+    static std::unordered_map<pmem::kv::status, const char*> PmemkvStatusDispatcher;
     JNIEnv* env;
 
 public:
@@ -24,7 +26,7 @@ public:
         env = env_;
     }
 
-    void ThrowException(int status, const char* msg =  pmemkv_errormsg()){
+    void ThrowException(pmem::kv::status status, const char* msg =  pmemkv_errormsg()){
         jclass exception_class;
         exception_class = env->FindClass(PmemkvStatusDispatcher[status]);
         if(exception_class == NULL) {
@@ -46,17 +48,17 @@ public:
     }
 };
 
-std::unordered_map<int, const char*> PmemkvJavaException::PmemkvStatusDispatcher = {
-       { PMEMKV_STATUS_UNKNOWN_ERROR, "io/pmem/pmemkv/DatabaseException" },
-       { PMEMKV_STATUS_NOT_FOUND, "io/pmem/pmemkv/NotFoundException"},
-       { PMEMKV_STATUS_NOT_SUPPORTED, "io/pmem/pmemkv/NotSupportedException"},
-       { PMEMKV_STATUS_INVALID_ARGUMENT, "io/pmem/pmemkv/InvalidArgumentException"},
-       { PMEMKV_STATUS_CONFIG_PARSING_ERROR, "io/pmem/pmemkv/BuilderException"},
-       { PMEMKV_STATUS_CONFIG_TYPE_ERROR, "io/pmem/pmemkv/BuilderException"},
-       { PMEMKV_STATUS_STOPPED_BY_CB, "io/pmem/pmemkv/StoppedByCallbackException"},
-       { PMEMKV_STATUS_OUT_OF_MEMORY, "io/pmem/pmemkv/OutOfMemoryException"},
-       { PMEMKV_STATUS_WRONG_ENGINE_NAME, "io/pmem/pmemkv/WrongEngineNameException"},
-       { PMEMKV_STATUS_TRANSACTION_SCOPE_ERROR, "io/pmem/pmemkv/TransactionScopeException"},
+std::unordered_map<pmem::kv::status, const char*> PmemkvJavaException::PmemkvStatusDispatcher = {
+       { pmem::kv::status::UNKNOWN_ERROR, "io/pmem/pmemkv/DatabaseException" },
+       { pmem::kv::status::NOT_FOUND, "io/pmem/pmemkv/NotFoundException"},
+       { pmem::kv::status::NOT_SUPPORTED, "io/pmem/pmemkv/NotSupportedException"},
+       { pmem::kv::status::INVALID_ARGUMENT, "io/pmem/pmemkv/InvalidArgumentException"},
+       { pmem::kv::status::CONFIG_PARSING_ERROR, "io/pmem/pmemkv/BuilderException"},
+       { pmem::kv::status::CONFIG_TYPE_ERROR, "io/pmem/pmemkv/BuilderException"},
+       { pmem::kv::status::STOPPED_BY_CB, "io/pmem/pmemkv/StoppedByCallbackException"},
+       { pmem::kv::status::OUT_OF_MEMORY, "io/pmem/pmemkv/OutOfMemoryException"},
+       { pmem::kv::status::WRONG_ENGINE_NAME, "io/pmem/pmemkv/WrongEngineNameException"},
+       { pmem::kv::status::TRANSACTION_SCOPE_ERROR, "io/pmem/pmemkv/TransactionScopeException"},
 };
 
 #define KEY_CALLBACK_NAME "keyCallbackWrapper"
@@ -78,11 +80,12 @@ extern "C" JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_Database_database_1start
     valueCallbackID = env->GetStaticMethodID(env->GetObjectClass(obj), VALUE_CALLBACK_NAME, VALUE_CALLBACK_SIG);
     keyValueCallbackID = env->GetStaticMethodID(env->GetObjectClass(obj), KEY_VALUE_CALLBACK_NAME, KEY_VALUE_CALLBACK_SIG);
 
-    pmemkv_db *db;
-    auto status = pmemkv_open(cengine, (pmemkv_config*) config, &db);
+    pmem::kv::db *db = new pmem::kv::db();
+    auto cfg = reinterpret_cast<pmemkv_config*>(config);
+    pmem::kv::status status = db->open(cengine, pmem::kv::config(cfg));
     env->ReleaseStringUTFChars(engine, cengine);
 
-    if (status != PMEMKV_STATUS_OK) {
+    if (status != pmem::kv::status::OK) {
             PmemkvJavaException(env).ThrowException(status);
     }
     return (jlong) db;
@@ -90,8 +93,8 @@ extern "C" JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_Database_database_1start
 
 extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1stop
         (JNIEnv* env, jobject obj, jlong pointer) {
-    auto engine = (pmemkv_db*) pointer;
-    pmemkv_close(engine);
+    auto engine = reinterpret_cast<pmem::kv::db*>(pointer);
+    engine->close();
 }
 
 struct Context {
@@ -129,83 +132,86 @@ int Callback_get_keys_buffer(const char* k, size_t kb, const char* v, size_t vb,
 
 extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1keys_1buffer
         (JNIEnv* env, jobject obj, jlong pointer, jobject callback) {
-    auto engine = (pmemkv_db*) pointer;
-    auto cxt = Context(env, obj, callback, keyCallbackID);
-    auto status = pmemkv_get_all(engine, Callback_get_keys_buffer, &cxt);
-    if (status != PMEMKV_STATUS_OK) PmemkvJavaException(env).ThrowException(status);
+    auto engine = reinterpret_cast<pmem::kv::db*>(pointer);
+    auto ctx = Context(env, obj, callback, keyCallbackID);
+    auto status = engine->get_all(Callback_get_keys_buffer, &ctx);
+    if (status != pmem::kv::status::OK) PmemkvJavaException(env).ThrowException(status);
 }
 
 extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1keys_1above_1buffer
         (JNIEnv* env, jobject obj, jlong pointer, jint keybytes, jobject key, jobject callback) {
-    auto engine = (pmemkv_db*) pointer;
+    auto engine = reinterpret_cast<pmem::kv::db*>(pointer);
     const char* ckey = (char*) env->GetDirectBufferAddress(key);
+    pmem::kv::string_view cppkey(ckey, keybytes);
     auto cxt = Context(env, obj, callback, keyCallbackID);
-    auto status = pmemkv_get_above(engine, ckey, keybytes, Callback_get_keys_buffer, &cxt);
-    if (status != PMEMKV_STATUS_OK) PmemkvJavaException(env).ThrowException(status);
+    auto status = engine->get_above(cppkey, Callback_get_keys_buffer, &cxt);
+    if (status != pmem::kv::status::OK) PmemkvJavaException(env).ThrowException(status);
 }
 
 extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1keys_1below_1buffer
         (JNIEnv* env, jobject obj, jlong pointer, jint keybytes, jobject key, jobject callback) {
-    auto engine = (pmemkv_db*) pointer;
+    auto engine = reinterpret_cast<pmem::kv::db*>(pointer);
     const char* ckey = (char*) env->GetDirectBufferAddress(key);
+    pmem::kv::string_view cppkey(ckey, keybytes);
     auto cxt = Context(env, obj, callback, keyCallbackID);
-    auto status = pmemkv_get_below(engine, ckey, keybytes, Callback_get_keys_buffer, &cxt);
-    if (status != PMEMKV_STATUS_OK) PmemkvJavaException(env).ThrowException(status);
+    auto status = engine->get_below(cppkey, Callback_get_keys_buffer, &cxt);
+    if (status != pmem::kv::status::OK) PmemkvJavaException(env).ThrowException(status);
 }
 
 extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1keys_1between_1buffer
         (JNIEnv* env, jobject obj, jlong pointer, jint keybytes1, jobject key1, jint keybytes2, jobject key2, jobject callback) {
-    auto engine = (pmemkv_db*) pointer;
+    auto engine = reinterpret_cast<pmem::kv::db*>(pointer);
     const char* ckey1 = (char*) env->GetDirectBufferAddress(key1);
     const char* ckey2 = (char*) env->GetDirectBufferAddress(key2);
+    pmem::kv::string_view cppkey1(ckey1, keybytes1);
+    pmem::kv::string_view cppkey2(ckey2, keybytes2);
     auto cxt = Context(env, obj, callback, keyCallbackID);
-    auto status = pmemkv_get_between(engine, ckey1, keybytes1, ckey2, keybytes2, Callback_get_keys_buffer, &cxt);
-    if (status != PMEMKV_STATUS_OK) PmemkvJavaException(env).ThrowException(status);
+    auto status = engine->get_between(cppkey1, cppkey2, Callback_get_keys_buffer, &cxt);
+    if (status != pmem::kv::status::OK) PmemkvJavaException(env).ThrowException(status);
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_Database_database_1count_1all
         (JNIEnv* env, jobject obj, jlong pointer) {
-    auto engine = (pmemkv_db*) pointer;
+    auto engine = reinterpret_cast<pmem::kv::db*>(pointer);
     size_t count;
-    auto status = pmemkv_count_all(engine, &count);
-    if (status != PMEMKV_STATUS_OK) PmemkvJavaException(env).ThrowException(status);
-
+    auto status = engine->count_all(count);
+    if (status != pmem::kv::status::OK) PmemkvJavaException(env).ThrowException(status);
     return count;
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_Database_database_1count_1above_1buffer
         (JNIEnv* env, jobject obj, jlong pointer, jint keybytes, jobject key) {
-    auto engine = (pmemkv_db*) pointer;
+    auto engine = reinterpret_cast<pmem::kv::db*>(pointer);
     const char* ckey = (char*) env->GetDirectBufferAddress(key);
-
+    pmem::kv::string_view cppkey(ckey, keybytes);
     size_t count;
-    auto status = pmemkv_count_above(engine, ckey, keybytes, &count);
-    if (status != PMEMKV_STATUS_OK) PmemkvJavaException(env).ThrowException(status);
-
+    auto status = engine->count_above(cppkey, count);
+    if (status != pmem::kv::status::OK) PmemkvJavaException(env).ThrowException(status);
     return count;
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_Database_database_1count_1below_1buffer
         (JNIEnv* env, jobject obj, jlong pointer, jint keybytes, jobject key) {
-    auto engine = (pmemkv_db*) pointer;
+    auto engine = reinterpret_cast<pmem::kv::db*>(pointer);
     const char* ckey = (char*) env->GetDirectBufferAddress(key);
-
+    pmem::kv::string_view cppkey(ckey, keybytes);
     size_t count;
-    auto status = pmemkv_count_below(engine, ckey, keybytes, &count);
-    if (status != PMEMKV_STATUS_OK) PmemkvJavaException(env).ThrowException(status);
+    auto status = engine->count_below(cppkey, count);
+    if (status != pmem::kv::status::OK) PmemkvJavaException(env).ThrowException(status);
 
     return count;
 }
 
 extern "C" JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_Database_database_1count_1between_1buffer
         (JNIEnv* env, jobject obj, jlong pointer, jint keybytes1, jobject key1, jint keybytes2, jobject key2) {
-    auto engine = (pmemkv_db*) pointer;
+    auto engine = reinterpret_cast<pmem::kv::db*>(pointer);
     const char* ckey1 = (char*) env->GetDirectBufferAddress(key1);
     const char* ckey2 = (char*) env->GetDirectBufferAddress(key2);
-
+    pmem::kv::string_view cppkey1(ckey1, keybytes1);
+    pmem::kv::string_view cppkey2(ckey2, keybytes2);
     size_t count;
-    auto status = pmemkv_count_between(engine, ckey1, keybytes1, ckey2, keybytes2, &count);
-    if (status != PMEMKV_STATUS_OK) PmemkvJavaException(env).ThrowException(status);
+    auto status = engine->count_between(cppkey1, cppkey2, count);
+    if (status != pmem::kv::status::OK) PmemkvJavaException(env).ThrowException(status);
 
     return count;
 }
@@ -228,48 +234,53 @@ int Callback_get_all_buffer(const char* k, size_t kb, const char* v, size_t vb, 
 
 extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1all_1buffer
         (JNIEnv* env, jobject obj, jlong pointer, jobject callback) {
-    auto engine = (pmemkv_db*) pointer;
+    auto engine = reinterpret_cast<pmem::kv::db*>(pointer);
     auto cxt = Context(env, obj, callback, keyValueCallbackID);
-    auto status = pmemkv_get_all(engine, Callback_get_all_buffer, &cxt);
-    if (status != PMEMKV_STATUS_OK) PmemkvJavaException(env).ThrowException(status);
+    auto status = engine->get_all(Callback_get_all_buffer, &cxt);
+    if (status != pmem::kv::status::OK) PmemkvJavaException(env).ThrowException(status);
 }
 
 extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1above_1buffer
         (JNIEnv* env, jobject obj, jlong pointer, jint keybytes, jobject key, jobject callback) {
-    auto engine = (pmemkv_db*) pointer;
+    auto engine = reinterpret_cast<pmem::kv::db*>(pointer);
     const char* ckey = (char*) env->GetDirectBufferAddress(key);
+    pmem::kv::string_view cppkey(ckey, keybytes);
     auto cxt = Context(env, obj, callback, keyValueCallbackID);
-    auto status = pmemkv_get_above(engine, ckey, keybytes, Callback_get_all_buffer, &cxt);
-    if (status != PMEMKV_STATUS_OK) PmemkvJavaException(env).ThrowException(status);
+    auto status = engine->get_above(cppkey, Callback_get_all_buffer, &cxt);
+    if (status != pmem::kv::status::OK) PmemkvJavaException(env).ThrowException(status);
 }
 
 extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1below_1buffer
         (JNIEnv* env, jobject obj, jlong pointer, jint keybytes, jobject key, jobject callback) {
-    auto engine = (pmemkv_db*) pointer;
+    auto engine = reinterpret_cast<pmem::kv::db*>(pointer);
     const char* ckey = (char*) env->GetDirectBufferAddress(key);
+    pmem::kv::string_view cppkey(ckey, keybytes);
     auto cxt = Context(env, obj, callback, keyValueCallbackID);
-    auto status = pmemkv_get_below(engine, ckey, keybytes, Callback_get_all_buffer, &cxt);
-    if (status != PMEMKV_STATUS_OK) PmemkvJavaException(env).ThrowException(status);
+    auto status = engine->get_below(cppkey, Callback_get_all_buffer,&cxt);
+    if (status != pmem::kv::status::OK) PmemkvJavaException(env).ThrowException(status);
 }
 
 extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1between_1buffer
         (JNIEnv* env, jobject obj, jlong pointer, jint keybytes1, jobject key1, jint keybytes2, jobject key2, jobject callback) {
-    auto engine = (pmemkv_db*) pointer;
+    auto engine = reinterpret_cast<pmem::kv::db*>(pointer);
     const char* ckey1 = (char*) env->GetDirectBufferAddress(key1);
     const char* ckey2 = (char*) env->GetDirectBufferAddress(key2);
+    pmem::kv::string_view cppkey1(ckey1, keybytes1);
+    pmem::kv::string_view cppkey2(ckey2, keybytes2);
     auto cxt = Context(env, obj, callback, keyValueCallbackID);
-    auto status = pmemkv_get_between(engine, ckey1, keybytes1, ckey2, keybytes2, Callback_get_all_buffer, &cxt);
-    if (status != PMEMKV_STATUS_OK) PmemkvJavaException(env).ThrowException(status);
+    auto status = engine->get_between(cppkey1, cppkey2, Callback_get_all_buffer, &cxt);
+    if (status != pmem::kv::status::OK) PmemkvJavaException(env).ThrowException(status);
 }
 
 extern "C" JNIEXPORT jboolean JNICALL Java_io_pmem_pmemkv_Database_database_1exists_1buffer
         (JNIEnv* env, jobject obj, jlong pointer, jint keybytes, jobject key) {
-    auto engine = (pmemkv_db*) pointer;
+    auto engine = reinterpret_cast<pmem::kv::db*>(pointer);
     const char* ckey = (char*) env->GetDirectBufferAddress(key);
-    auto status = pmemkv_exists(engine, ckey, keybytes);
-    if (status != PMEMKV_STATUS_OK && status != PMEMKV_STATUS_NOT_FOUND)
+    pmem::kv::string_view cppkey(ckey, keybytes);
+    auto status = engine->exists(cppkey);
+    if (status != pmem::kv::status::OK && status != pmem::kv::status::NOT_FOUND)
         PmemkvJavaException(env).ThrowException(status);
-    return status == PMEMKV_STATUS_OK;
+    return status == pmem::kv::status::OK;
 }
 
 struct ContextGetByteArray {
@@ -294,40 +305,45 @@ void callback_get_byte_array(const char* v, size_t vb, void *arg) {
 
 extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1buffer_1with_1callback
         (JNIEnv* env, jobject obj, jlong pointer, jint keybytes, jobject key, jobject callback) {
-    auto engine = (pmemkv_db*) pointer;
+    auto engine = reinterpret_cast<pmem::kv::db*>(pointer);
     const char* ckey = (char*) env->GetDirectBufferAddress(key);
+    pmem::kv::string_view cppkey(ckey, keybytes);
     auto cxt = Context(env, obj, callback, valueCallbackID);
-    auto status = pmemkv_get(engine, ckey, keybytes, Callback_get_value_buffer, &cxt);
-    if (status != PMEMKV_STATUS_OK) PmemkvJavaException(env).ThrowException(status);
+    auto status = engine->get(cppkey, Callback_get_value_buffer, &cxt);
+    if (status != pmem::kv::status::OK) PmemkvJavaException(env).ThrowException(status);
 }
 
 extern "C" JNIEXPORT jbyteArray JNICALL Java_io_pmem_pmemkv_Database_database_1get_1bytes
         (JNIEnv* env, jobject obj, jlong pointer, jint keybytes ,jobject key) {
-    auto engine = (pmemkv_db*) pointer;
+    auto engine = reinterpret_cast<pmem::kv::db*>(pointer);
     const char* ckey = (char*) env->GetDirectBufferAddress(key);
+    pmem::kv::string_view cppkey(ckey, keybytes);
     ContextGetByteArray cxt = ContextGetByteArray(env);
-    auto status = pmemkv_get(engine, (char*) ckey, keybytes, callback_get_byte_array, &cxt);
-    if (status != PMEMKV_STATUS_OK)
+    auto status = engine->get(cppkey, callback_get_byte_array, &cxt);
+    if (status != pmem::kv::status::OK)
         PmemkvJavaException(env).ThrowException(status);
     return cxt.result;
 }
 
 extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1put_1buffer
         (JNIEnv* env, jobject obj, jlong pointer, jint keybytes, jobject key, jint valuebytes, jobject value) {
-    auto engine = (pmemkv_db*) pointer;
+    auto engine = reinterpret_cast<pmem::kv::db*>(pointer);
     const char* ckey = (char*) env->GetDirectBufferAddress(key);
     const char* cvalue = (char*) env->GetDirectBufferAddress(value);
-    const auto result = pmemkv_put(engine, ckey, keybytes, cvalue, valuebytes);
-    if (result != PMEMKV_STATUS_OK)
+    pmem::kv::string_view cppkey(ckey, keybytes);
+    pmem::kv::string_view cppvalue(cvalue, valuebytes);
+    const auto result = engine->put(cppkey, cppvalue);
+    if (result != pmem::kv::status::OK)
         PmemkvJavaException(env).ThrowException(result);
 }
 
 extern "C" JNIEXPORT jboolean JNICALL Java_io_pmem_pmemkv_Database_database_1remove_1buffer
         (JNIEnv* env, jobject obj, jlong pointer, jint keybytes, jobject key) {
-    auto engine = (pmemkv_db*) pointer;
+    auto engine = reinterpret_cast<pmem::kv::db*>(pointer);
     const char* ckey = (char*) env->GetDirectBufferAddress(key);
-    const auto result = pmemkv_remove(engine, ckey, keybytes);
-    if (result != PMEMKV_STATUS_OK  && result != PMEMKV_STATUS_NOT_FOUND)
+    pmem::kv::string_view cppkey(ckey, keybytes);
+    const auto result = engine->remove(cppkey);
+    if (result != pmem::kv::status::OK  && result != pmem::kv::status::NOT_FOUND)
          PmemkvJavaException(env).ThrowException(result);
-    return result == PMEMKV_STATUS_OK;
+    return result == pmem::kv::status::OK;
 }
