@@ -7,6 +7,9 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.BufferOverflowException;
 import java.util.ArrayList;
+
+import javax.swing.text.StyledEditorKit.BoldAction;
+
 import java.lang.IllegalArgumentException;
 
 /**
@@ -32,6 +35,64 @@ public class Database<K, V> {
 	Converter<V> valueConverter;
 	private int keyBufferSize;
 	private int valueBufferSize;
+
+	public class WriteIterator {
+		public WriteIterator(long database_handle) {
+			db_ptr = database_handle;
+			it_ptr = iterator_new_write_iterator(db_ptr);
+			// System.out.println(it_ptr);
+			// byte[] aa = {'a'};
+			// ByteBuffer bb = ByteBuffer.wrap(aa);
+			// keyConverter.fromByteBuffer(bb);
+		}
+
+		public void seek(String key) {
+			// iterator_seek(it_ptr, key);
+		}
+
+		public void seek_to_first() {
+			iterator_seek_to_first(it_ptr);
+		}
+
+		public K key() {
+			byte value[];
+			try {
+				value = iterator_key(it_ptr);
+			} catch (NotFoundException kve) {
+				return null;
+			}
+			K retval = keyConverter.fromByteBuffer(ByteBuffer.wrap(value));
+			return retval;
+		}
+
+		public boolean isNext() {
+			return iterator_is_next(it_ptr);
+		}
+
+		public boolean next() {
+			return iterator_next(it_ptr);
+		}
+
+		private native long iterator_new_write_iterator(long database_handle);
+		private native void iterator_seek(long iterator_handle, String key);
+		private native void iterator_seek_lower(long iterator_handle, String key);
+		private native void iterator_seek_lower_eq(long iterator_handle, String key);
+		private native void iterator_seek_higher(long iterator_handle, String key);
+		private native void iterator_seek_higher_eq(long iterator_handle, String key);
+		private native void iterator_seek_to_first(long iterator_handle);
+		private native void iterator_seek_to_last(long iterator_handle);
+		private native boolean iterator_is_next(long iterator_handle);
+		private native boolean iterator_next(long iterator_handle);
+		private native void iterator_prev(long iterator_handle);
+		private native byte[] iterator_key(long iterator_handle);
+		private native byte[] iterator_read_range(long iterator_handle);
+		// write_range()
+		private native void iterator_commit(long iterator_handle);
+		private native void iterator_abort(long iterator_handle);
+
+		private long it_ptr;
+		private final long db_ptr;
+	}
 
 	private class ThreadDirectBuffers {
 		public final static int KEY1_BUFFER = 0;
@@ -141,6 +202,15 @@ public class Database<K, V> {
 	 */
 	public boolean stopped() {
 		return stopped;
+	}
+
+	/**
+	 * TODO(kfilipek): fill description
+	 *
+	 * @throws DatabaseException
+	 */
+	public WriteIterator iterator() {
+		return new WriteIterator(pointer);
 	}
 
 	/**
