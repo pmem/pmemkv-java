@@ -7,6 +7,7 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.BufferOverflowException;
 import java.util.ArrayList;
+
 import java.lang.IllegalArgumentException;
 
 /**
@@ -32,6 +33,99 @@ public class Database<K, V> {
 	Converter<V> valueConverter;
 	private int keyBufferSize;
 	private int valueBufferSize;
+
+	/**
+	 * Binding for a pmemkv iterator API. Iterator provides methods to iterate over
+	 * records in db. This object can be created only using Database method: iterator().
+	 * <p>
+	 * Important: This is an experimental feature and should not be used in
+	 * production code. For now, we don't guarantee stability of this API.
+	 */
+	public class WriteIterator {
+		/**
+		 * Constructor for iterator class. Can be accessed only via Database API.
+		 *
+		 * @param database_handle
+		 *            handle to database pointer
+		 */
+		WriteIterator(long database_handle) {
+			db_ptr = database_handle;
+			it_ptr = iterator_new_write_iterator(db_ptr);
+		}
+
+		/**
+		 * Changes iterator position to the first record.
+		 *
+		 * @return true if success, false otherwise
+		 */
+		public boolean seekToFirst() {
+			return iterator_seek_to_first(it_ptr);
+		}
+
+		/**
+		 * Returns record's key.
+		 *
+		 * If the iterator is on an undefined position, calling this method is undefined
+		 * behaviour.
+		 *
+		 * @return key of type K
+		 */
+		public K key() {
+			ByteBuffer value;
+			try {
+				value = iterator_key(it_ptr);
+			} catch (NotFoundException kve) {
+				return null;
+			}
+			K retval = keyConverter.fromByteBuffer(value);
+			return retval;
+		}
+
+		/**
+		 * Checks if there is a next record available.
+		 *
+		 * If true is returned, it is guaranteed that iterator.next() will return
+		 * status::OK, otherwise iterator is already on the last element and
+		 * iterator.next() will return false.
+		 *
+		 * @return true if there is a next record available, false otherwise.
+		 */
+		public boolean isNext() {
+			return iterator_is_next(it_ptr);
+		}
+
+		/**
+		 * Changes iterator position to the next record.
+		 *
+		 * If the next record exists, returns true, otherwise false is returned and the
+		 * iterator position is undefined.
+		 *
+		 * @return true if the iterator was moved on the next record, false otherwise.
+		 */
+		public boolean next() {
+			return iterator_next(it_ptr);
+		}
+
+		private native long iterator_new_write_iterator(long database_handle);
+		private native void iterator_seek(long iterator_handle, String key);
+		private native void iterator_seek_lower(long iterator_handle, String key);
+		private native void iterator_seek_lower_eq(long iterator_handle, String key);
+		private native void iterator_seek_higher(long iterator_handle, String key);
+		private native void iterator_seek_higher_eq(long iterator_handle, String key);
+		private native boolean iterator_seek_to_first(long iterator_handle);
+		private native void iterator_seek_to_last(long iterator_handle);
+		private native boolean iterator_is_next(long iterator_handle);
+		private native boolean iterator_next(long iterator_handle);
+		private native void iterator_prev(long iterator_handle);
+		private native ByteBuffer iterator_key(long iterator_handle);
+		private native byte[] iterator_read_range(long iterator_handle);
+		// write_range()
+		private native void iterator_commit(long iterator_handle);
+		private native void iterator_abort(long iterator_handle);
+
+		private long it_ptr;
+		private final long db_ptr;
+	}
 
 	private class ThreadDirectBuffers {
 		public final static int KEY1_BUFFER = 0;
@@ -141,6 +235,16 @@ public class Database<K, V> {
 	 */
 	public boolean stopped() {
 		return stopped;
+	}
+
+	/**
+	 * Iterator provides methods to iterate over records in db. Using iterator() is
+	 * the only one way to get an iterator object.
+	 *
+	 * @throws DatabaseException
+	 */
+	public WriteIterator iterator() throws DatabaseException {
+		return new WriteIterator(pointer);
 	}
 
 	/**
