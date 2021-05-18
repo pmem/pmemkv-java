@@ -35,8 +35,10 @@
                         <source>
                             <directory>.</directory>
                             <fileNames>
+                                <fileName>common.cpp</fileName>
                                 <fileName>io_pmem_pmemkv_Database.cpp</fileName>
                                 <fileName>io_pmem_pmemkv_Database_Builder.cpp</fileName>
+                                <fileName>io_pmem_pmemkv_Database_WriteIterator.cpp</fileName>
                             </fileNames>
                         </source>
                     </sources>

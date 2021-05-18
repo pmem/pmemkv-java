@@ -1,65 +1,14 @@
 // SPDX-License-Identifier: BSD-3-Clause
 /* Copyright 2017-2021, Intel Corporation */
 
+#include <common.h>
 #include <cstring>
 #include <string>
 #include <jni.h>
 #include <libpmemkv.hpp>
-#include <unordered_map>
 #include <iostream>
 #include <memory>
 #include <utility>
-
-#define DO_LOG 0
-#define LOG(msg) if (DO_LOG) std::cout << "[pmemkv-jni] " << msg << "\n"
-
-class PmemkvJavaException {
-private:
-    static std::unordered_map<pmem::kv::status, const char*> PmemkvStatusDispatcher;
-    JNIEnv* env;
-
-public:
-    constexpr static const char* DatabaseException = "io/pmem/pmemkv/DatabaseException";
-    constexpr static const char* GeneralException = "java/lang/Error";
-
-    PmemkvJavaException(JNIEnv* env_) {
-        env = env_;
-    }
-
-    void ThrowException(pmem::kv::status status, const char* msg =  pmemkv_errormsg()){
-        jclass exception_class;
-        exception_class = env->FindClass(PmemkvStatusDispatcher[status]);
-        if(exception_class == NULL) {
-            exception_class = env->FindClass(DatabaseException);
-        }
-        if(exception_class == NULL) {
-            exception_class = env->FindClass(GeneralException);
-        }
-        env->ThrowNew(exception_class, msg);
-    }
-
-    void ThrowException(const char* signature, const char* msg=""){
-        jclass exception_class;
-        exception_class = env->FindClass(signature);
-        if(exception_class == NULL) {
-            exception_class = env->FindClass(GeneralException);
-        }
-        env->ThrowNew(exception_class, msg);
-    }
-};
-
-std::unordered_map<pmem::kv::status, const char*> PmemkvJavaException::PmemkvStatusDispatcher = {
-       { pmem::kv::status::UNKNOWN_ERROR, "io/pmem/pmemkv/DatabaseException" },
-       { pmem::kv::status::NOT_FOUND, "io/pmem/pmemkv/NotFoundException"},
-       { pmem::kv::status::NOT_SUPPORTED, "io/pmem/pmemkv/NotSupportedException"},
-       { pmem::kv::status::INVALID_ARGUMENT, "io/pmem/pmemkv/InvalidArgumentException"},
-       { pmem::kv::status::CONFIG_PARSING_ERROR, "io/pmem/pmemkv/BuilderException"},
-       { pmem::kv::status::CONFIG_TYPE_ERROR, "io/pmem/pmemkv/BuilderException"},
-       { pmem::kv::status::STOPPED_BY_CB, "io/pmem/pmemkv/StoppedByCallbackException"},
-       { pmem::kv::status::OUT_OF_MEMORY, "io/pmem/pmemkv/OutOfMemoryException"},
-       { pmem::kv::status::WRONG_ENGINE_NAME, "io/pmem/pmemkv/WrongEngineNameException"},
-       { pmem::kv::status::TRANSACTION_SCOPE_ERROR, "io/pmem/pmemkv/TransactionScopeException"},
-};
 
 #define KEY_CALLBACK_NAME "keyCallbackWrapper"
 #define VALUE_CALLBACK_NAME "valueCallbackWrapper"
@@ -71,6 +20,56 @@ std::unordered_map<pmem::kv::status, const char*> PmemkvJavaException::PmemkvSta
 jmethodID keyCallbackID = NULL;
 jmethodID valueCallbackID = NULL;
 jmethodID keyValueCallbackID = NULL;
+
+struct Context {
+    JNIEnv* env;
+    jobject db;
+    jobject callback;
+    jmethodID mid;
+
+    Context(JNIEnv* env_, jobject db_, jobject callback_, jmethodID mid_) {
+        env = env_;
+        db = db_;
+        callback = callback_;
+        mid = mid_;
+    }
+};
+
+struct ContextGetByteArray {
+    JNIEnv* env;
+    jbyteArray result;
+
+    ContextGetByteArray(JNIEnv* env_, jbyteArray result_ = NULL){
+        env = env_;
+        result = result_;
+    }
+};
+
+void callback_get_byte_array(const char* v, size_t vb, void *arg) {
+    const auto c = ((ContextGetByteArray*) arg);
+    if((c->result = c->env->NewByteArray(vb))) {
+        c->env->SetByteArrayRegion(c->result, 0, vb, (jbyte*) v);
+    } else {
+        PmemkvJavaException ex = PmemkvJavaException(c->env);
+        ex.ThrowException(PmemkvJavaException::DatabaseException, "Cannot allocate output buffer");
+    }
+};
+
+int Callback_get_all_buffer(const char* k, size_t kb, const char* v, size_t vb, void *arg) {
+    const auto c = static_cast<Context*>(arg);
+
+    jobject keybuf = c->env->NewDirectByteBuffer(const_cast<char*>(k), kb);
+    jobject valuebuf = c->env->NewDirectByteBuffer(const_cast<char*>(v), vb);
+    if(keybuf && valuebuf) {
+        c->env->CallStaticVoidMethod(c->env->GetObjectClass(c->db), c->mid, c->db, c->callback, kb, keybuf, vb, valuebuf);
+        c->env->DeleteLocalRef(keybuf);
+        c->env->DeleteLocalRef(valuebuf);
+    }
+    if( c->env->ExceptionOccurred()) {
+        return 1;
+    }
+    return 0;
+};
 
 extern "C" JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_Database_database_1start
         (JNIEnv* env, jobject obj, jstring engine, jlong config) {
@@ -96,20 +95,6 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1stop
     auto engine = reinterpret_cast<pmem::kv::db*>(pointer);
     engine->close();
 }
-
-struct Context {
-    JNIEnv* env;
-    jobject db;
-    jobject callback;
-    jmethodID mid;
-
-    Context(JNIEnv* env_, jobject db_, jobject callback_, jmethodID mid_) {
-        env = env_;
-        db = db_;
-        callback = callback_;
-        mid = mid_;
-    }
-};
 
 void Callback_get_value_buffer(const char* v, size_t vb, void *arg) {
     const auto c = static_cast<Context*>(arg);
@@ -216,22 +201,6 @@ extern "C" JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_Database_database_1count_
     return count;
 }
 
-int Callback_get_all_buffer(const char* k, size_t kb, const char* v, size_t vb, void *arg) {
-    const auto c = static_cast<Context*>(arg);
-
-    jobject keybuf = c->env->NewDirectByteBuffer(const_cast<char*>(k), kb);
-    jobject valuebuf = c->env->NewDirectByteBuffer(const_cast<char*>(v), vb);
-    if(keybuf && valuebuf) {
-        c->env->CallStaticVoidMethod(c->env->GetObjectClass(c->db), c->mid, c->db, c->callback, kb, keybuf, vb, valuebuf);
-        c->env->DeleteLocalRef(keybuf);
-        c->env->DeleteLocalRef(valuebuf);
-    }
-    if( c->env->ExceptionOccurred()) {
-        return 1;
-    }
-    return 0;
-};
-
 extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1all_1buffer
         (JNIEnv* env, jobject obj, jlong pointer, jobject callback) {
     auto engine = reinterpret_cast<pmem::kv::db*>(pointer);
@@ -282,26 +251,6 @@ extern "C" JNIEXPORT jboolean JNICALL Java_io_pmem_pmemkv_Database_database_1exi
         PmemkvJavaException(env).ThrowException(status);
     return status == pmem::kv::status::OK;
 }
-
-struct ContextGetByteArray {
-    JNIEnv* env;
-    jbyteArray result;
-
-    ContextGetByteArray(JNIEnv* env_, jbyteArray result_ = NULL){
-        env = env_;
-        result = result_;
-    }
-};
-
-void callback_get_byte_array(const char* v, size_t vb, void *arg) {
-    const auto c = ((ContextGetByteArray*) arg);
-    if((c->result = c->env->NewByteArray(vb))) {
-        c->env->SetByteArrayRegion(c->result, 0, vb, (jbyte*) v);
-    } else {
-        PmemkvJavaException ex = PmemkvJavaException(c->env);
-        ex.ThrowException(PmemkvJavaException::DatabaseException, "Cannot allocate output buffer");
-    }
-};
 
 extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1buffer_1with_1callback
         (JNIEnv* env, jobject obj, jlong pointer, jint keybytes, jobject key, jobject callback) {
