@@ -33,6 +33,43 @@ public class Database<K, V> {
 	private int keyBufferSize;
 	private int valueBufferSize;
 
+	public class WriteIterator {
+		public WriteIterator(long database_handle) {
+			db_ptr = database_handle;
+			it_ptr = iterator_new_write_iterator(db_ptr);
+			System.out.println(it_ptr);
+		}
+		public void seek(String key) {
+			// iterator_seek(it_ptr, key);
+		}
+		public void seek_to_first() {
+			iterator_seek_to_first(it_ptr);
+		}
+		public String key() {
+			// iterator_key(it_ptr);
+			return "";
+		}
+		private native long iterator_new_write_iterator(long database_handle);
+		private native void iterator_seek(long iterator_handle, String key);
+		private native void iterator_seek_lower(long iterator_handle, String key);
+		private native void iterator_seek_lower_eq(long iterator_handle, String key);
+		private native void iterator_seek_higher(long iterator_handle, String key);
+		private native void iterator_seek_higher_eq(long iterator_handle, String key);
+		private native void iterator_seek_to_first(long iterator_handle);
+		private native void iterator_seek_to_last(long iterator_handle);
+		private native void iterator_is_next(long iterator_handle);
+		private native void iterator_next(long iterator_handle);
+		private native void iterator_prev(long iterator_handle);
+		private native String iterator_key(long iterator_handle);
+		private native String iterator_read_range(long iterator_handle);
+		// write_range()
+		private native void iterator_commit(long iterator_handle);
+		private native void iterator_abort(long iterator_handle);
+
+		private long it_ptr;
+		private final long db_ptr;
+	}
+
 	private class ThreadDirectBuffers {
 		public final static int KEY1_BUFFER = 0;
 		public final static int KEY2_BUFFER = 1;
@@ -141,6 +178,15 @@ public class Database<K, V> {
 	 */
 	public boolean stopped() {
 		return stopped;
+	}
+
+	/**
+	 * TODO(kfilipek): fill description
+	 *
+	 * @throws DatabaseException
+	 */
+	public WriteIterator iterator() {
+		return new WriteIterator(pointer);
 	}
 
 	/**
