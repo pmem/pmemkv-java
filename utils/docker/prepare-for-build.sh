@@ -39,6 +39,15 @@ function run_example() {
 	example_name=${1}
 	# Find current pmemkv-binding package and path to example's jar
 	jar_path=$(find ../pmemkv-binding/target/ | grep -E "pmemkv-([0-9.]+).jar")
+	example_path=$(find . | grep -E "${StringExample}-([0-9.]+).jar$")
+
+	java -ea -Xms1G -cp ${jar_path}:${example_path} ${example_name}
+}
+
+function run_standalone_example() {
+	example_name=${1}
+	# Find pmemkv package (in the system) and path to example's jar
+	jar_path=$(find ${HOME}/.m2/repository/io/pmem | grep -E "pmemkv-([root\-][0-9.]+).jar$")
 	example_path=$(find . | grep -E "${example_name}-([0-9.]+).jar$")
 
 	java -ea -Xms1G -cp ${jar_path}:${example_path} ${example_name}

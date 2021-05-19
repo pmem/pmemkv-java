@@ -26,7 +26,7 @@ mvn install -e ${MVN_PARAMS}
 
 echo
 echo "###########################################################"
-echo "### Verifying building and execution of examples"
+echo "### Verifying execution of examples"
 echo "###########################################################"
 cd examples
 run_example StringExample
