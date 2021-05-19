@@ -1,0 +1,27 @@
+From 3a43b34617e123dbb2bf108900b056a85734d265 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?=C5=81ukasz=20Stolarczuk?= <lukasz.stolarczuk@intel.com>
+Date: Wed, 19 May 2021 16:08:21 +0200
+Subject: [PATCH] examples: use pmemkv from maven repo
+
+---
+ examples/pom.xml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/examples/pom.xml b/examples/pom.xml
+index 811b2fa..4482b97 100644
+--- a/examples/pom.xml
++++ b/examples/pom.xml
+@@ -81,8 +81,8 @@
+     <dependencies>
+         <dependency>
+             <groupId>io.pmem</groupId>
+-            <artifactId>pmemkv</artifactId>
+-            <version>${project.version}</version>
++            <artifactId>pmemkv-root</artifactId>
++            <version>1.0.1</version>
+         </dependency>
+     </dependencies>
+ </project>
+-- 
+2.27.0
+

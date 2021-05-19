@@ -44,6 +44,14 @@ function run_example() {
 	java -ea -Xms1G -cp ${jar_path}:${example_path} ${example_name}
 }
 
+function run_standalone_example() {
+	example_name=${1}
+	# Find path to example's jar with dependencies
+	example_path=$(find . | grep -E "${example_name}-([0-9.]+).jar-with-dependencies.jar$")
+
+	java -ea -Xms1G -cp ${example_path} ${example_name}
+}
+
 # this should be run only on CIs
 if [ "$CI_RUN" == "YES" ]; then
 	sudo_password chown -R $(id -u).$(id -g) $WORKDIR
