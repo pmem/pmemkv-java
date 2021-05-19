@@ -59,6 +59,9 @@ if [[ -z "$COMMAND" ]]; then
 	doc)
 		COMMAND="./run-doc-update.sh";
 		;;
+	maven)
+		COMMAND="./run-maven-example.sh";
+		;;
 	*)
 		echo "ERROR: wrong build TYPE"
 		exit 1

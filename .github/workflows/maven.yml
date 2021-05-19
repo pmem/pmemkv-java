@@ -1,0 +1,33 @@
+
+name: pmemkv-java-maven
+# this job downloads pmemkv from maven and tries to run example with it
+on:
+  schedule:
+    # run this job at 00:00 UTC every Monday
+    - cron:  '0 0 * * 1'
+
+env:
+  REPO:           pmemkv-java
+  GITHUB_REPO:    pmem/pmemkv-java
+  CONTAINER_REG:  ghcr.io/pmem/pmemkv-java
+  HOST_WORKDIR:   ${{ github.workspace }}
+  WORKDIR:        utils/docker
+  IMG_VER:        latest
+
+jobs:
+  linux:
+    name: Linux-maven
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        CONFIG: ["TYPE=maven OS=ubuntu OS_VER=20.04_clean PUSH_IMAGE=1"]
+    steps:
+      - name: Clone the git repo
+        uses: actions/checkout@v2
+
+      # maven workflow should always rebuild the image
+      - name: Rebuild the image
+        run: cd $WORKDIR && ${{ matrix.CONFIG }} ./pull-or-rebuild-image.sh rebuild
+
+      - name: Run the build
+        run: cd $WORKDIR && ${{ matrix.CONFIG }} ./build.sh
