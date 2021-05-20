@@ -3,23 +3,26 @@
 # Copyright 2019-2021, Intel Corporation
 
 #
-# install-dependencies.sh - install binding's dependencies
-#                           so it can be built offline
+# install-dependencies.sh - install binding's dependencies, so it
+#                 can be built offline; and setup maven settings.
+#                 Both can be turned off using build arguments (see below if's).
 #
 
 set -e
 
-if [ "${SKIP_DEPENDENCIES_BUILD}" ]; then
-	echo "Variable 'SKIP_DEPENDENCIES_BUILD' is set; skipping building dependencies"
-	exit
-fi
-
 # Include setup of extra maven parameters...
 source /opt/setup-maven-settings.sh
 
-# ...and set the same script as an entrypoint for all users (newly defined in future)
-if [ -z "${SKIP_MAVEN_RUNTIME_SETUP}" ]; then
+# ...and set the same script as an entrypoint for all users (newly defined in the future)
+if [ -n "${SKIP_MAVEN_RUNTIME_SETUP}" ]; then
+	echo "Variable 'SKIP_MAVEN_RUNTIME_SETUP' is set; skipping building dependencies"
+else
 	echo "source /opt/setup-maven-settings.sh" >> /etc/skel/.bashrc
+fi
+
+if [ -n "${SKIP_DEPENDENCIES_BUILD}" ]; then
+	echo "Variable 'SKIP_DEPENDENCIES_BUILD' is set; skipping building dependencies"
+	exit
 fi
 
 MVN_PARAMS="${PMEMKV_MVN_PARAMS}"
