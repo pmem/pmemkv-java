@@ -23,7 +23,25 @@ Java API is documented with javadocs and can be found as html here:
 * gcc-c++ compiler
 * [Apache Maven 3](https://maven.apache.org) - build system
 
-## Installation
+## Usage
+
+### Maven repository
+
+This pmemkv binding is accesible from maven repository:
+
+[io.pmem namespace @ maven.org](https://repo1.maven.org/maven2/io/pmem/pmemkv-root)
+
+You can add our project as a dependency and use it freely. Make sure to use it e.g. like this:
+
+```
+<dependency>
+  <groupId>io.pmem</groupId>
+  <artifactId>pmemkv-root</artifactId>
+  <version>1.0.1</version>
+</dependency>
+```
+
+### Installation
 
 Start by installing [pmemkv](https://github.com/pmem/pmemkv/blob/master/INSTALLING.md)
 (currently at least in version **1.0.2**) in your system.
@@ -88,6 +106,14 @@ To execute them, run e.g.:
 cd examples
 mvn package
 PMEM_IS_PMEM_FORCE=1 java -ea -Xms1G -jar StringExample/target/StringExample-*-jar-with-dependencies.jar
+```
+
+If you want to use our examples with pmemkv from maven repository, you can take a look at our
+[testing script](./utils/docker/run-maven-example.sh) executed in our [dedicated CI workflow](./.github/workflows/maven.yml).
+It boils down to changing build command (`mvn package`) to e.g.:
+
+```sh
+mvn package -Dpmemkv.packageName=pmemkv-root -Dpmemkv.packageVersion=1.0.1
 ```
 
 ## Contributing

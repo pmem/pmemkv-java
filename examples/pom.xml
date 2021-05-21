@@ -18,6 +18,9 @@
         <maven.javadoc.skip>true</maven.javadoc.skip>
         <!-- utilsParent will be inherited into each example -->
         <main.utilsParent>${project.parent.basedir}/..</main.utilsParent>
+        <!-- extra parameters to allow easier building of examples with pmemkv from maven -->
+        <pmemkv.packageName>pmemkv</pmemkv.packageName>
+        <pmemkv.packageVersion>${project.version}</pmemkv.packageVersion>
     </properties>
 
     <modules>
@@ -81,8 +84,8 @@
     <dependencies>
         <dependency>
             <groupId>io.pmem</groupId>
-            <artifactId>pmemkv</artifactId>
-            <version>${project.version}</version>
+            <artifactId>${pmemkv.packageName}</artifactId>
+            <version>${pmemkv.packageVersion}</version>
         </dependency>
     </dependencies>
 </project>
