@@ -1,3 +1,19 @@
+XXX May XXX 2021 XXX <XXX@intel.com>
+
+	* Version 1.1
+
+	Improvements:
+	- add caching of direct buffer(s) and allow to specify their default size(s)
+		by new Builder methods
+	- optimize calling callback from JNI, which improves Java performance
+		(because of fewer calls to JNI)
+	- use pmemkv C++ API (instead of C) in JNI layer
+
+	Minor changes:
+	- set up configurable test path
+	- update documentation
+	- add finalize idiom (to ensure DB's finalizer is always called)
+
 Fri Mar 12 2021 Krzysztof Filipek <krzysztof.filipek@intel.com>
 
 	* Version 1.0.1
