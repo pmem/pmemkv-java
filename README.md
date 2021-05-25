@@ -113,7 +113,7 @@ If you want to use our examples with pmemkv from maven repository, you can take 
 It boils down to changing build command (`mvn package`) to e.g.:
 
 ```sh
-mvn package -Dpmemkv.packageName=pmemkv-root -Dpmemkv.packageVersion=1.0.1
+mvn package -Dpmemkv.packageName=pmemkv-root -Dpmemkv.packageVersion=1.1
 ```
 
 ## Contributing
