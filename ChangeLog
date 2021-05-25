@@ -1,3 +1,17 @@
+Tue May 25 2021 Igor Chorążewicz <igor.chorazewicz@intel.com>
+
+	* Version 1.1
+
+	Improvements:
+	- improve performance over 2 times by caching direct buffers and
+		optimizing JNI calls (of callbacks)
+	- add new Builder methods to adjust direct buffers' sizes
+	- use pmemkv C++ API (instead of C) in JNI layer
+
+	Minor changes:
+	- set up configurable test path
+	- update documentation
+
 Fri Mar 12 2021 Krzysztof Filipek <krzysztof.filipek@intel.com>
 
 	* Version 1.0.1
