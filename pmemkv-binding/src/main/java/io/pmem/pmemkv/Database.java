@@ -609,7 +609,7 @@ public class Database<K, V> {
 		 * @return this builder object.
 		 * @throws IllegalArgumentException
 		 *             if size {@literal <}= 0
-		 * @since 1.1
+		 * @since 1.1.0
 		 */
 		public Builder<K, V> setKeyBufferSize(int size) throws IllegalArgumentException {
 			if (size <= 0)
@@ -634,7 +634,7 @@ public class Database<K, V> {
 		 * @return this builder object.
 		 * @throws IllegalArgumentException
 		 *             if size {@literal <}= 0
-		 * @since 1.1
+		 * @since 1.1.0
 		 */
 		public Builder<K, V> setValueBufferSize(int size) throws IllegalArgumentException {
 			if (size <= 0)

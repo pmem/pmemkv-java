@@ -20,7 +20,7 @@ cd ${WORKDIR}/examples
 
 # pmemkv package in maven repository has a bit different name
 # and there may be different version available.
-mvn package -Dpmemkv.packageName=pmemkv-root -Dpmemkv.packageVersion=1.1 -e ${PMEMKV_MVN_PARAMS}
+mvn package -Dpmemkv.packageName=pmemkv-root -Dpmemkv.packageVersion=1.1.0 -e ${PMEMKV_MVN_PARAMS}
 
 echo
 echo "#############################################################"

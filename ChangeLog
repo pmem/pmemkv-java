@@ -1,6 +1,6 @@
-Tue May 25 2021 Igor Chorążewicz <igor.chorazewicz@intel.com>
+Mon May 31 2021 Igor Chorążewicz <igor.chorazewicz@intel.com>
 
-	* Version 1.1
+	* Version 1.1.0
 
 	Improvements:
 	- improve performance over 2 times by caching direct buffers and
@@ -11,6 +11,10 @@ Tue May 25 2021 Igor Chorążewicz <igor.chorazewicz@intel.com>
 	Minor changes:
 	- set up configurable test path
 	- update documentation
+
+	Other:
+	- adjust versioning scheme to match Semantic Versioning (always provide
+	    patch version)
 
 Fri Mar 12 2021 Krzysztof Filipek <krzysztof.filipek@intel.com>
 
