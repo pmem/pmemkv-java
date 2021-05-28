@@ -57,12 +57,67 @@ public class Database<K, V> {
 		}
 
 		/**
+		 * TBD
+		 *
+		 * @return true if success, false otherwise
+		 */
+		public boolean seek(String key) {
+			return iterator_seek(it_ptr, key);
+		}
+
+		/**
+		 * TBD
+		 *
+		 * @return true if success, false otherwise
+		 */
+		public boolean seekLower(String key) {
+			return iterator_seek_lower(it_ptr, key);
+		}
+
+		/**
+		 * TBD
+		 *
+		 * @return true if success, false otherwise
+		 */
+		public boolean seekLowerEq(String key) {
+			return iterator_seek_lower_eq(it_ptr, key);
+		}
+
+		/**
+		 * TBD
+		 *
+		 * @return true if success, false otherwise
+		 */
+		public boolean seekHigher(String key) {
+			return iterator_seek_higher(it_ptr, key);
+		}
+
+		/**
+		 * TBD
+		 *
+		 * @return true if success, false otherwise
+		 */
+		public boolean seekHigherEq(String key) {
+			return iterator_seek_higher_eq(it_ptr, key);
+		}
+
+		/**
 		 * Changes iterator position to the first record.
 		 *
 		 * @return true if success, false otherwise
 		 */
 		public boolean seekToFirst() {
 			return iterator_seek_to_first(it_ptr);
+		}
+
+		/**
+		 * TBD
+		 *
+		 * @return true if success, false otherwise
+		 */
+
+		public boolean seekToLast() {
+			return iterator_seek_to_last(it_ptr);
 		}
 
 		/**
@@ -118,16 +173,16 @@ public class Database<K, V> {
 		}
 
 		private native long iterator_new_write_iterator(long database_handle);
-		private native void iterator_seek(long iterator_handle, String key);
-		private native void iterator_seek_lower(long iterator_handle, String key);
-		private native void iterator_seek_lower_eq(long iterator_handle, String key);
-		private native void iterator_seek_higher(long iterator_handle, String key);
-		private native void iterator_seek_higher_eq(long iterator_handle, String key);
+		private native boolean iterator_seek(long iterator_handle, String key);
+		private native boolean iterator_seek_lower(long iterator_handle, String key);
+		private native boolean iterator_seek_lower_eq(long iterator_handle, String key);
+		private native boolean iterator_seek_higher(long iterator_handle, String key);
+		private native boolean iterator_seek_higher_eq(long iterator_handle, String key);
 		private native boolean iterator_seek_to_first(long iterator_handle);
-		private native void iterator_seek_to_last(long iterator_handle);
+		private native boolean iterator_seek_to_last(long iterator_handle);
 		private native boolean iterator_is_next(long iterator_handle);
 		private native boolean iterator_next(long iterator_handle);
-		private native void iterator_prev(long iterator_handle);
+		private native boolean iterator_prev(long iterator_handle);
 		private native ByteBuffer iterator_key(long iterator_handle);
 		private native byte[] iterator_read_range(long iterator_handle);
 		// write_range()
