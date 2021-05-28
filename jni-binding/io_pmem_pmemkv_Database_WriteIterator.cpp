@@ -3,6 +3,20 @@
 
 #include <common.h>
 
+/* Helper function for seek methods */
+template <typename Function>
+jboolean boilerplate_seek(JNIEnv *env, jlong ptr, Function &&func, jobject key = nullptr) {
+  auto w_it = reinterpret_cast<pmem::kv::db::write_iterator*>(ptr);
+  const char* ckey = (key ? reinterpret_cast<char*>(env->GetDirectBufferAddress(key)) : nullptr);
+  pmem::kv::status status = func(w_it, ckey);
+
+  if (status == pmem::kv::status::OK || status == pmem::kv::status::NOT_FOUND) {
+    return status == pmem::kv::status::OK;
+  }
+  PmemkvJavaException(env).ThrowException(status);
+  return false;
+}
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -29,42 +43,62 @@ Java_io_pmem_pmemkv_Database_00024WriteIterator_iterator_1new_1write_1iterator(J
 /*
  * Class:     io_pmem_pmemkv_Database_WriteIterator
  * Method:    iterator_seek
- * Signature: (JLjava/lang/String;)V
+ * Signature: (JLjava/nio/ByteBuffer;)Z
  */
-JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_00024WriteIterator_iterator_1seek
-  (JNIEnv *, jobject, jlong, jstring);
+JNIEXPORT jboolean JNICALL Java_io_pmem_pmemkv_Database_00024WriteIterator_iterator_1seek
+  (JNIEnv *env, jobject, jlong ptr, jobject key) {
+  return boilerplate_seek(env, ptr, [](pmem::kv::db::write_iterator *w_it, const char* ckey) {
+	  return w_it->seek(ckey);
+  }, key);
+}
 
 /*
  * Class:     io_pmem_pmemkv_Database_WriteIterator
  * Method:    iterator_seek_lower
- * Signature: (JLjava/lang/String;)V
+ * Signature: (JLjava/nio/ByteBuffer;)Z
  */
-JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_00024WriteIterator_iterator_1seek_1lower
-  (JNIEnv *, jobject, jlong, jstring);
+JNIEXPORT jboolean JNICALL Java_io_pmem_pmemkv_Database_00024WriteIterator_iterator_1seek_1lower
+  (JNIEnv *env, jobject, jlong ptr, jobject key) {
+  return boilerplate_seek(env, ptr, [](pmem::kv::db::write_iterator *w_it, const char* ckey) {
+	  return w_it->seek_lower(ckey);
+  }, key);
+}
 
 /*
  * Class:     io_pmem_pmemkv_Database_WriteIterator
  * Method:    iterator_seek_lower_eq
- * Signature: (JLjava/lang/String;)V
+ * Signature: (JLjava/nio/ByteBuffer;)Z
  */
-JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_00024WriteIterator_iterator_1seek_1lower_1eq
-  (JNIEnv *, jobject, jlong, jstring);
+JNIEXPORT jboolean JNICALL Java_io_pmem_pmemkv_Database_00024WriteIterator_iterator_1seek_1lower_1eq
+  (JNIEnv *env, jobject, jlong ptr, jobject key) {
+  return boilerplate_seek(env, ptr, [](pmem::kv::db::write_iterator *w_it, const char* ckey) {
+	  return w_it->seek_lower_eq(ckey);
+  }, key);
+}
 
 /*
  * Class:     io_pmem_pmemkv_Database_WriteIterator
  * Method:    iterator_seek_higher
- * Signature: (JLjava/lang/String;)V
+ * Signature: (JLjava/nio/ByteBuffer;)Z
  */
-JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_00024WriteIterator_iterator_1seek_1higher
-  (JNIEnv *, jobject, jlong, jstring);
+JNIEXPORT jboolean JNICALL Java_io_pmem_pmemkv_Database_00024WriteIterator_iterator_1seek_1higher
+  (JNIEnv *env, jobject, jlong ptr, jobject key) {
+  return boilerplate_seek(env, ptr, [](pmem::kv::db::write_iterator *w_it, const char* ckey) {
+	  return w_it->seek_higher(ckey);
+  }, key);
+}
 
 /*
  * Class:     io_pmem_pmemkv_Database_WriteIterator
  * Method:    iterator_seek_higher_eq
- * Signature: (JLjava/lang/String;)V
+ * Signature: (JLjava/nio/ByteBuffer;)Z
  */
-JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_00024WriteIterator_iterator_1seek_1higher_1eq
-  (JNIEnv *, jobject, jlong, jstring);
+JNIEXPORT jboolean JNICALL Java_io_pmem_pmemkv_Database_00024WriteIterator_iterator_1seek_1higher_1eq
+  (JNIEnv *env, jobject, jlong ptr, jobject key) {
+  return boilerplate_seek(env, ptr, [](pmem::kv::db::write_iterator *w_it, const char* ckey) {
+	  return w_it->seek_higher_eq(ckey);
+  }, key);
+}
 
 /*
  * Class:     io_pmem_pmemkv_Database_WriteIterator
@@ -73,23 +107,22 @@ JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_00024WriteIterator_iterator_
  */
 JNIEXPORT jboolean JNICALL Java_io_pmem_pmemkv_Database_00024WriteIterator_iterator_1seek_1to_1first
   (JNIEnv *env, jobject, jlong ptr) {
-    auto w_it = reinterpret_cast<pmem::kv::db::write_iterator*>(ptr);
-    auto status = w_it->seek_to_first();
-
-    if (status == pmem::kv::status::OK || status == pmem::kv::status::NOT_FOUND) {
-      return status == pmem::kv::status::OK;
-    }
-    PmemkvJavaException(env).ThrowException(status);
-    return false;
+    return boilerplate_seek(env, ptr, [](pmem::kv::db::write_iterator *w_it, const char* ckey) {
+      return w_it->seek_to_first();
+    });
 }
 
 /*
  * Class:     io_pmem_pmemkv_Database_WriteIterator
  * Method:    iterator_seek_to_last
- * Signature: (J)V
+ * Signature: (J)Z
  */
-JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_00024WriteIterator_iterator_1seek_1to_1last
-  (JNIEnv *, jobject, jlong);
+JNIEXPORT jboolean JNICALL Java_io_pmem_pmemkv_Database_00024WriteIterator_iterator_1seek_1to_1last
+  (JNIEnv *env, jobject, jlong ptr) {
+  return boilerplate_seek(env, ptr, [](pmem::kv::db::write_iterator *w_it, const char* ckey) {
+    return w_it->seek_to_last();
+  });
+}
 
 /*
  * Class:     io_pmem_pmemkv_Database_WriteIterator
@@ -98,14 +131,9 @@ JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_00024WriteIterator_iterator_
  */
 JNIEXPORT jboolean JNICALL Java_io_pmem_pmemkv_Database_00024WriteIterator_iterator_1is_1next
   (JNIEnv *env, jobject, jlong ptr) {
-    auto w_it = reinterpret_cast<pmem::kv::db::write_iterator*>(ptr);
-    auto status = w_it->is_next();
-
-    if (status == pmem::kv::status::OK || status == pmem::kv::status::NOT_FOUND) {
-      return status == pmem::kv::status::OK;
-    }
-    PmemkvJavaException(env).ThrowException(status);
-    return false;
+  return boilerplate_seek(env, ptr, [](pmem::kv::db::write_iterator *w_it, const char* ckey) {
+    return w_it->is_next();
+  });
 }
 
 /*
@@ -115,23 +143,22 @@ JNIEXPORT jboolean JNICALL Java_io_pmem_pmemkv_Database_00024WriteIterator_itera
  */
 JNIEXPORT jboolean JNICALL Java_io_pmem_pmemkv_Database_00024WriteIterator_iterator_1next
   (JNIEnv *env, jobject, jlong ptr) {
-    auto w_it = reinterpret_cast<pmem::kv::db::write_iterator*>(ptr);
-    auto status = w_it->next();
-
-    if (status == pmem::kv::status::OK || status == pmem::kv::status::NOT_FOUND) {
-      return status == pmem::kv::status::OK;
-    }
-    PmemkvJavaException(env).ThrowException(status);
-    return false;
+  return boilerplate_seek(env, ptr, [](pmem::kv::db::write_iterator *w_it, const char* ckey) {
+    return w_it->next();
+  });
 }
 
 /*
  * Class:     io_pmem_pmemkv_Database_WriteIterator
  * Method:    iterator_prev
- * Signature: (J)V
+ * Signature: (J)Z
  */
-JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_00024WriteIterator_iterator_1prev
-  (JNIEnv *, jobject, jlong);
+JNIEXPORT jboolean JNICALL Java_io_pmem_pmemkv_Database_00024WriteIterator_iterator_1prev
+  (JNIEnv *env, jobject, jlong ptr) {
+  return boilerplate_seek(env, ptr, [](pmem::kv::db::write_iterator *w_it, const char* ckey) {
+    return w_it->prev();
+  });
+}
 
 /*
  * Class:     io_pmem_pmemkv_Database_WriteIterator
