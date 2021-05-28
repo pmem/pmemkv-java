@@ -9,7 +9,6 @@ import java.lang.OutOfMemoryError;
 import java.nio.ByteBuffer;
 import java.nio.BufferOverflowException;
 import java.util.ArrayList;
-import java.lang.IllegalArgumentException;
 
 /**
  * Main Java binding pmemkv class, which is a local/embedded key-value datastore
@@ -57,12 +56,138 @@ public class Database<K, V> {
 		}
 
 		/**
-		 * Changes iterator position to the first record.
+		 * Changes iterator position to a record with the given key.
+		 *
+		 * If the record is present and no errors occurred, returns true. If the record
+		 * does not exist, false is returned and the iterator position is undefined. It
+		 * internally aborts all uncommitted changes made to an element previously
+		 * pointed by the iterator.
+		 *
+		 * @param key
+		 *            key to seek
+		 * @return true if success, false otherwise.
+		 * @throws DatabaseException
+		 *             or derived class that matches pmemkv's status
+		 * @since 1.2.0
+		 */
+		public boolean seek(K key) {
+			ByteBuffer direct_key = getDirectKeyBuffer(keyConverter.toByteBuffer(key));
+			return iterator_seek(it_ptr, direct_key);
+		}
+
+		/**
+		 * Changes iterator position to a record with a key lower than the given key.
+		 *
+		 * If the record is present and no errors occurred, returns true. If the record
+		 * does not exist, false is returned and the iterator position is undefined. It
+		 * internally aborts all uncommitted changes made to an element previously
+		 * pointed by the iterator.
+		 *
+		 * @param key
+		 *            key to seek
+		 * @return true if success, false otherwise
+		 * @throws DatabaseException
+		 *             or derived class that matches pmemkv's status
+		 * @since 1.2.0
+		 */
+		public boolean seekLower(K key) {
+			ByteBuffer direct_key = getDirectKeyBuffer(keyConverter.toByteBuffer(key));
+			return iterator_seek_lower(it_ptr, direct_key);
+		}
+
+		/**
+		 * Changes iterator position to a record with a key equal or lower than the
+		 * given key.
+		 *
+		 * If the record is present and no errors occurred, returns true. If the record
+		 * does not exist, false is returned and the iterator position is undefined. It
+		 * internally aborts all uncommitted changes made to an element previously
+		 * pointed by the iterator.
+		 *
+		 * @param key
+		 *            key to seek
+		 * @return true if success, false otherwise
+		 * @throws DatabaseException
+		 *             or derived class that matches pmemkv's status
+		 * @since 1.2.0
+		 */
+		public boolean seekLowerEq(K key) {
+			ByteBuffer direct_key = getDirectKeyBuffer(keyConverter.toByteBuffer(key));
+			return iterator_seek_lower_eq(it_ptr, direct_key);
+		}
+
+		/**
+		 * Changes iterator position to a record with a key higher than the given key.
+		 *
+		 * If the record is present and no errors occurred, returns true. If the record
+		 * does not exist, false is returned and the iterator position is undefined. It
+		 * internally aborts all uncommitted changes made to an element previously
+		 * pointed by the iterator.
+		 *
+		 * @param key
+		 *            key to seek
+		 * @return true if success, false otherwise
+		 * @throws DatabaseException
+		 *             or derived class that matches pmemkv's status
+		 * @since 1.2.0
+		 */
+		public boolean seekHigher(K key) {
+			ByteBuffer direct_key = getDirectKeyBuffer(keyConverter.toByteBuffer(key));
+			return iterator_seek_higher(it_ptr, direct_key);
+		}
+
+		/**
+		 * Changes iterator position to a record with a key equal or higher than the
+		 * given key.
+		 *
+		 * If the record is present and no errors occurred, returns true. If the record
+		 * does not exist, false is returned and the iterator position is undefined. It
+		 * internally aborts all uncommitted changes made to an element previously
+		 * pointed by the iterator.
+		 *
+		 * @param key
+		 *            key to seek
+		 * @return true if success, false otherwise
+		 * @throws DatabaseException
+		 *             or derived class that matches pmemkv's status
+		 * @since 1.2.0
+		 */
+		public boolean seekHigherEq(K key) {
+			ByteBuffer direct_key = getDirectKeyBuffer(keyConverter.toByteBuffer(key));
+			return iterator_seek_higher_eq(it_ptr, direct_key);
+		}
+
+		/**
+		 * Changes iterator position to a first record.
+		 *
+		 * If db isn't empty and no errors occurred, returns true. If db is empty, false
+		 * is returned and the iterator position is undefined. It internally aborts all
+		 * uncommited changes made to an element previously pointed by the iterator.
 		 *
 		 * @return true if success, false otherwise
+		 * @throws DatabaseException
+		 *             or derived class that matches pmemkv's status
+		 * @since 1.2.0
 		 */
 		public boolean seekToFirst() {
 			return iterator_seek_to_first(it_ptr);
+		}
+
+		/**
+		 * Changes iterator position to a last record.
+		 *
+		 * If db isn't empty and no errors occurred, returns true. If db is empty, false
+		 * is returned and the iterator position is undefined. It internally aborts all
+		 * uncommited changes made to an element previously pointed by the iterator.
+		 *
+		 * @return true if success, false otherwise
+		 * @throws DatabaseException
+		 *             or derived class that matches pmemkv's status
+		 * @since 1.2.0
+		 */
+
+		public boolean seekToLast() {
+			return iterator_seek_to_last(it_ptr);
 		}
 
 		/**
@@ -72,6 +197,7 @@ public class Database<K, V> {
 		 * behaviour.
 		 *
 		 * @return key of type K
+		 * @since 1.2.0
 		 */
 		public K key() {
 			ByteBuffer value;
@@ -91,7 +217,8 @@ public class Database<K, V> {
 		 * status::OK, otherwise iterator is already on the last element and
 		 * iterator.next() will return false.
 		 *
-		 * @return true if there is a next record available, false otherwise.
+		 * @return true if there is a next record available, false otherwise
+		 * @since 1.2.0
 		 */
 		public boolean isNext() {
 			return iterator_is_next(it_ptr);
@@ -103,7 +230,8 @@ public class Database<K, V> {
 		 * If the next record exists, returns true, otherwise false is returned and the
 		 * iterator position is undefined.
 		 *
-		 * @return true if the iterator was moved on the next record, false otherwise.
+		 * @return true if the iterator was moved on the next record, false otherwise
+		 * @since 1.2.0
 		 */
 		public boolean next() {
 			return iterator_next(it_ptr);
@@ -111,6 +239,8 @@ public class Database<K, V> {
 
 		/**
 		 * Releases underlying resources
+		 *
+		 * @since 1.2.0
 		 */
 		public void close() {
 			iterator_close(it_ptr);
@@ -118,16 +248,16 @@ public class Database<K, V> {
 		}
 
 		private native long iterator_new_write_iterator(long database_handle);
-		private native void iterator_seek(long iterator_handle, String key);
-		private native void iterator_seek_lower(long iterator_handle, String key);
-		private native void iterator_seek_lower_eq(long iterator_handle, String key);
-		private native void iterator_seek_higher(long iterator_handle, String key);
-		private native void iterator_seek_higher_eq(long iterator_handle, String key);
+		private native boolean iterator_seek(long iterator_handle, ByteBuffer key);
+		private native boolean iterator_seek_lower(long iterator_handle, ByteBuffer key);
+		private native boolean iterator_seek_lower_eq(long iterator_handle, ByteBuffer key);
+		private native boolean iterator_seek_higher(long iterator_handle, ByteBuffer key);
+		private native boolean iterator_seek_higher_eq(long iterator_handle, ByteBuffer key);
 		private native boolean iterator_seek_to_first(long iterator_handle);
-		private native void iterator_seek_to_last(long iterator_handle);
+		private native boolean iterator_seek_to_last(long iterator_handle);
 		private native boolean iterator_is_next(long iterator_handle);
 		private native boolean iterator_next(long iterator_handle);
-		private native void iterator_prev(long iterator_handle);
+		private native boolean iterator_prev(long iterator_handle);
 		private native ByteBuffer iterator_key(long iterator_handle);
 		private native byte[] iterator_read_range(long iterator_handle);
 		// write_range()
@@ -254,6 +384,7 @@ public class Database<K, V> {
 	 * the only one way to get an iterator object.
 	 *
 	 * @throws DatabaseException
+	 *             or derived class that matches pmemkv's status.
 	 */
 	public WriteIterator iterator() throws DatabaseException {
 		return new WriteIterator(pointer);
