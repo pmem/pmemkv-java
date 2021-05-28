@@ -124,7 +124,8 @@ void Callback_get_value_buffer(const char* v, size_t vb, void *arg) {
 int Callback_get_keys_buffer(const char* k, size_t kb, const char* v, size_t vb, void *arg) {
     const auto c = static_cast<Context*>(arg);
     Callback_get_value_buffer(k, kb, arg);
-    if (c->env->ExceptionOccurred()) {
+    if (c->env->ExceptionCheck() = JNI_TRUE) {
+        c->env->ExceptionClear();
         return 1;
     }
     return 0;
@@ -226,7 +227,8 @@ int Callback_get_all_buffer(const char* k, size_t kb, const char* v, size_t vb, 
         c->env->DeleteLocalRef(keybuf);
         c->env->DeleteLocalRef(valuebuf);
     }
-    if( c->env->ExceptionOccurred()) {
+    if (c->env->ExceptionCheck() == JNI_TRUE) {
+        c->env->ExceptionClear();
         return 1;
     }
     return 0;
