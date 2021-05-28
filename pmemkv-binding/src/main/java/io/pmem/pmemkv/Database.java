@@ -9,7 +9,6 @@ import java.lang.OutOfMemoryError;
 import java.nio.ByteBuffer;
 import java.nio.BufferOverflowException;
 import java.util.ArrayList;
-import java.lang.IllegalArgumentException;
 
 /**
  * Main Java binding pmemkv class, which is a local/embedded key-value datastore
@@ -57,12 +56,104 @@ public class Database<K, V> {
 		}
 
 		/**
+		 * Changes iterator position to the record with given key.
+		 *
+		 * If the record is present and no errors occurred, returns true. If the record
+		 * does not exist, false is returned and the iterator position is undefined. It
+		 * internally aborts all changes made to an element previously pointed by the
+		 * iterator.
+		 *
+		 * @return true if success, false otherwise
+		 * @throws DatabaseException
+		 */
+		public boolean seek(K key) {
+			ByteBuffer direct_key = getDirectKeyBuffer(keyConverter.toByteBuffer(key));
+			return iterator_seek(it_ptr, direct_key);
+		}
+
+		/**
+		 * Changes iterator position to the record with key lower than given key.
+		 *
+		 * If the record is present and no errors occurred, returns true. If the record
+		 * does not exist, false is returned and the iterator position is undefined. It
+		 * internally aborts all changes made to an element previously pointed by the
+		 * iterator.
+		 *
+		 * @return true if success, false otherwise
+		 * @throws DatabaseException
+		 */
+		public boolean seekLower(K key) {
+			ByteBuffer direct_key = getDirectKeyBuffer(keyConverter.toByteBuffer(key));
+			return iterator_seek_lower(it_ptr, direct_key);
+		}
+
+		/**
+		 * Changes iterator position to the record with key equal or lower than given
+		 * key.
+		 *
+		 * If the record is present and no errors occurred, returns true. If the record
+		 * does not exist, false is returned and the iterator position is undefined. It
+		 * internally aborts all changes made to an element previously pointed by the
+		 * iterator.
+		 *
+		 * @return true if success, false otherwise
+		 * @throws DatabaseException
+		 */
+		public boolean seekLowerEq(K key) {
+			ByteBuffer direct_key = getDirectKeyBuffer(keyConverter.toByteBuffer(key));
+			return iterator_seek_lower_eq(it_ptr, direct_key);
+		}
+
+		/**
+		 * Changes iterator position to the record with key higher than given key.
+		 *
+		 * If the record is present and no errors occurred, returns true. If the record
+		 * does not exist, false is returned and the iterator position is undefined. It
+		 * internally aborts all changes made to an element previously pointed by the
+		 * iterator.
+		 *
+		 * @return true if success, false otherwise
+		 * @throws DatabaseException
+		 */
+		public boolean seekHigher(K key) {
+			ByteBuffer direct_key = getDirectKeyBuffer(keyConverter.toByteBuffer(key));
+			return iterator_seek_higher(it_ptr, direct_key);
+		}
+
+		/**
+		 * Changes iterator position to the record with key equal or higher than given
+		 * key.
+		 *
+		 * If the record is present and no errors occurred, returns true. If the record
+		 * does not exist, false is returned and the iterator position is undefined. It
+		 * internally aborts all changes made to an element previously pointed by the
+		 * iterator.
+		 *
+		 * @return true if success, false otherwise
+		 * @throws DatabaseException
+		 */
+		public boolean seekHigherEq(K key) {
+			ByteBuffer direct_key = getDirectKeyBuffer(keyConverter.toByteBuffer(key));
+			return iterator_seek_higher_eq(it_ptr, direct_key);
+		}
+
+		/**
 		 * Changes iterator position to the first record.
 		 *
 		 * @return true if success, false otherwise
 		 */
 		public boolean seekToFirst() {
 			return iterator_seek_to_first(it_ptr);
+		}
+
+		/**
+		 * TBD
+		 *
+		 * @return true if success, false otherwise
+		 */
+
+		public boolean seekToLast() {
+			return iterator_seek_to_last(it_ptr);
 		}
 
 		/**
@@ -118,16 +209,16 @@ public class Database<K, V> {
 		}
 
 		private native long iterator_new_write_iterator(long database_handle);
-		private native void iterator_seek(long iterator_handle, String key);
-		private native void iterator_seek_lower(long iterator_handle, String key);
-		private native void iterator_seek_lower_eq(long iterator_handle, String key);
-		private native void iterator_seek_higher(long iterator_handle, String key);
-		private native void iterator_seek_higher_eq(long iterator_handle, String key);
+		private native boolean iterator_seek(long iterator_handle, ByteBuffer key);
+		private native boolean iterator_seek_lower(long iterator_handle, ByteBuffer key);
+		private native boolean iterator_seek_lower_eq(long iterator_handle, ByteBuffer key);
+		private native boolean iterator_seek_higher(long iterator_handle, ByteBuffer key);
+		private native boolean iterator_seek_higher_eq(long iterator_handle, ByteBuffer key);
 		private native boolean iterator_seek_to_first(long iterator_handle);
-		private native void iterator_seek_to_last(long iterator_handle);
+		private native boolean iterator_seek_to_last(long iterator_handle);
 		private native boolean iterator_is_next(long iterator_handle);
 		private native boolean iterator_next(long iterator_handle);
-		private native void iterator_prev(long iterator_handle);
+		private native boolean iterator_prev(long iterator_handle);
 		private native ByteBuffer iterator_key(long iterator_handle);
 		private native byte[] iterator_read_range(long iterator_handle);
 		// write_range()
