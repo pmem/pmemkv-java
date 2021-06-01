@@ -1,11 +1,14 @@
 // SPDX-License-Identifier: BSD-3-Clause
-/* Copyright 2020, Intel Corporation */
+/* Copyright 2020-2021, Intel Corporation */
 
 import io.pmem.pmemkv.Database;
 import io.pmem.pmemkv.Converter;
 
 import java.nio.ByteBuffer;
 
+/* Implementation of Converter interface to allow
+ * storing (in Database) keys and values as Strings.
+ */
 class StringConverter implements Converter<String> {
 	public ByteBuffer toByteBuffer(String entry) {
 		return ByteBuffer.wrap(entry.getBytes());
@@ -20,12 +23,10 @@ class StringConverter implements Converter<String> {
 }
 
 public class StringExample {
-
 	public static void main(String[] args) {
 		String ENGINE = "vsmap";
 
 		System.out.println("Starting engine");
-
 		Database<String, String> db = new Database.Builder<String, String>(ENGINE)
 				.setSize(1073741824)
 				.setPath("/dev/shm")
@@ -38,11 +39,19 @@ public class StringExample {
 		assert db.countAll() == 1;
 
 		System.out.println("Reading key back");
-		assert db.getCopy("key1").equals("value1");
+		String value = db.getCopy("key1");
+		assert value.equals("value1");
 
-		System.out.println("Iterating existing keys");
+		System.out.println("Reading key back using callback");
+		db.get("key1", (String v) -> {
+			assert v.equals("value1");
+		});
+
+		System.out.println("Putting more keys");
 		db.put("key2", "value2");
 		db.put("key3", "value3");
+
+		System.out.println("Iterating existing keys");
 		db.getKeys((k) -> System.out.println("  visited: " + k));
 
 		System.out.println("Removing existing key");

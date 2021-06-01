@@ -15,8 +15,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
+/* Helper implementation, extending InputStream.
+ * We'll use it to store images as ByteBuffer.
+ */
 class ByteBufferBackedInputStream extends InputStream {
-
 	ByteBuffer buff;
 
 	public ByteBufferBackedInputStream(ByteBuffer buff) {
@@ -41,6 +43,10 @@ class ByteBufferBackedInputStream extends InputStream {
 	}
 }
 
+/*
+ * We want to use String as keys, so we need to show how to convert it into/from
+ * ByteBuffer.
+ */
 class StringConverter implements Converter<String> {
 	public ByteBuffer toByteBuffer(String entry) {
 		return ByteBuffer.wrap(entry.getBytes());
@@ -54,6 +60,7 @@ class StringConverter implements Converter<String> {
 	}
 }
 
+/* And BufferedImage will be our values. */
 class ImageConverter implements Converter<BufferedImage> {
 	public ByteBuffer toByteBuffer(BufferedImage entry) {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -76,34 +83,37 @@ class ImageConverter implements Converter<BufferedImage> {
 	}
 }
 
-/* Add Pmemkv superpowers to the Canvas class */
+/* Add pmemkv's superpowers to the Canvas class */
 class PmemkvPicture extends Canvas {
 	private static final long serialVersionUID = 705612541135496879L;
+
+	/* Use Strings as keys and BufferedImages as values */
 	private Database<String, BufferedImage> db;
 	private String engine = "cmap";
 
-	public PmemkvPicture(String Path, int size) {
-		System.out.println("Creating new database in path: " + Path + " with size: " + size);
+	public PmemkvPicture(String path, int size) {
+		System.out.println("Creating new database in path: " + path + " with size: " + size);
 		db = new Database.Builder<String, BufferedImage>(engine)
 				.setSize(size)
-				.setPath(Path)
+				.setPath(path)
 				.setKeyConverter(new StringConverter())
 				.setValueConverter(new ImageConverter())
 				.setForceCreate(true)
 				.build();
 	}
 
-	public PmemkvPicture(String Path) {
-		System.out.println("Using already existing database: " + Path);
+	public PmemkvPicture(String path) {
+		System.out.println("Using already existing database: " + path);
 		db = new Database.Builder<String, BufferedImage>(engine)
-				.setPath(Path)
+				.setPath(path)
 				.setKeyConverter(new StringConverter())
 				.setValueConverter(new ImageConverter())
 				.build();
 	}
 
-	public void putAllPicturesFromDirectory(String dir_path) {
-		File[] images = new File(dir_path).listFiles((dir, name) -> name.endsWith(".png"));
+	/* Simply read all images from a directory and put them into Database. */
+	public void putAllPicturesFromDirectory(String dirPath) {
+		File[] images = new File(dirPath).listFiles((dir, name) -> name.endsWith(".png"));
 		for (File image : images) {
 			System.out.println(image.getAbsolutePath());
 
@@ -128,6 +138,12 @@ class PmemkvPicture extends Canvas {
 	}
 }
 
+/*
+ * Main example's class.
+ *
+ * Reads parameters from environment, open/create database, optionally load
+ * pictures from directory, paint them all in JFrame.
+ */
 public class PicturesExample {
 	public static void main(String[] args) {
 		String inputDirEnv = System.getenv("InputDir");
@@ -155,14 +171,18 @@ public class PicturesExample {
 
 		PmemkvPicture m = null;
 		if (pmemkvSize != 0) {
+			/* if size is given we create new database */
 			m = new PmemkvPicture(pmemkvPathEnv, pmemkvSize);
 		} else {
+			/* only path was given, we open existing database with pictures */
 			m = new PmemkvPicture(pmemkvPathEnv);
 		}
+		/* input dir was set - we're loading all .png pictures into database */
 		if (inputDirEnv != null) {
 			System.out.println("Loading files from " + inputDirEnv + " to pmemkv database.");
 			m.putAllPicturesFromDirectory(inputDirEnv);
 		}
+
 		JFrame f = new JFrame();
 		f.add(m);
 		f.setSize(512, 512);

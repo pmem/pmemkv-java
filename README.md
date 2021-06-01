@@ -100,7 +100,7 @@ We use `/dev/shm` with [emulated persistent memory](https://pmem.io/2016/02/22/p
 in examples.
 
 Examples can be found within this repository in [examples directory](https://github.com/pmem/pmemkv-java/tree/master/examples).
-To execute them, run e.g.:
+To execute them install pmemkv-java and run e.g.:
 
 ```sh
 cd examples
