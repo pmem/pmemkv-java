@@ -167,16 +167,14 @@ public class ExceptionTest {
 	/* Exceptions in Gets methods */
 
 	@Test
-	public void exceptionInGetallTest() {
-		int exception_counter = 0;
-		try {
+	public void exceptionInGetAllTest() {
+		String exception_message = "Inner exception";
+		Exception exception = assertThrows(CustomException.class, () -> {
 			db.getAll((k, v) -> {
-				throw new RuntimeException("Inner exception");
+				throw new CustomException(exception_message);
 			});
-		} catch (Exception e) {
-			exception_counter++;
-		}
-		assertEquals(exception_counter, 1);
+		});
+		assertEquals(exception_message, exception.getMessage());
 	}
 
 	@Test

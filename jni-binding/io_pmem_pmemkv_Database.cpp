@@ -29,10 +29,10 @@ public:
     void ThrowException(pmem::kv::status status, const char* msg =  pmemkv_errormsg()){
         jclass exception_class;
         exception_class = env->FindClass(PmemkvStatusDispatcher[status]);
-        if(exception_class == NULL) {
+        if (exception_class == NULL) {
             exception_class = env->FindClass(DatabaseException);
         }
-        if(exception_class == NULL) {
+        if (exception_class == NULL) {
             exception_class = env->FindClass(GeneralException);
         }
         env->ThrowNew(exception_class, msg);
@@ -41,10 +41,11 @@ public:
     void ThrowException(const char* signature, const char* msg=""){
         jclass exception_class;
         exception_class = env->FindClass(signature);
-        if(exception_class == NULL) {
+        if (exception_class == NULL) {
             exception_class = env->FindClass(GeneralException);
         }
         env->ThrowNew(exception_class, msg);
+        env->DeleteLocalRef(exception_class);
     }
 };
 
@@ -86,7 +87,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_io_pmem_pmemkv_Database_database_1start
     env->ReleaseStringUTFChars(engine, cengine);
 
     if (status != pmem::kv::status::OK) {
-            PmemkvJavaException(env).ThrowException(status);
+        PmemkvJavaException(env).ThrowException(status);
     }
     return (jlong) db;
 }
@@ -124,7 +125,7 @@ void Callback_get_value_buffer(const char* v, size_t vb, void *arg) {
 int Callback_get_keys_buffer(const char* k, size_t kb, const char* v, size_t vb, void *arg) {
     const auto c = static_cast<Context*>(arg);
     Callback_get_value_buffer(k, kb, arg);
-    if (c->env->ExceptionOccurred()) {
+    if (c->env->ExceptionCheck() == JNI_TRUE) {
         return 1;
     }
     return 0;
@@ -135,6 +136,7 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1ke
     auto engine = reinterpret_cast<pmem::kv::db*>(pointer);
     auto ctx = Context(env, obj, callback, keyCallbackID);
     auto status = engine->get_all(Callback_get_keys_buffer, &ctx);
+    if (env->ExceptionCheck() == JNI_TRUE) return;
     if (status != pmem::kv::status::OK) PmemkvJavaException(env).ThrowException(status);
 }
 
@@ -145,6 +147,7 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1ke
     pmem::kv::string_view cppkey(ckey, keybytes);
     auto cxt = Context(env, obj, callback, keyCallbackID);
     auto status = engine->get_above(cppkey, Callback_get_keys_buffer, &cxt);
+    if (env->ExceptionCheck() == JNI_TRUE) return;
     if (status != pmem::kv::status::OK) PmemkvJavaException(env).ThrowException(status);
 }
 
@@ -155,6 +158,7 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1ke
     pmem::kv::string_view cppkey(ckey, keybytes);
     auto cxt = Context(env, obj, callback, keyCallbackID);
     auto status = engine->get_below(cppkey, Callback_get_keys_buffer, &cxt);
+    if (env->ExceptionCheck() == JNI_TRUE) return;
     if (status != pmem::kv::status::OK) PmemkvJavaException(env).ThrowException(status);
 }
 
@@ -167,6 +171,7 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1ke
     pmem::kv::string_view cppkey2(ckey2, keybytes2);
     auto cxt = Context(env, obj, callback, keyCallbackID);
     auto status = engine->get_between(cppkey1, cppkey2, Callback_get_keys_buffer, &cxt);
+    if (env->ExceptionCheck() == JNI_TRUE) return;
     if (status != pmem::kv::status::OK) PmemkvJavaException(env).ThrowException(status);
 }
 
@@ -220,13 +225,18 @@ int Callback_get_all_buffer(const char* k, size_t kb, const char* v, size_t vb, 
     const auto c = static_cast<Context*>(arg);
 
     jobject keybuf = c->env->NewDirectByteBuffer(const_cast<char*>(k), kb);
+    if (c->env->ExceptionCheck() == JNI_TRUE)
+        return 1;
     jobject valuebuf = c->env->NewDirectByteBuffer(const_cast<char*>(v), vb);
+    if (c->env->ExceptionCheck() == JNI_TRUE)
+        return 1;
+
     if(keybuf && valuebuf) {
         c->env->CallStaticVoidMethod(c->env->GetObjectClass(c->db), c->mid, c->db, c->callback, kb, keybuf, vb, valuebuf);
         c->env->DeleteLocalRef(keybuf);
         c->env->DeleteLocalRef(valuebuf);
     }
-    if( c->env->ExceptionOccurred()) {
+    if (c->env->ExceptionCheck() == JNI_TRUE) {
         return 1;
     }
     return 0;
@@ -237,6 +247,8 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1al
     auto engine = reinterpret_cast<pmem::kv::db*>(pointer);
     auto cxt = Context(env, obj, callback, keyValueCallbackID);
     auto status = engine->get_all(Callback_get_all_buffer, &cxt);
+    if (env->ExceptionCheck() == JNI_TRUE)
+        return; // Propagate exception raised by CallStaticVoidMethod()
     if (status != pmem::kv::status::OK) PmemkvJavaException(env).ThrowException(status);
 }
 
@@ -247,6 +259,8 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1ab
     pmem::kv::string_view cppkey(ckey, keybytes);
     auto cxt = Context(env, obj, callback, keyValueCallbackID);
     auto status = engine->get_above(cppkey, Callback_get_all_buffer, &cxt);
+    if (env->ExceptionCheck() == JNI_TRUE)
+        return; // Propagate exception raised by CallStaticVoidMethod()
     if (status != pmem::kv::status::OK) PmemkvJavaException(env).ThrowException(status);
 }
 
@@ -257,6 +271,8 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1be
     pmem::kv::string_view cppkey(ckey, keybytes);
     auto cxt = Context(env, obj, callback, keyValueCallbackID);
     auto status = engine->get_below(cppkey, Callback_get_all_buffer,&cxt);
+    if (env->ExceptionCheck() == JNI_TRUE)
+        return; // Propagate exception raised by CallStaticVoidMethod()
     if (status != pmem::kv::status::OK) PmemkvJavaException(env).ThrowException(status);
 }
 
@@ -269,6 +285,8 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1be
     pmem::kv::string_view cppkey2(ckey2, keybytes2);
     auto cxt = Context(env, obj, callback, keyValueCallbackID);
     auto status = engine->get_between(cppkey1, cppkey2, Callback_get_all_buffer, &cxt);
+    if (env->ExceptionCheck() == JNI_TRUE)
+        return; // Propagate exception raised by CallStaticVoidMethod()
     if (status != pmem::kv::status::OK) PmemkvJavaException(env).ThrowException(status);
 }
 
@@ -310,6 +328,7 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1get_1bu
     pmem::kv::string_view cppkey(ckey, keybytes);
     auto cxt = Context(env, obj, callback, valueCallbackID);
     auto status = engine->get(cppkey, Callback_get_value_buffer, &cxt);
+    if (env->ExceptionCheck() == JNI_TRUE) return;
     if (status != pmem::kv::status::OK) PmemkvJavaException(env).ThrowException(status);
 }
 
@@ -320,6 +339,7 @@ extern "C" JNIEXPORT jbyteArray JNICALL Java_io_pmem_pmemkv_Database_database_1g
     pmem::kv::string_view cppkey(ckey, keybytes);
     ContextGetByteArray cxt = ContextGetByteArray(env);
     auto status = engine->get(cppkey, callback_get_byte_array, &cxt);
+    if (env->ExceptionCheck() == JNI_TRUE) return nullptr;
     if (status != pmem::kv::status::OK)
         PmemkvJavaException(env).ThrowException(status);
     return cxt.result;

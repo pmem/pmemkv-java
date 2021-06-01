@@ -117,9 +117,12 @@ public class CmapTest {
 		runParallel(threadsNumber, () -> {
 			for (int j = numberOfElements - 1; j >= 0; --j) {
 				final int x = j;
-				db.get(stringToByteBuffer(Integer.toString(x)), (ByteBuffer v) -> {
-					assertEquals(byteBufferToString(v), Integer.toString(x + 1));
-				});
+				try {
+					db.get(stringToByteBuffer(Integer.toString(x)), (ByteBuffer v) -> {
+						assertEquals(byteBufferToString(v), Integer.toString(x + 1));
+					});
+				} catch (Exception e) {
+				}
 			}
 		});
 
@@ -151,16 +154,22 @@ public class CmapTest {
 		runParallel(threadsNumber, () -> {
 			for (int j = 0; j < numberOfElements; ++j) {
 				final int x = j;
-				dbString.get(sb.substring(0, x), (String v) -> {
-					assertEquals(v, sb.substring(0, x + 1));
-				});
+				try {
+					dbString.get(sb.substring(0, x), (String v) -> {
+						assertEquals(v, sb.substring(0, x + 1));
+					});
+				} catch (Exception e) {
+				}
 			}
 		}, () -> {
 			for (int j = 0; j < numberOfElements; ++j) {
 				final int x = j;
-				dbByteBuffer.get(stringToByteBuffer(sb.substring(0, x)), (ByteBuffer v) -> {
-					assertEquals(byteBufferToString(v), sb.substring(0, x + 1));
-				});
+				try {
+					dbByteBuffer.get(stringToByteBuffer(sb.substring(0, x)), (ByteBuffer v) -> {
+						assertEquals(byteBufferToString(v), sb.substring(0, x + 1));
+					});
+				} catch (Exception e) {
+				}
 			}
 		});
 		dbByteBuffer.stop();
