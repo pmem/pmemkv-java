@@ -167,7 +167,7 @@ public class ExceptionTest {
 	/* Exceptions in Gets methods */
 
 	@Test
-	public void exceptionInGetallTest() {
+	public void exceptionInGetAllTest() {
 		int exception_counter = 0;
 		try {
 			db.getAll((k, v) -> {
@@ -177,6 +177,13 @@ public class ExceptionTest {
 			exception_counter++;
 		}
 		assertEquals(exception_counter, 1);
+	}
+
+	@Test(expected = StoppedByCallbackException.class)
+	public void exceptionStoppedByCallbackInGetAllTest() {
+		db.getAll((k, v) -> {
+			throw new RuntimeException("Inner exception");
+		});
 	}
 
 	@Test

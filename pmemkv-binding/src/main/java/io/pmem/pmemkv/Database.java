@@ -8,6 +8,7 @@ import java.nio.ByteBuffer;
 import java.nio.BufferOverflowException;
 import java.util.ArrayList;
 import java.lang.IllegalArgumentException;
+import java.lang.OutOfMemoryError;
 
 /**
  * Main Java binding pmemkv class, which is a local/embedded key-value datastore
@@ -150,9 +151,11 @@ public class Database<K, V> {
 	 *            Function to be called for each key.
 	 * @throws DatabaseException
 	 *             with pmemkv return status.
+	 * @throws OutOfMemoryException
+	 *             Exception will be thrown when data cannot be allocated in DRAM.
 	 * @since 1.0
 	 */
-	public void getKeys(KeyCallback<K> callback) throws DatabaseException {
+	public void getKeys(KeyCallback<K> callback) throws DatabaseException, OutOfMemoryException {
 		database_get_keys_buffer(pointer, callback);
 	}
 
@@ -169,9 +172,11 @@ public class Database<K, V> {
 	 *            Function to be called for each key.
 	 * @throws DatabaseException
 	 *             with pmemkv return status.
+	 * @throws OutOfMemoryException
+	 *             Exception will be thrown when data cannot be allocated in DRAM.
 	 * @since 1.0
 	 */
-	public void getKeysAbove(K key, KeyCallback<K> callback) throws DatabaseException {
+	public void getKeysAbove(K key, KeyCallback<K> callback) throws DatabaseException, OutOfMemoryException {
 		ByteBuffer direct_key = getDirectKeyBuffer(keyConverter.toByteBuffer(key));
 		database_get_keys_above_buffer(pointer, direct_key.position(), direct_key, callback);
 	}
@@ -189,9 +194,11 @@ public class Database<K, V> {
 	 *            Function to be called for each key.
 	 * @throws DatabaseException
 	 *             with pmemkv return status.
+	 * @throws OutOfMemoryException
+	 *             Exception will be thrown when data cannot be allocated in DRAM.
 	 * @since 1.0
 	 */
-	public void getKeysBelow(K key, KeyCallback<K> callback) throws DatabaseException {
+	public void getKeysBelow(K key, KeyCallback<K> callback) throws DatabaseException, OutOfMemoryException {
 		ByteBuffer direct_key = getDirectKeyBuffer(keyConverter.toByteBuffer(key));
 		database_get_keys_below_buffer(pointer, direct_key.position(), direct_key, callback);
 	}
@@ -211,9 +218,11 @@ public class Database<K, V> {
 	 *            Function to be called for each key.
 	 * @throws DatabaseException
 	 *             with pmemkv return status.
+	 * @throws OutOfMemoryException
+	 *             Exception will be thrown when data cannot be allocated in DRAM.
 	 * @since 1.0
 	 */
-	public void getKeysBetween(K key1, K key2, KeyCallback<K> callback) throws DatabaseException {
+	public void getKeysBetween(K key1, K key2, KeyCallback<K> callback) throws DatabaseException, OutOfMemoryException {
 		ByteBuffer direct_key1 = getDirectKeyBuffer(keyConverter.toByteBuffer(key1), ThreadDirectBuffers.KEY1_BUFFER);
 		ByteBuffer direct_key2 = getDirectKeyBuffer(keyConverter.toByteBuffer(key2), ThreadDirectBuffers.KEY2_BUFFER);
 		database_get_keys_between_buffer(pointer, direct_key1.position(), direct_key1, direct_key2.position(),
@@ -399,7 +408,7 @@ public class Database<K, V> {
 	 *             with pmemkv return status.
 	 * @since 1.0
 	 */
-	public void get(K key, ValueCallback<V> callback) throws DatabaseException {
+	public void get(K key, ValueCallback<V> callback) throws DatabaseException, OutOfMemoryException {
 		ByteBuffer direct_key = getDirectKeyBuffer(keyConverter.toByteBuffer(key));
 		database_get_buffer_with_callback(pointer, direct_key.position(), direct_key, callback);
 	}
