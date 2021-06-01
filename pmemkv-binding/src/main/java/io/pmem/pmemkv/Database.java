@@ -4,11 +4,11 @@
 package io.pmem.pmemkv;
 
 import java.io.*;
+import java.lang.IllegalArgumentException;
+import java.lang.OutOfMemoryError;
 import java.nio.ByteBuffer;
 import java.nio.BufferOverflowException;
 import java.util.ArrayList;
-import java.lang.IllegalArgumentException;
-import java.lang.OutOfMemoryError;
 
 /**
  * Main Java binding pmemkv class, which is a local/embedded key-value datastore
@@ -17,8 +17,9 @@ import java.lang.OutOfMemoryError;
  * bindings and storage engines.
  * <p>
  * This generic class allows to store data of any type (as both key and value).
- * In most cases user needs to implement Converter interface, which provides
- * functionality of converting between key and value types, and ByteBuffer.
+ * In most cases user needs to implement {@link io.pmem.pmemkv.Converter
+ * Converter} interface, which provides functionality of converting between key
+ * and value types, and ByteBuffer.
  *
  * @see <a href= "https://github.com/pmem/pmemkv/">Pmemkv library
  *      description</a>
@@ -165,7 +166,7 @@ public class Database<K, V> {
 	 * whose keys are greater than the given key.
 	 * <p>
 	 * Comparison mechanism is based on binary comparison of bytes - by a function
-	 * equivalent to std::string::compare in C++. Any Exception thrown by the user
+	 * equivalent to std::string::compare in C++. Any exception thrown by the user
 	 * from callback will be propagated.
 	 *
 	 * @param key
@@ -188,7 +189,7 @@ public class Database<K, V> {
 	 * whose keys are less than the given key.
 	 * <p>
 	 * Comparison mechanism is based on binary comparison of bytes - by a function
-	 * equivalent to std::string::compare in C++. Any Exception thrown by the user
+	 * equivalent to std::string::compare in C++. Any exception thrown by the user
 	 * from callback will be propagated.
 	 *
 	 * @param key
@@ -211,7 +212,7 @@ public class Database<K, V> {
 	 * whose keys are greater than the key1 and less than the key2.
 	 * <p>
 	 * Comparison mechanism is based on binary comparison of bytes - by a function
-	 * equivalent to std::string::compare in C++. Any Exception thrown by the user
+	 * equivalent to std::string::compare in C++. Any exception thrown by the user
 	 * from callback will be propagated.
 	 *
 	 * @param key1
@@ -311,7 +312,7 @@ public class Database<K, V> {
 
 	/**
 	 * Executes callback function for every key/value pair stored in the pmemkv
-	 * datastore. Any Exception thrown by the user from callback will be propagated.
+	 * datastore. Any exception thrown by the user from callback will be propagated.
 	 *
 	 * @param callback
 	 *            Function to be called for each key/value pair.
@@ -403,8 +404,9 @@ public class Database<K, V> {
 	}
 
 	/**
-	 * Executes callback function on the value for a given key. Any Exception thrown
-	 * by the user from callback will be propagated.
+	 * Executes callback function on the value for a given key. It allows to read
+	 * the entire value for a given key. Any exception thrown by the user from
+	 * callback will be propagated.
 	 *
 	 * @param key
 	 *            key to query for.
@@ -422,11 +424,12 @@ public class Database<K, V> {
 	}
 
 	/**
-	 * Gets a copy of the value for a given key.
+	 * Gets a copy of the entire value for a given key.
 	 *
 	 * @param key
 	 *            key to query for.
-	 * @return Copy of value associated with the given key or null if not found.
+	 * @return Copy of the entire value associated with the given key, or null if
+	 *         not found.
 	 * @throws DatabaseException
 	 *             with pmemkv return status.
 	 * @since 1.0
@@ -447,7 +450,9 @@ public class Database<K, V> {
 	}
 
 	/**
-	 * Inserts new key/value pair into the pmemkv datastore.
+	 * Inserts new key/value pair into the pmemkv datastore. If the record with
+	 * selected key already exists it will replace the entire (existing) value with
+	 * new value.
 	 *
 	 * @param key
 	 *            the key.
@@ -581,7 +586,7 @@ public class Database<K, V> {
 		 * <p>
 		 * All data is internally stored as ByteBuffer. It's possible to store objects
 		 * of an arbitrary chosen type K as a key by providing object, which implements
-		 * conversion between K and ByteBuffer. Type of such an object has to implement
+		 * conversion between K and ByteBuffer. Type of such object has to implement
 		 * Converter interface.
 		 *
 		 * @param newKeyConverter
@@ -599,7 +604,7 @@ public class Database<K, V> {
 		 * <p>
 		 * All data is internally stored as ByteBuffer. It's possible to store objects
 		 * of an arbitrary chosen type V as a value by providing object, which
-		 * implements conversion between V and ByteBuffer. Type of such an object has to
+		 * implements conversion between V and ByteBuffer. Type of such object has to
 		 * implement Converter interface.
 		 *
 		 * @param newValueConverter

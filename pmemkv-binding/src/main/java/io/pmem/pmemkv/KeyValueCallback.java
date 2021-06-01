@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: BSD-3-Clause
-/* Copyright 2017-2020, Intel Corporation */
+/* Copyright 2017-2021, Intel Corporation */
 
 package io.pmem.pmemkv;
 
 /**
  * Represents callback function, which handle key/value use cases. Such
- * expression may be passed to get*() methods in Database class.
+ * expression may be passed to get*() methods in {@link io.pmem.pmemkv.Database
+ * Database} class.
  *
  * @param <KeyT>
  *            the type of a key stored in the pmemkv database
