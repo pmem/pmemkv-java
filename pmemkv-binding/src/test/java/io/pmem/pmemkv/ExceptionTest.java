@@ -68,165 +68,113 @@ public class ExceptionTest {
 
 	@Test
 	public void throwsExceptionOnStartWhenPathIsMissing() {
-		Database<ByteBuffer, ByteBuffer> db = null;
-		boolean exception_occured = false;
-		try {
-			db = new Database.Builder<ByteBuffer, ByteBuffer>(ENGINE)
+		Exception exception = assertThrows(InvalidArgumentException.class, () -> {
+			Database<ByteBuffer, ByteBuffer> db = new Database.Builder<ByteBuffer, ByteBuffer>(ENGINE)
 					.setSize(DEFAULT_DB_SIZE)
 					.build();
-			Assert.fail();
-		} catch (InvalidArgumentException kve) {
-			exception_occured = true;
-		} catch (Exception e) {
-			Assert.fail();
-		}
-		assertTrue(exception_occured);
-		assertNull(db);
+		});
 	}
 
 	@Test
 	public void throwsExceptionOnStartWhenSizeIsMissing() {
-		Database<ByteBuffer, ByteBuffer> db = null;
-		boolean exception_occured = false;
-		try {
-			db = new Database.Builder<ByteBuffer, ByteBuffer>(ENGINE)
+		Exception exception = assertThrows(InvalidArgumentException.class, () -> {
+			Database<ByteBuffer, ByteBuffer> db = new Database.Builder<ByteBuffer, ByteBuffer>(ENGINE)
 					.setPath(DB_DIR)
 					.build();
-			Assert.fail();
-		} catch (InvalidArgumentException kve) {
-			exception_occured = true;
-		} catch (Exception e) {
-			Assert.fail();
-		}
-		assertNull(db);
-		assertTrue(exception_occured);
+		});
 	}
 
 	@Test
 	public void throwsExceptionOnStartWhenEngineIsInvalidTest() {
-		Database<ByteBuffer, ByteBuffer> db = null;
-		boolean exception_occured = false;
-		try {
-			db = buildDB("nope.nope");
-			Assert.fail();
-		} catch (WrongEngineNameException kve) {
-			exception_occured = true;
-		} catch (Exception e) {
-			Assert.fail();
-		}
-		assertNull(db);
-		assertTrue(exception_occured);
+		Exception exception = assertThrows(WrongEngineNameException.class, () -> {
+			Database<ByteBuffer, ByteBuffer> db = buildDB("nope.nope");
+		});
 	}
 
 	@Test
 	public void throwsExceptionOnStartWhenPathIsInvalidTest() {
-		Database<ByteBuffer, ByteBuffer> db = null;
-		boolean exception_occured = false;
-		try {
-			db = new Database.Builder<ByteBuffer, ByteBuffer>(ENGINE)
+		Exception exception = assertThrows(DatabaseException.class, () -> {
+			Database<ByteBuffer, ByteBuffer> db = new Database.Builder<ByteBuffer, ByteBuffer>(ENGINE)
 					.setSize(DEFAULT_DB_SIZE)
 					.setPath("/tmp/123/234/345/456/567/678/nope.nope")
 					.build();
-			Assert.fail();
 			/*
 			 * It should be InvalidArgumentException, but:
 			 * https://github.com/pmem/pmemkv/issues/565
 			 */
-		} catch (DatabaseException kve) {
-			exception_occured = true;
-		} catch (Exception e) {
-			Assert.fail();
-		}
-		assertNull(db);
-		assertTrue(exception_occured);
+		});
 	}
 
 	@Test
 	public void throwsExceptionOnStartWhenPathIsWrongTypeTest() {
-		Database<ByteBuffer, ByteBuffer> db = null;
-		boolean exception_occured = false;
-		try {
-			db = new Database.Builder<ByteBuffer, ByteBuffer>(ENGINE)
+		Exception exception = assertThrows(DatabaseException.class, () -> {
+			Database<ByteBuffer, ByteBuffer> db = new Database.Builder<ByteBuffer, ByteBuffer>(ENGINE)
 					.setSize(DEFAULT_DB_SIZE)
 					.setPath("1234")
 					.build();
-			Assert.fail();
 			/*
 			 * It's not a valid path, so it should be InvalidArgumentException, but:
 			 * https://github.com/pmem/pmemkv/issues/565
 			 */
-		} catch (DatabaseException kve) {
-			exception_occured = true;
-		} catch (Exception e) {
-			Assert.fail();
-		}
-		assertNull(db);
-		assertTrue(exception_occured);
+		});
 	}
 
 	/* Exceptions in Gets methods */
 
 	@Test
-	public void exceptionInGetallTest() {
-		int exception_counter = 0;
-		try {
+	public void exceptionInGetAllTest() {
+		String exception_message = "Inner exception";
+		Exception exception = assertThrows(CustomException.class, () -> {
 			db.getAll((k, v) -> {
-				throw new RuntimeException("Inner exception");
+				throw new CustomException(exception_message);
 			});
-		} catch (Exception e) {
-			exception_counter++;
-		}
-		assertEquals(exception_counter, 1);
+		});
+		assertEquals(exception_message, exception.getMessage());
 	}
 
 	@Test
 	public void exceptionInGetKeysTest() {
 		int exception_counter = 0;
+		String exception_message = "Inner exception";
 		AtomicInteger loop_counter = new AtomicInteger(0);
-		try {
+		Exception exception = assertThrows(CustomException.class, () -> {
 			db.getKeys((k) -> {
 				loop_counter.getAndIncrement();
-				throw new RuntimeException("Inner exception");
+				throw new CustomException(exception_message);
 			});
-		} catch (Exception e) {
-			exception_counter++;
-		}
-		assertEquals(exception_counter, 1);
+		});
+		assertEquals(exception_message, exception.getMessage());
 		assertEquals(loop_counter.intValue(), 1);
 	}
 
 	@Test
 	public void exceptionInTheMiddleOfGetKeysTest() {
 		int exception_counter = 0;
+		String exception_message = "Inner exception";
 		AtomicInteger loop_counter = new AtomicInteger(0);
-		try {
+		Exception exception = assertThrows(CustomException.class, () -> {
 			db.getKeys((k) -> {
 				loop_counter.getAndIncrement();
 				if (k.getInt() == 15) {
-					throw new RuntimeException("Inner exception");
+					throw new CustomException(exception_message);
 				}
 			});
-		} catch (Exception e) {
-			exception_counter++;
-		}
-		assertEquals(exception_counter, 1);
+		});
+		assertEquals(exception_message, exception.getMessage());
 		assertEquals(loop_counter.intValue(), 16);
 	}
 
 	@Test
 	public void exceptionInGet() {
 		ByteBuffer key = ByteBuffer.allocateDirect(256);
+		String exception_message = "Lorem ipsum";
 		key.putInt(1);
-		boolean exception_occured = false;
-		try {
+		Exception exception = assertThrows(CustomException.class, () -> {
 			db.get(key, (ByteBuffer k) -> {
-				throw new CustomException("Lorem ipsum");
+				throw new CustomException(exception_message);
 			});
-		} catch (CustomException e) {
-			exception_occured = true;
-			assertEquals(e.getMessage(), "Lorem ipsum");
-		}
-		assertTrue(exception_occured);
+		});
+		assertEquals(exception.getMessage(), exception_message);
 	}
 
 	/* Other exceptions */

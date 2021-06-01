@@ -8,6 +8,7 @@ import java.nio.ByteBuffer;
 import java.nio.BufferOverflowException;
 import java.util.ArrayList;
 import java.lang.IllegalArgumentException;
+import java.lang.OutOfMemoryError;
 
 /**
  * Main Java binding pmemkv class, which is a local/embedded key-value datastore
@@ -150,9 +151,13 @@ public class Database<K, V> {
 	 *            Function to be called for each key.
 	 * @throws DatabaseException
 	 *             with pmemkv return status.
+	 * @throws OutOfMemoryError
+	 *             Exception will be thrown when data cannot be allocated in DRAM.
+	 * @throws Exception
+	 *             Any Exception thrown by user from callback will be propagated.
 	 * @since 1.0
 	 */
-	public void getKeys(KeyCallback<K> callback) throws DatabaseException {
+	public void getKeys(KeyCallback<K> callback) throws DatabaseException, OutOfMemoryError {
 		database_get_keys_buffer(pointer, callback);
 	}
 
@@ -169,9 +174,13 @@ public class Database<K, V> {
 	 *            Function to be called for each key.
 	 * @throws DatabaseException
 	 *             with pmemkv return status.
+	 * @throws OutOfMemoryError
+	 *             Exception will be thrown when data cannot be allocated in DRAM.
+	 * @throws Exception
+	 *             Any Exception thrown by user from callback will be propagated.
 	 * @since 1.0
 	 */
-	public void getKeysAbove(K key, KeyCallback<K> callback) throws DatabaseException {
+	public void getKeysAbove(K key, KeyCallback<K> callback) throws DatabaseException, OutOfMemoryError {
 		ByteBuffer direct_key = getDirectKeyBuffer(keyConverter.toByteBuffer(key));
 		database_get_keys_above_buffer(pointer, direct_key.position(), direct_key, callback);
 	}
@@ -189,9 +198,13 @@ public class Database<K, V> {
 	 *            Function to be called for each key.
 	 * @throws DatabaseException
 	 *             with pmemkv return status.
+	 * @throws OutOfMemoryError
+	 *             Exception will be thrown when data cannot be allocated in DRAM.
+	 * @throws Exception
+	 *             Any Exception thrown by user from callback will be propagated.
 	 * @since 1.0
 	 */
-	public void getKeysBelow(K key, KeyCallback<K> callback) throws DatabaseException {
+	public void getKeysBelow(K key, KeyCallback<K> callback) throws DatabaseException, OutOfMemoryError {
 		ByteBuffer direct_key = getDirectKeyBuffer(keyConverter.toByteBuffer(key));
 		database_get_keys_below_buffer(pointer, direct_key.position(), direct_key, callback);
 	}
@@ -211,9 +224,14 @@ public class Database<K, V> {
 	 *            Function to be called for each key.
 	 * @throws DatabaseException
 	 *             with pmemkv return status.
+	 * @throws OutOfMemoryError
+	 *             Exception will be thrown when data cannot be allocated in DRAM.
+	 * @throws Exception
+	 *             Any Exception thrown by user from callback will be propagated.
 	 * @since 1.0
 	 */
-	public void getKeysBetween(K key1, K key2, KeyCallback<K> callback) throws DatabaseException {
+	public void getKeysBetween(K key1, K key2, KeyCallback<K> callback)
+			throws DatabaseException, OutOfMemoryError {
 		ByteBuffer direct_key1 = getDirectKeyBuffer(keyConverter.toByteBuffer(key1), ThreadDirectBuffers.KEY1_BUFFER);
 		ByteBuffer direct_key2 = getDirectKeyBuffer(keyConverter.toByteBuffer(key2), ThreadDirectBuffers.KEY2_BUFFER);
 		database_get_keys_between_buffer(pointer, direct_key1.position(), direct_key1, direct_key2.position(),
@@ -303,6 +321,8 @@ public class Database<K, V> {
 	 *            Function to be called for each key/value pair.
 	 * @throws DatabaseException
 	 *             with pmemkv return status.
+	 * @throws Exception
+	 *             Any Exception thrown by user from callback will be propagated.
 	 * @since 1.0
 	 */
 	public void getAll(KeyValueCallback<K, V> callback) throws DatabaseException {
@@ -397,9 +417,13 @@ public class Database<K, V> {
 	 *            Function to be called for each specified key/value pair.
 	 * @throws DatabaseException
 	 *             with pmemkv return status.
+	 * @throws OutOfMemoryError
+	 *             Exception will be thrown when data cannot be allocated in DRAM.
+	 * @throws Exception
+	 *             Any Exception thrown by user from callback will be propagated.
 	 * @since 1.0
 	 */
-	public void get(K key, ValueCallback<V> callback) throws DatabaseException {
+	public void get(K key, ValueCallback<V> callback) throws DatabaseException, OutOfMemoryError {
 		ByteBuffer direct_key = getDirectKeyBuffer(keyConverter.toByteBuffer(key));
 		database_get_buffer_with_callback(pointer, direct_key.position(), direct_key, callback);
 	}
@@ -412,6 +436,8 @@ public class Database<K, V> {
 	 * @return Copy of value associated with the given key or null if not found.
 	 * @throws DatabaseException
 	 *             with pmemkv return status.
+	 * @throws ArrayIndexOutOfBoundsException
+	 *             when internally fails.
 	 * @since 1.0
 	 */
 	public V getCopy(K key) throws DatabaseException {
