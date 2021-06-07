@@ -151,7 +151,7 @@ public class Database<K, V> {
 	 * @param callback
 	 *            Function to be called for each key.
 	 * @throws DatabaseException
-	 *             with pmemkv return status.
+	 *             or derived class that matches pmemkv's status.
 	 * @throws OutOfMemoryError
 	 *             Exception will be thrown when data cannot be allocated in DRAM.
 	 * @since 1.0
@@ -173,7 +173,7 @@ public class Database<K, V> {
 	 * @param callback
 	 *            Function to be called for each key.
 	 * @throws DatabaseException
-	 *             with pmemkv return status.
+	 *             or derived class that matches pmemkv's status.
 	 * @throws OutOfMemoryError
 	 *             Exception will be thrown when data cannot be allocated in DRAM.
 	 * @since 1.0
@@ -196,7 +196,7 @@ public class Database<K, V> {
 	 * @param callback
 	 *            Function to be called for each key.
 	 * @throws DatabaseException
-	 *             with pmemkv return status.
+	 *             or derived class that matches pmemkv's status.
 	 * @throws OutOfMemoryError
 	 *             Exception will be thrown when data cannot be allocated in DRAM.
 	 * @since 1.0
@@ -221,7 +221,7 @@ public class Database<K, V> {
 	 * @param callback
 	 *            Function to be called for each key.
 	 * @throws DatabaseException
-	 *             with pmemkv return status.
+	 *             or derived class that matches pmemkv's status.
 	 * @throws OutOfMemoryError
 	 *             Exception will be thrown when data cannot be allocated in DRAM.
 	 * @since 1.0
@@ -239,7 +239,7 @@ public class Database<K, V> {
 	 *
 	 * @return Total number of elements in the datastore.
 	 * @throws DatabaseException
-	 *             with pmemkv return status.
+	 *             or derived class that matches pmemkv's status.
 	 * @since 1.0
 	 */
 	public long countAll() throws DatabaseException {
@@ -258,7 +258,7 @@ public class Database<K, V> {
 	 * @return Number of key/value pairs in the datastore, whose keys are greater
 	 *         than the given key.
 	 * @throws DatabaseException
-	 *             with pmemkv return status.
+	 *             or derived class that matches pmemkv's status.
 	 * @since 1.0
 	 */
 	public long countAbove(K key) throws DatabaseException {
@@ -278,7 +278,7 @@ public class Database<K, V> {
 	 * @return Number of key/value pairs in the datastore, whose keys are less than
 	 *         the given key.
 	 * @throws DatabaseException
-	 *             with pmemkv return status.
+	 *             or derived class that matches pmemkv's status.
 	 * @since 1.0
 	 */
 	public long countBelow(K key) throws DatabaseException {
@@ -299,7 +299,7 @@ public class Database<K, V> {
 	 *            Sets the upper bound for querying.
 	 * @return Number of key/value pairs in the datastore, between given keys.
 	 * @throws DatabaseException
-	 *             with pmemkv return status.
+	 *             or derived class that matches pmemkv's status.
 	 * @since 1.0
 	 */
 	public long countBetween(K key1, K key2) throws DatabaseException {
@@ -316,7 +316,7 @@ public class Database<K, V> {
 	 * @param callback
 	 *            Function to be called for each key/value pair.
 	 * @throws DatabaseException
-	 *             with pmemkv return status.
+	 *             or derived class that matches pmemkv's status.
 	 * @since 1.0
 	 */
 	public void getAll(KeyValueCallback<K, V> callback) throws DatabaseException {
@@ -335,7 +335,7 @@ public class Database<K, V> {
 	 * @param callback
 	 *            Function to be called for each specified key/value pair.
 	 * @throws DatabaseException
-	 *             with pmemkv return status.
+	 *             or derived class that matches pmemkv's status.
 	 * @since 1.0
 	 */
 	public void getAbove(K key, KeyValueCallback<K, V> callback) throws DatabaseException {
@@ -355,7 +355,7 @@ public class Database<K, V> {
 	 * @param callback
 	 *            Function to be called for each specified key/value pair.
 	 * @throws DatabaseException
-	 *             with pmemkv return status.
+	 *             or derived class that matches pmemkv's status.
 	 * @since 1.0
 	 */
 	public void getBelow(K key, KeyValueCallback<K, V> callback) throws DatabaseException {
@@ -377,7 +377,7 @@ public class Database<K, V> {
 	 * @param callback
 	 *            Function to be called for each specified key/value pair.
 	 * @throws DatabaseException
-	 *             with pmemkv return status.
+	 *             or derived class that matches pmemkv's status.
 	 * @since 1.0
 	 */
 	public void getBetween(K key1, K key2, KeyValueCallback<K, V> callback) throws DatabaseException {
@@ -394,7 +394,7 @@ public class Database<K, V> {
 	 *            key to query for.
 	 * @return true if key exists in the datastore, false otherwise
 	 * @throws DatabaseException
-	 *             with pmemkv return status.
+	 *             or derived class that matches pmemkv's status.
 	 * @since 1.0
 	 */
 	public boolean exists(K key) throws DatabaseException {
@@ -411,7 +411,7 @@ public class Database<K, V> {
 	 * @param callback
 	 *            Function to be called for each specified key/value pair.
 	 * @throws DatabaseException
-	 *             with pmemkv return status.
+	 *             or derived class that matches pmemkv's status.
 	 * @throws OutOfMemoryError
 	 *             Exception will be thrown when data cannot be allocated in DRAM.
 	 * @since 1.0
@@ -428,7 +428,7 @@ public class Database<K, V> {
 	 *            key to query for.
 	 * @return Copy of value associated with the given key or null if not found.
 	 * @throws DatabaseException
-	 *             with pmemkv return status.
+	 *             or derived class that matches pmemkv's status.
 	 * @since 1.0
 	 */
 	public V getCopy(K key) throws DatabaseException {
@@ -454,7 +454,7 @@ public class Database<K, V> {
 	 * @param value
 	 *            data to be inserted for the specified key.
 	 * @throws DatabaseException
-	 *             with pmemkv return status.
+	 *             or derived class that matches pmemkv's status.
 	 * @since 1.0
 	 */
 	public void put(K key, V value) throws DatabaseException {
@@ -472,7 +472,7 @@ public class Database<K, V> {
 	 * @return true if element was removed, false if element didn't exist before
 	 *         removal.
 	 * @throws DatabaseException
-	 *             with pmemkv return status.
+	 *             or derived class that matches pmemkv's status.
 	 * @since 1.0
 	 */
 	public boolean remove(K key) throws DatabaseException {
