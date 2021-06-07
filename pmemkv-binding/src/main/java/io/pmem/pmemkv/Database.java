@@ -8,6 +8,7 @@ import java.nio.ByteBuffer;
 import java.nio.BufferOverflowException;
 import java.util.ArrayList;
 import java.lang.IllegalArgumentException;
+import java.lang.OutOfMemoryError;
 
 /**
  * Main Java binding pmemkv class, which is a local/embedded key-value datastore
@@ -144,15 +145,18 @@ public class Database<K, V> {
 	}
 
 	/**
-	 * Executes callback function for every key stored in the pmemkv datastore.
+	 * Executes callback function for every key stored in the pmemkv datastore. Any
+	 * exception thrown by the user from callback will be propagated.
 	 *
 	 * @param callback
 	 *            Function to be called for each key.
 	 * @throws DatabaseException
 	 *             with pmemkv return status.
+	 * @throws OutOfMemoryError
+	 *             Exception will be thrown when data cannot be allocated in DRAM.
 	 * @since 1.0
 	 */
-	public void getKeys(KeyCallback<K> callback) throws DatabaseException {
+	public void getKeys(KeyCallback<K> callback) throws DatabaseException, OutOfMemoryError {
 		database_get_keys_buffer(pointer, callback);
 	}
 
@@ -161,7 +165,8 @@ public class Database<K, V> {
 	 * whose keys are greater than the given key.
 	 * <p>
 	 * Comparison mechanism is based on binary comparison of bytes - by a function
-	 * equivalent to std::string::compare in C++.
+	 * equivalent to std::string::compare in C++. Any Exception thrown by the user
+	 * from callback will be propagated.
 	 *
 	 * @param key
 	 *            Sets the lower bound for querying.
@@ -169,9 +174,11 @@ public class Database<K, V> {
 	 *            Function to be called for each key.
 	 * @throws DatabaseException
 	 *             with pmemkv return status.
+	 * @throws OutOfMemoryError
+	 *             Exception will be thrown when data cannot be allocated in DRAM.
 	 * @since 1.0
 	 */
-	public void getKeysAbove(K key, KeyCallback<K> callback) throws DatabaseException {
+	public void getKeysAbove(K key, KeyCallback<K> callback) throws DatabaseException, OutOfMemoryError {
 		ByteBuffer direct_key = getDirectKeyBuffer(keyConverter.toByteBuffer(key));
 		database_get_keys_above_buffer(pointer, direct_key.position(), direct_key, callback);
 	}
@@ -181,7 +188,8 @@ public class Database<K, V> {
 	 * whose keys are less than the given key.
 	 * <p>
 	 * Comparison mechanism is based on binary comparison of bytes - by a function
-	 * equivalent to std::string::compare in C++.
+	 * equivalent to std::string::compare in C++. Any Exception thrown by the user
+	 * from callback will be propagated.
 	 *
 	 * @param key
 	 *            Sets the upper bound for querying.
@@ -189,9 +197,11 @@ public class Database<K, V> {
 	 *            Function to be called for each key.
 	 * @throws DatabaseException
 	 *             with pmemkv return status.
+	 * @throws OutOfMemoryError
+	 *             Exception will be thrown when data cannot be allocated in DRAM.
 	 * @since 1.0
 	 */
-	public void getKeysBelow(K key, KeyCallback<K> callback) throws DatabaseException {
+	public void getKeysBelow(K key, KeyCallback<K> callback) throws DatabaseException, OutOfMemoryError {
 		ByteBuffer direct_key = getDirectKeyBuffer(keyConverter.toByteBuffer(key));
 		database_get_keys_below_buffer(pointer, direct_key.position(), direct_key, callback);
 	}
@@ -201,7 +211,8 @@ public class Database<K, V> {
 	 * whose keys are greater than the key1 and less than the key2.
 	 * <p>
 	 * Comparison mechanism is based on binary comparison of bytes - by a function
-	 * equivalent to std::string::compare in C++.
+	 * equivalent to std::string::compare in C++. Any Exception thrown by the user
+	 * from callback will be propagated.
 	 *
 	 * @param key1
 	 *            Sets the lower bound for querying.
@@ -211,9 +222,12 @@ public class Database<K, V> {
 	 *            Function to be called for each key.
 	 * @throws DatabaseException
 	 *             with pmemkv return status.
+	 * @throws OutOfMemoryError
+	 *             Exception will be thrown when data cannot be allocated in DRAM.
 	 * @since 1.0
 	 */
-	public void getKeysBetween(K key1, K key2, KeyCallback<K> callback) throws DatabaseException {
+	public void getKeysBetween(K key1, K key2, KeyCallback<K> callback)
+			throws DatabaseException, OutOfMemoryError {
 		ByteBuffer direct_key1 = getDirectKeyBuffer(keyConverter.toByteBuffer(key1), ThreadDirectBuffers.KEY1_BUFFER);
 		ByteBuffer direct_key2 = getDirectKeyBuffer(keyConverter.toByteBuffer(key2), ThreadDirectBuffers.KEY2_BUFFER);
 		database_get_keys_between_buffer(pointer, direct_key1.position(), direct_key1, direct_key2.position(),
@@ -297,7 +311,7 @@ public class Database<K, V> {
 
 	/**
 	 * Executes callback function for every key/value pair stored in the pmemkv
-	 * datastore.
+	 * datastore. Any Exception thrown by the user from callback will be propagated.
 	 *
 	 * @param callback
 	 *            Function to be called for each key/value pair.
@@ -389,7 +403,8 @@ public class Database<K, V> {
 	}
 
 	/**
-	 * Executes callback function on the value for a given key.
+	 * Executes callback function on the value for a given key. Any Exception thrown
+	 * by the user from callback will be propagated.
 	 *
 	 * @param key
 	 *            key to query for.
@@ -397,9 +412,11 @@ public class Database<K, V> {
 	 *            Function to be called for each specified key/value pair.
 	 * @throws DatabaseException
 	 *             with pmemkv return status.
+	 * @throws OutOfMemoryError
+	 *             Exception will be thrown when data cannot be allocated in DRAM.
 	 * @since 1.0
 	 */
-	public void get(K key, ValueCallback<V> callback) throws DatabaseException {
+	public void get(K key, ValueCallback<V> callback) throws DatabaseException, OutOfMemoryError {
 		ByteBuffer direct_key = getDirectKeyBuffer(keyConverter.toByteBuffer(key));
 		database_get_buffer_with_callback(pointer, direct_key.position(), direct_key, callback);
 	}
@@ -421,6 +438,8 @@ public class Database<K, V> {
 			value = database_get_bytes(pointer, direct_key.position(), direct_key);
 		} catch (NotFoundException kve) {
 			return null;
+		} catch (ArrayIndexOutOfBoundsException e) {
+			throw new DatabaseException("Internal exception occured.");
 		}
 		V retval = valueConverter.fromByteBuffer(ByteBuffer.wrap(value));
 
