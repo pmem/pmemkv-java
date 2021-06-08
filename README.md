@@ -37,7 +37,7 @@ You can add our project as a dependency and use it freely. Make sure to use it e
 <dependency>
   <groupId>io.pmem</groupId>
   <artifactId>pmemkv-root</artifactId>
-  <version>1.0.1</version>
+  <version>[1.0.1,)</version>
 </dependency>
 ```
 
