@@ -12,8 +12,7 @@ extern "C" {
  * Signature: (J)J
  */
 JNIEXPORT jlong JNICALL
-Java_io_pmem_pmemkv_Database_00024WriteIterator_iterator_1new_1write_1iterator(JNIEnv *env, jobject, jlong db_pointer)
-{
+Java_io_pmem_pmemkv_Database_00024WriteIterator_iterator_1new_1write_1iterator(JNIEnv *env, jobject, jlong db_pointer) {
   auto engine = reinterpret_cast<pmem::kv::db *>(db_pointer);
   pmem::kv::result<pmem::kv::db::write_iterator> res = engine->new_write_iterator();
 
@@ -77,7 +76,7 @@ JNIEXPORT jboolean JNICALL Java_io_pmem_pmemkv_Database_00024WriteIterator_itera
     auto w_it = reinterpret_cast<pmem::kv::db::write_iterator*>(ptr);
     auto status = w_it->seek_to_first();
 
-    if (status == pmem::kv::status::OK or status == pmem::kv::status::NOT_FOUND) {
+    if (status == pmem::kv::status::OK || status == pmem::kv::status::NOT_FOUND) {
       return status == pmem::kv::status::OK;
     }
     PmemkvJavaException(env).ThrowException(status);
@@ -102,7 +101,7 @@ JNIEXPORT jboolean JNICALL Java_io_pmem_pmemkv_Database_00024WriteIterator_itera
     auto w_it = reinterpret_cast<pmem::kv::db::write_iterator*>(ptr);
     auto status = w_it->is_next();
 
-    if (status == pmem::kv::status::OK or status == pmem::kv::status::NOT_FOUND) {
+    if (status == pmem::kv::status::OK || status == pmem::kv::status::NOT_FOUND) {
       return status == pmem::kv::status::OK;
     }
     PmemkvJavaException(env).ThrowException(status);
@@ -119,7 +118,7 @@ JNIEXPORT jboolean JNICALL Java_io_pmem_pmemkv_Database_00024WriteIterator_itera
     auto w_it = reinterpret_cast<pmem::kv::db::write_iterator*>(ptr);
     auto status = w_it->next();
 
-    if (status == pmem::kv::status::OK or status == pmem::kv::status::NOT_FOUND) {
+    if (status == pmem::kv::status::OK || status == pmem::kv::status::NOT_FOUND) {
       return status == pmem::kv::status::OK;
     }
     PmemkvJavaException(env).ThrowException(status);
@@ -177,6 +176,17 @@ JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_00024WriteIterator_iterator_
  */
 JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_00024WriteIterator_iterator_1abort
   (JNIEnv *, jobject, jlong);
+
+/*
+ * Class:     io_pmem_pmemkv_Database_WriteIterator
+ * Method:    iterator_close
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_00024WriteIterator_iterator_1close
+  (JNIEnv *, jobject, jlong ptr) {
+    auto w_it = reinterpret_cast<pmem::kv::db::write_iterator*>(ptr);
+    delete w_it;
+}
 
 #ifdef __cplusplus
 }
