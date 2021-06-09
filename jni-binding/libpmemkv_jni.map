@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright 2020, Intel Corporation
+# Copyright 2020-2021, Intel Corporation
 #
 #
 # libpmemkv-jni.map -- linker map file for libpmemkv-jni
@@ -29,6 +29,11 @@ LIBPMEMKV_JNI_1.0 {
 		Java_io_pmem_pmemkv_Database_00024Builder_config_1delete;
 		Java_io_pmem_pmemkv_Database_00024Builder_config_1put_1int;
 		Java_io_pmem_pmemkv_Database_00024Builder_config_1put_1string;
+		Java_io_pmem_pmemkv_Database_00024WriteIterator_iterator_1new_1write_1iterator;
+		Java_io_pmem_pmemkv_Database_00024WriteIterator_iterator_1seek_1to_1first;
+		Java_io_pmem_pmemkv_Database_00024WriteIterator_iterator_1key;
+		Java_io_pmem_pmemkv_Database_00024WriteIterator_iterator_1next;
+		Java_io_pmem_pmemkv_Database_00024WriteIterator_iterator_1is_1next;
 	local:
 		*;
 };
