@@ -62,7 +62,7 @@
                         <linkerStartOption>-O3</linkerStartOption>
                     </linkerStartOptions>
                     <linkerEndOptions>
-                        <linkerEndOption>-lpmemkv</linkerEndOption>
+                        <linkerEndOption>-lpmemkv -lpmemkv_json_config</linkerEndOption>
                     </linkerEndOptions>
                 </configuration>
             </plugin>

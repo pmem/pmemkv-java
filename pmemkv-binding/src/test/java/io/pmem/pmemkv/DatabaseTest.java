@@ -9,9 +9,10 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import static org.junit.Assert.*;
 
+import java.io.*;
 import java.nio.ByteBuffer;
-import java.util.concurrent.atomic.AtomicInteger;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static io.pmem.pmemkv.TestUtils.*;
 
@@ -69,6 +70,26 @@ public class DatabaseTest {
 		assertTrue(db.stopped());
 		db.stop();
 		assertTrue(db.stopped());
+	}
+
+	@Test
+	public void openDBFromJsonTest() {
+		String json = "{\"path\":\"" + DB_DIR + "\", \"size\":" + DEFAULT_DB_SIZE + "}";
+		Database<ByteBuffer, ByteBuffer> db = openDBFromJson(ENGINE, json, new ByteBufferConverter());
+		db.stop();
+	}
+
+	/* the same test as above, but using json (with new lines) as InputStream */
+	@Test
+	public void openDBFromJsonStreamTest() {
+		String json = "{\n\"path\":\"" + DB_DIR + "\",\n\"size\":" + DEFAULT_DB_SIZE + "\n}";
+		InputStream jsonStream = new ByteArrayInputStream(json.getBytes());
+		Database<ByteBuffer, ByteBuffer> db = new Database.Builder<ByteBuffer, ByteBuffer>(ENGINE)
+				.fromJson(jsonStream)
+				.setKeyConverter(new ByteBufferConverter())
+				.setValueConverter(new ByteBufferConverter())
+				.build();
+		db.stop();
 	}
 
 	@Test

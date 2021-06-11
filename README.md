@@ -44,7 +44,8 @@ You can add our project as a dependency and use it freely. Make sure to use it e
 ### Installation
 
 Start by installing [pmemkv](https://github.com/pmem/pmemkv/blob/master/INSTALLING.md)
-(currently at least in version **1.0.2**) in your system.
+(currently at least in version **1.0.2**) in your system. Make sure helper json library
+is enabled by specifying extra cmake parameter - `cmake .. -DBUILD_JSON_CONFIG=ON ...`.
 
 It may be necessary to [configure a proxy](https://maven.apache.org/guides/mini/guide-proxies.html)
 and set `JAVA_HOME` environment variable. Set `JAVA_HOME` variable with directory containing

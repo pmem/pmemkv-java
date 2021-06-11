@@ -124,6 +124,37 @@ public class ExceptionTest {
 		assertTrue(exception.getMessage().length() > 0);
 	}
 
+	@Test
+	public void throwsExceptionOnStartWhenPathIsWrongInJsonTest() {
+		Exception exception = assertThrows(InvalidArgumentException.class, () -> {
+			String wrongPathJson = "{\"path\":\"/none-existing/dir\"}";
+			Database<ByteBuffer, ByteBuffer> db = openDBFromJson(ENGINE, wrongPathJson, new ByteBufferConverter());
+		});
+		assertTrue(exception.getMessage().length() > 0);
+	}
+
+	@Test
+	public void throwsExceptionOnStartWhenJsonIsIncorrectTest() {
+		Exception exception = assertThrows(BuilderException.class, () -> {
+			String wrongJson = "{{{{\":";
+			Database<ByteBuffer, ByteBuffer> db = openDBFromJson(ENGINE, wrongJson, new ByteBufferConverter());
+		});
+		assertTrue(exception.getMessage().length() > 0);
+	}
+
+	@Test
+	public void throwsExceptionOnStartWhenParamIsDefinedTwiceTest() {
+		Exception exception = assertThrows(BuilderException.class, () -> {
+			String json = "{\"path\":\"" + DB_DIR + "\", \"size\":" + DEFAULT_DB_SIZE + "}";
+			Database<ByteBuffer, ByteBuffer> db = new Database.Builder<ByteBuffer, ByteBuffer>(ENGINE)
+					.fromJson(json)
+					.setSize(DEFAULT_DB_SIZE)
+					.setPath("1234")
+					.build();
+		});
+		assertTrue(exception.getMessage().length() > 0);
+	}
+
 	/* Exceptions in Gets methods */
 
 	@Test

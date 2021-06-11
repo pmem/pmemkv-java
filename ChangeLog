@@ -1,3 +1,17 @@
+XXX XXX XX 2021 Igor Chorążewicz <igor.chorazewicz@intel.com>
+
+	* Version 1.2.0
+
+	Improvements:
+	-
+
+	Minor changes:
+	- add new Builder methods to read config params from JSON objects
+	-
+
+	Other:
+	-
+
 Tue Jun 08 2021 Igor Chorążewicz <igor.chorazewicz@intel.com>
 
 	* Version 1.1.0
@@ -14,9 +28,9 @@ Tue Jun 08 2021 Igor Chorążewicz <igor.chorazewicz@intel.com>
 
 	Other:
 	- rethrow user exception in get_above/all/below/between instead of
-	    StoppedByCallbackException
+		StoppedByCallbackException
 	- adjust versioning scheme to match Semantic Versioning (always provide
-	    patch version)
+		patch version)
 
 Fri Mar 12 2021 Krzysztof Filipek <krzysztof.filipek@intel.com>
 

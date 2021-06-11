@@ -8,8 +8,9 @@ import java.lang.IllegalArgumentException;
 import java.lang.OutOfMemoryError;
 import java.nio.ByteBuffer;
 import java.nio.BufferOverflowException;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import java.util.ArrayList;
-import java.lang.IllegalArgumentException;
+import java.util.Scanner;
 
 /**
  * Main Java binding pmemkv class, which is a local/embedded key-value datastore
@@ -253,7 +254,9 @@ public class Database<K, V> {
 	 * Iterator provides methods to iterate over records in db. Using iterator() is
 	 * the only one way to get an iterator object.
 	 *
+	 * @return XXX
 	 * @throws DatabaseException
+	 *             XXX
 	 */
 	public WriteIterator iterator() throws DatabaseException {
 		return new WriteIterator(pointer);
@@ -684,6 +687,46 @@ public class Database<K, V> {
 		}
 
 		/**
+		 * Reads config parameters from JSON Object stored in a string. One by one, each
+		 * parameter is inserted into config. It can be used alternatively with
+		 * setPath/setSize/etc., but it will fail if defining the same parameter twice.
+		 *
+		 * @param json
+		 *            config parameters, given as proper JSON Object.
+		 * @return this builder object.
+		 * @throws BuilderException
+		 *             with pmemkv's config return status.
+		 * @since 1.2.0
+		 */
+		public Builder<K, V> fromJson(String json) throws BuilderException {
+			config_from_json(config, json);
+			return this;
+		}
+
+		/**
+		 * Reads config parameters from JSON Object, stored in an InputStream. It
+		 * behaves exactly as {@link #fromJson(String) fromJson(String)}.
+		 *
+		 * @param jsonStream
+		 *            config parameters, given as InputStream (encoded in UTF_8) with
+		 *            proper JSON Object.
+		 * @return this builder object.
+		 * @throws BuilderException
+		 *             with pmemkv's config return status.
+		 * @since 1.2.0
+		 */
+		public Builder<K, V> fromJson(InputStream jsonStream) throws BuilderException {
+			String jsonContent = null;
+			try (Scanner scanner = new Scanner(jsonStream, UTF_8.name())) {
+				/*
+				 * sets delimiter to the beginning of the input, so it reads the whole content
+				 */
+				jsonContent = scanner.useDelimiter("\\A").next();
+			}
+			return fromJson(jsonContent);
+		}
+
+		/**
 		 * Returns an instance of pmemkv Database created from the config parameters set
 		 * within this builder.
 		 *
@@ -794,6 +837,8 @@ public class Database<K, V> {
 		private native void config_put_int(long ptr, String key, long value);
 
 		private native void config_put_string(long ptr, String key, String value);
+
+		private native void config_from_json(long ptr, String json);
 
 		static {
 			boolean unsatisfied_error = false;
