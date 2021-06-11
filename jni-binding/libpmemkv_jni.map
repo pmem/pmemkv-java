@@ -27,6 +27,7 @@ LIBPMEMKV_JNI_1.0 {
 		Java_io_pmem_pmemkv_Database_database_1remove_1buffer;
 		Java_io_pmem_pmemkv_Database_00024Builder_config_1new;
 		Java_io_pmem_pmemkv_Database_00024Builder_config_1delete;
+		Java_io_pmem_pmemkv_Database_00024Builder_config_1from_1json;
 		Java_io_pmem_pmemkv_Database_00024Builder_config_1put_1int;
 		Java_io_pmem_pmemkv_Database_00024Builder_config_1put_1string;
 		Java_io_pmem_pmemkv_Database_00024WriteIterator_iterator_1new_1write_1iterator;
