@@ -13,6 +13,9 @@ env:
   HOST_WORKDIR:   ${{ github.workspace }}
   WORKDIR:        utils/docker
   IMG_VER:        latest
+  # use org's Private Access Token to log in to GitHub Container Registry
+  CONTAINER_REG_USER:   ${{ secrets.GH_CR_USER }}
+  CONTAINER_REG_PASS:   ${{ secrets.GH_CR_PAT }}
 
 jobs:
   linux:
