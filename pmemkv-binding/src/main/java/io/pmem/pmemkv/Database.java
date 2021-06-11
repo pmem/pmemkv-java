@@ -44,7 +44,7 @@ public class Database<K, V> {
 	 * Important: This is an experimental feature and should not be used in
 	 * production code. For now, we don't guarantee stability of this API.
 	 */
-	public class WriteIterator {
+	public class WriteIterator implements AutoCloseable {
 		/**
 		 * Constructor for iterator class. Can be accessed only via Database API.
 		 *
@@ -109,6 +109,14 @@ public class Database<K, V> {
 			return iterator_next(it_ptr);
 		}
 
+		/**
+		 * Releases underlying resources
+		 */
+		public void close() {
+			iterator_close(it_ptr);
+			it_ptr = 0;
+		}
+
 		private native long iterator_new_write_iterator(long database_handle);
 		private native void iterator_seek(long iterator_handle, String key);
 		private native void iterator_seek_lower(long iterator_handle, String key);
@@ -125,6 +133,7 @@ public class Database<K, V> {
 		// write_range()
 		private native void iterator_commit(long iterator_handle);
 		private native void iterator_abort(long iterator_handle);
+		private native void iterator_close(long iterator_handle);
 
 		private long it_ptr;
 		private final long db_ptr;
