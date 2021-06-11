@@ -3,17 +3,16 @@
 
 package io.pmem.pmemkv;
 
+import java.nio.ByteBuffer;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import static org.junit.Assert.*;
-
-import java.nio.ByteBuffer;
-import java.util.concurrent.atomic.AtomicInteger;
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 import static io.pmem.pmemkv.TestUtils.*;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.junit.Assert.*;
 
 public class DatabaseTest {
 
@@ -69,6 +68,25 @@ public class DatabaseTest {
 		assertTrue(db.stopped());
 		db.stop();
 		assertTrue(db.stopped());
+	}
+
+	@Test
+	public void openDBFromJsonTest() {
+		String json = "{\"path\":\"" + DB_DIR + "\", \"size\":" + DEFAULT_DB_SIZE + "}";
+		Database<ByteBuffer, ByteBuffer> db = openDBFromJson(ENGINE, json, new ByteBufferConverter());
+		db.stop();
+	}
+
+	@Test
+	public void openDBFromJsonAndSetTest() {
+		String json = "{\"path\":\"" + DB_DIR + "\", \"my_bool_param\":" + true + "}";
+		Database<ByteBuffer, ByteBuffer> db = new Database.Builder<ByteBuffer, ByteBuffer>(ENGINE)
+				.fromJson(json)
+				.setSize(DEFAULT_DB_SIZE)
+				.setKeyConverter(new ByteBufferConverter())
+				.setValueConverter(new ByteBufferConverter())
+				.build();
+		db.stop();
 	}
 
 	@Test

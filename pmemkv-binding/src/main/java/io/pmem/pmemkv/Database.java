@@ -5,11 +5,14 @@ package io.pmem.pmemkv;
 
 import java.io.*;
 import java.lang.IllegalArgumentException;
+import java.lang.NullPointerException;
 import java.lang.OutOfMemoryError;
 import java.nio.ByteBuffer;
 import java.nio.BufferOverflowException;
 import java.util.ArrayList;
-import java.lang.IllegalArgumentException;
+import java.util.Scanner;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Main Java binding pmemkv class, which is a local/embedded key-value datastore
@@ -253,7 +256,9 @@ public class Database<K, V> {
 	 * Iterator provides methods to iterate over records in db. Using iterator() is
 	 * the only one way to get an iterator object.
 	 *
+	 * @return XXX
 	 * @throws DatabaseException
+	 *             XXX
 	 */
 	public WriteIterator iterator() throws DatabaseException {
 		return new WriteIterator(pointer);
@@ -684,6 +689,28 @@ public class Database<K, V> {
 		}
 
 		/**
+		 * Reads config parameters from JSON object stored in a string. One by one, each
+		 * parameter (from the object) is inserted into config. It can be mixed and used
+		 * alternatively with setPath/setSize/etc. to create the config, but it will
+		 * fail if the same parameter will be defined for the second time.
+		 *
+		 * @param json
+		 *            config parameters, given as a proper JSON object.
+		 * @return this builder object.
+		 * @throws BuilderException
+		 *             when improper or malformed JSON object was passed or when pmemkv
+		 *             returns status different than OK.
+		 * @since 1.2.0
+		 */
+		public Builder<K, V> fromJson(String json) throws BuilderException {
+			if (json == null) {
+				throw new BuilderException("Incorrect JSON Object! Null given!");
+			}
+			config_from_json(config, json);
+			return this;
+		}
+
+		/**
 		 * Returns an instance of pmemkv Database created from the config parameters set
 		 * within this builder.
 		 *
@@ -794,6 +821,8 @@ public class Database<K, V> {
 		private native void config_put_int(long ptr, String key, long value);
 
 		private native void config_put_string(long ptr, String key, String value);
+
+		private native void config_from_json(long ptr, String json);
 
 		static {
 			boolean unsatisfied_error = false;
