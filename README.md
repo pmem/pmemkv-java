@@ -1,6 +1,6 @@
-[![Travis build status](https://travis-ci.org/pmem/pmemkv-java.svg?branch=master)](https://travis-ci.org/pmem/pmemkv-java)
 [![GHA build status](https://github.com/pmem/pmemkv-java/workflows/pmemkv-java/badge.svg?branch=master)](https://github.com/pmem/pmemkv-java/actions)
 [![PMEMKV-JAVA version](https://img.shields.io/github/tag/pmem/pmemkv-java.svg)](https://github.com/pmem/pmemkv-java/releases/latest)
+[![pmemkv-root maven central](https://maven-badges.herokuapp.com/maven-central/io.pmem/pmemkv-root/badge.svg?style=flat-for-the-badge)](https://search.maven.org/artifact/io.pmem/pmemkv-root)
 
 # pmemkv-java
 
@@ -13,11 +13,12 @@ in pmemkv's man pages.
 Java API is documented with javadocs and can be found as html here:
 
 - [master](https://pmem.io/pmemkv-java/master/html/index.html)
+- [v1.1](https://pmem.io/pmemkv-java/v1.1/html/index.html)
 - [v1.0](https://pmem.io/pmemkv-java/v1.0/html/index.html)
 
 ## Dependencies
 
-* [pmemkv](https://github.com/pmem/pmemkv) - Key-Value Datastore for Persistent Memory
+* [pmemkv 1.4](https://github.com/pmem/pmemkv) - Key-Value Datastore for Persistent Memory
   * pmemkv source package (pmemkv-devel or libpmemkv-dev)
 * Java Development Kit 8
 * gcc-c++ compiler
@@ -37,14 +38,14 @@ You can add our project as a dependency and use it freely. Make sure to use it e
 <dependency>
   <groupId>io.pmem</groupId>
   <artifactId>pmemkv-root</artifactId>
-  <version>1.0.1</version>
+  <version>[1.0.1,)</version>
 </dependency>
 ```
 
 ### Installation
 
 Start by installing [pmemkv](https://github.com/pmem/pmemkv/blob/master/INSTALLING.md)
-(currently at least in version **1.0.2**) in your system.
+(currently at least in version **1.4**) in your system.
 
 It may be necessary to [configure a proxy](https://maven.apache.org/guides/mini/guide-proxies.html)
 and set `JAVA_HOME` environment variable. Set `JAVA_HOME` variable with directory containing
