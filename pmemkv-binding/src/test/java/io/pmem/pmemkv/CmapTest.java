@@ -3,6 +3,8 @@
 
 package io.pmem.pmemkv;
 
+import java.util.Map;
+import java.util.TreeMap;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -27,6 +29,38 @@ public class CmapTest {
 	public void init() {
 		DB_PATH = testDir.getRoot() + File.separator + "testfile";
 		assertTrue(DB_PATH != null && !DB_PATH.isEmpty());
+	}
+
+	@Test
+	public void testIteratorExceptionWithCmap() {
+		Database<ByteBuffer, ByteBuffer> db = createDB(ENGINE, DB_PATH, new ByteBufferConverter());
+		assertNotNull(db);
+		assertFalse(db.stopped());
+
+		TreeMap<String, String> hs = new TreeMap<String, String>();
+		for (Map.Entry<String, String> entry : hs.entrySet()) {
+			db.put(TestUtils.stringToByteBuffer(entry.getKey()), TestUtils.stringToByteBuffer(entry.getValue()));
+		}
+
+		Database<ByteBuffer, ByteBuffer>.WriteIterator it = db.iterator();
+		assertThrows(NotSupportedException.class, () -> {
+			it.seekHigher(TestUtils.stringToByteBuffer("key3"));
+			assertTrue(false);
+		});
+		assertThrows(NotSupportedException.class, () -> {
+			it.seekLower(TestUtils.stringToByteBuffer("key3"));
+			assertTrue(false);
+		});
+		assertThrows(NotSupportedException.class, () -> {
+			it.seekLowerEq(TestUtils.stringToByteBuffer("key3"));
+			assertTrue(false);
+		});
+		assertThrows(NotSupportedException.class, () -> {
+			it.seekHigherEq(TestUtils.stringToByteBuffer("key3"));
+			assertTrue(false);
+		});
+		it.close();
+		db.stop();
 	}
 
 	@Test
