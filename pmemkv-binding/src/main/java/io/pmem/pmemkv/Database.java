@@ -39,14 +39,14 @@ public class Database<K, V> {
 	private int valueBufferSize;
 
 	/**
-	 * Binding for a pmemkv iterator API. Iterator provides methods to iterate over
-	 * records in db. This object can be created only using Database method:
-	 * iterator().
+	 * Binding for a pmemkv (read) iterator API. Iterator provides methods to
+	 * iterate over records in db. This object can be created only using Database
+	 * method: iterator().
 	 * <p>
-	 * Important: This is an experimental feature and should not be used in
+	 * IMPORTANT: This is an EXPERIMENTAL feature and should not be used in
 	 * production code. For now, we don't guarantee stability of this API.
 	 */
-	public class WriteIterator implements AutoCloseable {
+	public class ReadIterator implements AutoCloseable {
 		/**
 		 * Constructor for iterator class. Can be accessed only via Database API.
 		 *
@@ -54,9 +54,9 @@ public class Database<K, V> {
 		 *            handle to database pointer
 		 * @since 1.2.0
 		 */
-		WriteIterator(long database_handle) {
+		ReadIterator(long database_handle) {
 			db_ptr = database_handle;
-			it_ptr = iterator_new_write_iterator(db_ptr);
+			it_ptr = iterator_new_read_iterator(db_ptr);
 		}
 
 		/**
@@ -195,23 +195,49 @@ public class Database<K, V> {
 		}
 
 		/**
-		 * Returns record's key.
+		 * Returns key of a record currently pointed by the iterator.
 		 *
 		 * If the iterator is on an undefined position, calling this method is undefined
 		 * behaviour.
 		 *
 		 * @return key of type K
+		 * @throws DatabaseException
+		 *             or derived class that matches pmemkv's status.
+		 * @throws OutOfMemoryError
+		 *             Exception will be thrown when data cannot be allocated in DRAM.
 		 * @since 1.2.0
 		 */
-		public K key() {
-			ByteBuffer value;
+		public K key() throws DatabaseException, OutOfMemoryError {
+			ByteBuffer k;
 			try {
-				value = iterator_key(it_ptr);
+				k = iterator_key(it_ptr);
 			} catch (NotFoundException kve) {
 				return null;
 			}
-			K retval = keyConverter.fromByteBuffer(value);
-			return retval;
+			return keyConverter.fromByteBuffer(k);
+		}
+
+		/**
+		 * Returns value of a record currently pointed by the iterator.
+		 *
+		 * If the iterator is on an undefined position, calling this method is undefined
+		 * behaviour.
+		 *
+		 * @return value of type V
+		 * @throws DatabaseException
+		 *             or derived class that matches pmemkv's status.
+		 * @throws OutOfMemoryError
+		 *             Exception will be thrown when data cannot be allocated in DRAM.
+		 * @since 1.2.0
+		 */
+		public V value() throws DatabaseException, OutOfMemoryError {
+			ByteBuffer v;
+			try {
+				v = iterator_value(it_ptr);
+			} catch (NotFoundException kve) {
+				return null;
+			}
+			return valueConverter.fromByteBuffer(v);
 		}
 
 		/**
@@ -251,7 +277,7 @@ public class Database<K, V> {
 			it_ptr = 0;
 		}
 
-		private native long iterator_new_write_iterator(long database_handle);
+		private native long iterator_new_read_iterator(long database_handle);
 		private native boolean iterator_seek(long iterator_handle, ByteBuffer key);
 		private native boolean iterator_seek_lower(long iterator_handle, ByteBuffer key);
 		private native boolean iterator_seek_lower_eq(long iterator_handle, ByteBuffer key);
@@ -263,11 +289,12 @@ public class Database<K, V> {
 		private native boolean iterator_next(long iterator_handle);
 		private native boolean iterator_prev(long iterator_handle);
 		private native ByteBuffer iterator_key(long iterator_handle);
-		private native byte[] iterator_read_range(long iterator_handle);
-		// write_range()
-		private native void iterator_commit(long iterator_handle);
-		private native void iterator_abort(long iterator_handle);
+		private native ByteBuffer iterator_value(long iterator_handle);
 		private native void iterator_close(long iterator_handle);
+		// iterator_write_range()
+		// iterator_read_range()
+		// private native void iterator_commit(long iterator_handle);
+		// private native void iterator_abort(long iterator_handle);
 
 		private long it_ptr;
 		private final long db_ptr;
@@ -387,13 +414,13 @@ public class Database<K, V> {
 	 * Iterator provides methods to iterate over records in db. Using iterator() is
 	 * the only one way to get an iterator object.
 	 *
-	 * @return instance of WriteIterator
+	 * @return instance of ReadIterator
 	 * @throws DatabaseException
 	 *             or derived class that matches pmemkv's status.
 	 * @since 1.2.0
 	 */
-	public WriteIterator iterator() throws DatabaseException {
-		return new WriteIterator(pointer);
+	public ReadIterator iterator() throws DatabaseException {
+		return new ReadIterator(pointer);
 	}
 
 	/**

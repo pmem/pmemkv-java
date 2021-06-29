@@ -4,7 +4,8 @@ XXX XXX XX 2021 Igor Chorążewicz <igor.chorazewicz@intel.com>
 
 	Improvements:
 	- add new Builder methods to read config params from JSON objects
-	-
+	- add ReadIterator experimental API - it allows iterating through
+		records and read (currently only entire) value
 
 	Minor changes:
 	-

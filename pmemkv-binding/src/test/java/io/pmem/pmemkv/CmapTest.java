@@ -32,40 +32,10 @@ public class CmapTest {
 	}
 
 	@Test
-	public void testIteratorExceptionWithCmap() {
+	public void testCreateAndOpen() {
 		Database<ByteBuffer, ByteBuffer> db = createDB(ENGINE, DB_PATH, new ByteBufferConverter());
 		assertNotNull(db);
 		assertFalse(db.stopped());
-
-		TreeMap<String, String> hs = new TreeMap<String, String>();
-		for (Map.Entry<String, String> entry : hs.entrySet()) {
-			db.put(TestUtils.stringToByteBuffer(entry.getKey()), TestUtils.stringToByteBuffer(entry.getValue()));
-		}
-
-		Database<ByteBuffer, ByteBuffer>.WriteIterator it = db.iterator();
-		assertThrows(NotSupportedException.class, () -> {
-			it.seekHigher(TestUtils.stringToByteBuffer("key3"));
-			assertTrue(false);
-		});
-		assertThrows(NotSupportedException.class, () -> {
-			it.seekLower(TestUtils.stringToByteBuffer("key3"));
-			assertTrue(false);
-		});
-		assertThrows(NotSupportedException.class, () -> {
-			it.seekLowerEq(TestUtils.stringToByteBuffer("key3"));
-			assertTrue(false);
-		});
-		assertThrows(NotSupportedException.class, () -> {
-			it.seekHigherEq(TestUtils.stringToByteBuffer("key3"));
-			assertTrue(false);
-		});
-		it.close();
-		db.stop();
-	}
-
-	@Test
-	public void testCreateAndOpen() {
-		Database<ByteBuffer, ByteBuffer> db = createDB(ENGINE, DB_PATH, new ByteBufferConverter());
 
 		assertFalse(db.exists(stringToByteBuffer("key1")));
 		db.put(stringToByteBuffer("key1"), stringToByteBuffer("value1"));
@@ -74,8 +44,11 @@ public class CmapTest {
 		assertEquals(byteBufferToString(resBuff), "value1");
 
 		db.stop();
+		assertTrue(db.stopped());
 
 		db = openDB(ENGINE, DB_PATH, new ByteBufferConverter());
+		assertNotNull(db);
+		assertFalse(db.stopped());
 		assertTrue(db.exists(stringToByteBuffer("key1")));
 		resBuff = db.getCopy(stringToByteBuffer("key1"));
 		assertEquals(byteBufferToString(resBuff), "value1");
@@ -99,6 +72,8 @@ public class CmapTest {
 	public void createDBFromJson() {
 		String json = "{\"path\":\"" + DB_PATH + "\", \"size\":" + DEFAULT_DB_SIZE + ", \"force_create\":1}";
 		Database<ByteBuffer, ByteBuffer> db = openDBFromJson(ENGINE, json, new ByteBufferConverter());
+		assertNotNull(db);
+		assertFalse(db.stopped());
 		db.stop();
 	}
 
@@ -221,5 +196,31 @@ public class CmapTest {
 		});
 		dbByteBuffer.stop();
 		dbString.stop();
+	}
+
+	/* unsorted engine should not implement lower/higher methods */
+	@Test
+	public void testIteratorExceptionWithCmap() {
+		Database<ByteBuffer, ByteBuffer> db = createDB(ENGINE, DB_PATH, new ByteBufferConverter());
+
+		Database<ByteBuffer, ByteBuffer>.ReadIterator it = db.iterator();
+		assertThrows(NotSupportedException.class, () -> {
+			it.seekHigher(stringToByteBuffer("key"));
+			assertTrue(false);
+		});
+		assertThrows(NotSupportedException.class, () -> {
+			it.seekLower(stringToByteBuffer("key"));
+			assertTrue(false);
+		});
+		assertThrows(NotSupportedException.class, () -> {
+			it.seekLowerEq(stringToByteBuffer("key"));
+			assertTrue(false);
+		});
+		assertThrows(NotSupportedException.class, () -> {
+			it.seekHigherEq(stringToByteBuffer("key"));
+			assertTrue(false);
+		});
+		it.close();
+		db.stop();
 	}
 }
