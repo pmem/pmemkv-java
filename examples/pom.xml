@@ -28,6 +28,7 @@
         <module>PicturesExample</module>
         <module>StringExample</module>
         <module>MixedTypesExample</module>
+        <module>IteratorExample</module>
     </modules>
 
     <build>

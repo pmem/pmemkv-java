@@ -29,5 +29,6 @@ echo "#############################################################"
 run_standalone_example StringExample
 run_standalone_example ByteBufferExample
 run_standalone_example MixedTypesExample
+run_standalone_example IteratorExample
 # PicturesExample is a GUI application, so just test compilation.
 run_standalone_example PicturesExample
