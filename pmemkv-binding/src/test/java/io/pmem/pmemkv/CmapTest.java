@@ -96,6 +96,28 @@ public class CmapTest {
 	}
 
 	@Test
+	public void createDBFromJson() {
+		String json = "{\"path\":\"" + DB_PATH + "\", \"size\":" + DEFAULT_DB_SIZE + ", \"force_create\":1}";
+		Database<ByteBuffer, ByteBuffer> db = openDBFromJson(ENGINE, json, new ByteBufferConverter());
+		db.stop();
+	}
+
+	@Test
+	public void throwsOnStartWhenOpeningFromJsonNonExistentFile() {
+		Exception exception = assertThrows(DatabaseException.class, () -> {
+			/* force_create set to 0 */
+			String json = "{\"path\":\"" + DB_PATH + "\", \"size\":" + DEFAULT_DB_SIZE + ", \"force_create\":0}";
+			Database<ByteBuffer, ByteBuffer> db = openDBFromJson(ENGINE, json, new ByteBufferConverter());
+
+			/*
+			 * It's not a valid path (it's not created), so it should be
+			 * InvalidArgumentException, but: https://github.com/pmem/pmemkv/issues/565
+			 */
+		});
+		assertTrue(exception.getMessage().length() > 0);
+	}
+
+	@Test
 	public void throwsExceptionOnSortedCountFuncs() {
 		Database<ByteBuffer, ByteBuffer> db = createDB(ENGINE, DB_PATH, new ByteBufferConverter());
 		ByteBuffer key1 = stringToByteBuffer("key1");

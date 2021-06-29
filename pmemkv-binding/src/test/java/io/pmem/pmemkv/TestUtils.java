@@ -115,4 +115,12 @@ class TestUtils {
 				.setValueBufferSize(valBufferSize)
 				.build();
 	}
+
+	public static <KV> Database<KV, KV> openDBFromJson(String engine, String json, Converter<KV> kvConverter) {
+		return new Database.Builder<KV, KV>(engine)
+				.fromJson(json)
+				.setKeyConverter(kvConverter)
+				.setValueConverter(kvConverter)
+				.build();
+	}
 }
