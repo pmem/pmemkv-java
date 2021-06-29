@@ -32,5 +32,6 @@ cd examples
 run_example StringExample
 run_example ByteBufferExample
 run_example MixedTypesExample
+run_example IteratorExample
 # PicturesExample is a GUI application, so just test compilation.
 run_example PicturesExample
