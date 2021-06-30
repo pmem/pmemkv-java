@@ -13,7 +13,7 @@ import org.junit.rules.TemporaryFolder;
 
 import static org.junit.Assert.*;
 
-public class DatabaseWriteIteratorTest {
+public class DatabaseIteratorTest {
 
 	private final String ENGINE = "vsmap";
 	private String DB_DIR = "";
@@ -46,29 +46,30 @@ public class DatabaseWriteIteratorTest {
 		assertTrue(DB_DIR != null && !DB_DIR.isEmpty());
 	}
 
+	/*
+	 * XXX: change ByteBufferConverter to StringConverter to avoid conversion
+	 * outside converter
+	 */
 	@Test
 	public void readFirstEntryTest() {
 		Database<ByteBuffer, ByteBuffer> db = buildDB(ENGINE);
-
 		assertFalse(db.exists(TestUtils.stringToByteBuffer("key1")));
-		/*
-		 * XXX: change ByteBufferConverter to StringConverter to avoid conversion
-		 * outside converter
-		 */
+
 		db.put(TestUtils.stringToByteBuffer("key1"), TestUtils.stringToByteBuffer("value1"));
 		assertTrue(db.exists(TestUtils.stringToByteBuffer("key1")));
-		try (Database<ByteBuffer, ByteBuffer>.WriteIterator it = db.iterator()) {
+		try (Database<ByteBuffer, ByteBuffer>.ReadIterator it = db.readIterator()) {
 			assertNotNull(it);
-			assertTrue(it.seekToFirst());;
+			assertTrue(it.seekToFirst());
 			assertTrue(TestUtils.byteBufferToString(it.key()).equals("key1"));
+			assertTrue(TestUtils.byteBufferToString(it.value()).equals("value1"));
+			assertFalse(it.isNext());
 		}
 		db.stop();
 		assertTrue(db.stopped());
 	}
-
 	@Test
-	public void readFewEntryTest() {
-		TreeMap<String, String> hs = buildHashMapWithGaps(10);
+	public void readAllEntriesTest() {
+		TreeMap<String, String> hs = buildHashMapWithGaps(1024);
 		Database<ByteBuffer, ByteBuffer> db = buildDB(ENGINE);
 		assertFalse(db.exists(TestUtils.stringToByteBuffer("key1")));
 
@@ -76,19 +77,22 @@ public class DatabaseWriteIteratorTest {
 			db.put(TestUtils.stringToByteBuffer(entry.getKey()), TestUtils.stringToByteBuffer(entry.getValue()));
 		}
 
-		try (Database<ByteBuffer, ByteBuffer>.WriteIterator it = db.iterator()) {
+		try (Database<ByteBuffer, ByteBuffer>.ReadIterator it = db.readIterator()) {
 			assertNotNull(it);
 			assertTrue(it.seekToFirst());
 			assertTrue(it.isNext());
 			int counter = 1;
 			while (it.isNext()) {
 				counter++;
-				assertTrue(it.next());;
+				String key = TestUtils.byteBufferToString(it.key());
+				String value = TestUtils.byteBufferToString(it.value());
+				/* key and value should have the same last character */
+				assertTrue(key.substring(key.length() - 1).equals(value.substring(value.length() - 1)));
+				assertTrue(it.next());
 			}
 			assertTrue(counter == hs.size());
 		}
 		db.stop();
-		assertTrue(db.stopped());
 	}
 
 	@Test
@@ -100,13 +104,29 @@ public class DatabaseWriteIteratorTest {
 			db.put(TestUtils.stringToByteBuffer(entry.getKey()), TestUtils.stringToByteBuffer(entry.getValue()));
 		}
 
-		try (Database<ByteBuffer, ByteBuffer>.WriteIterator it = db.iterator()) {
+		try (Database<ByteBuffer, ByteBuffer>.ReadIterator it = db.readIterator()) {
 			assertTrue(it.seek(TestUtils.stringToByteBuffer("key3")));
 			assertTrue(TestUtils.byteBufferToString(it.key()).equals("key3"));
+			assertTrue(TestUtils.byteBufferToString(it.value()).equals("value3"));
 			while (it.isNext()) {
 				assertTrue(it.next());
 				assertTrue(hs.containsKey(TestUtils.byteBufferToString(it.key())));
 			}
+		}
+		db.stop();
+	}
+
+	@Test
+	public void seekFailTest() {
+		TreeMap<String, String> hs = buildHashMapWithGaps(10);
+		Database<ByteBuffer, ByteBuffer> db = buildDB(ENGINE);
+
+		for (Map.Entry<String, String> entry : hs.entrySet()) {
+			db.put(TestUtils.stringToByteBuffer(entry.getKey()), TestUtils.stringToByteBuffer(entry.getValue()));
+		}
+
+		try (Database<ByteBuffer, ByteBuffer>.ReadIterator it = db.readIterator()) {
+			assertFalse(it.seek(TestUtils.stringToByteBuffer("nope")));
 		}
 		db.stop();
 	}
@@ -120,13 +140,29 @@ public class DatabaseWriteIteratorTest {
 			db.put(TestUtils.stringToByteBuffer(entry.getKey()), TestUtils.stringToByteBuffer(entry.getValue()));
 		}
 
-		try (Database<ByteBuffer, ByteBuffer>.WriteIterator it = db.iterator()) {
+		try (Database<ByteBuffer, ByteBuffer>.ReadIterator it = db.readIterator()) {
 			assertTrue(it.seekLower(TestUtils.stringToByteBuffer("key3")));
 			assertTrue(TestUtils.byteBufferToString(it.key()).equals("key2"));
+			assertTrue(TestUtils.byteBufferToString(it.value()).equals("value2"));
 			while (it.isNext()) {
 				assertTrue(it.next());
 				assertTrue(hs.containsKey(TestUtils.byteBufferToString(it.key())));
 			}
+		}
+		db.stop();
+	}
+
+	@Test
+	public void seekLowerFailTest() {
+		TreeMap<String, String> hs = buildHashMapWithGaps(10);
+		Database<ByteBuffer, ByteBuffer> db = buildDB(ENGINE);
+
+		for (Map.Entry<String, String> entry : hs.entrySet()) {
+			db.put(TestUtils.stringToByteBuffer(entry.getKey()), TestUtils.stringToByteBuffer(entry.getValue()));
+		}
+
+		try (Database<ByteBuffer, ByteBuffer>.ReadIterator it = db.readIterator()) {
+			assertFalse(it.seekLower(TestUtils.stringToByteBuffer("key0")));
 		}
 		db.stop();
 	}
@@ -140,9 +176,10 @@ public class DatabaseWriteIteratorTest {
 			db.put(TestUtils.stringToByteBuffer(entry.getKey()), TestUtils.stringToByteBuffer(entry.getValue()));
 		}
 
-		try (Database<ByteBuffer, ByteBuffer>.WriteIterator it = db.iterator()) {
+		try (Database<ByteBuffer, ByteBuffer>.ReadIterator it = db.readIterator()) {
 			assertTrue(it.seekLowerEq(TestUtils.stringToByteBuffer("key4")));
 			assertTrue(TestUtils.byteBufferToString(it.key()).equals("key3"));
+			assertTrue(TestUtils.byteBufferToString(it.value()).equals("value3"));
 			while (it.isNext()) {
 				assertTrue(it.next());
 				assertTrue(hs.containsKey(TestUtils.byteBufferToString(it.key())));
@@ -160,9 +197,10 @@ public class DatabaseWriteIteratorTest {
 			db.put(TestUtils.stringToByteBuffer(entry.getKey()), TestUtils.stringToByteBuffer(entry.getValue()));
 		}
 
-		try (Database<ByteBuffer, ByteBuffer>.WriteIterator it = db.iterator()) {
+		try (Database<ByteBuffer, ByteBuffer>.ReadIterator it = db.readIterator()) {
 			assertTrue(it.seekLowerEq(TestUtils.stringToByteBuffer("key3")));
 			assertTrue(TestUtils.byteBufferToString(it.key()).equals("key3"));
+			assertTrue(TestUtils.byteBufferToString(it.value()).equals("value3"));
 			while (it.isNext()) {
 				assertTrue(it.next());
 				assertTrue(hs.containsKey(TestUtils.byteBufferToString(it.key())));
@@ -180,9 +218,10 @@ public class DatabaseWriteIteratorTest {
 			db.put(TestUtils.stringToByteBuffer(entry.getKey()), TestUtils.stringToByteBuffer(entry.getValue()));
 		}
 
-		try (Database<ByteBuffer, ByteBuffer>.WriteIterator it = db.iterator()) {
+		try (Database<ByteBuffer, ByteBuffer>.ReadIterator it = db.readIterator()) {
 			assertTrue(it.seekHigher(TestUtils.stringToByteBuffer("key3")));
 			assertTrue(TestUtils.byteBufferToString(it.key()).equals("key5"));
+			assertTrue(TestUtils.byteBufferToString(it.value()).equals("value5"));
 			while (it.isNext()) {
 				assertTrue(it.next());
 				assertTrue(hs.containsKey(TestUtils.byteBufferToString(it.key())));
@@ -192,7 +231,7 @@ public class DatabaseWriteIteratorTest {
 	}
 
 	@Test
-	public void seekHigherAndReadKeyFailTest() {
+	public void seekHigherFailTest() {
 		TreeMap<String, String> hs = buildHashMapWithGaps(10);
 		Database<ByteBuffer, ByteBuffer> db = buildDB(ENGINE);
 
@@ -200,13 +239,8 @@ public class DatabaseWriteIteratorTest {
 			db.put(TestUtils.stringToByteBuffer(entry.getKey()), TestUtils.stringToByteBuffer(entry.getValue()));
 		}
 
-		try (Database<ByteBuffer, ByteBuffer>.WriteIterator it = db.iterator()) {
-			assertTrue(it.seekHigher(TestUtils.stringToByteBuffer("key3")));
-			assertTrue(TestUtils.byteBufferToString(it.key()).equals("key5"));
-			while (it.isNext()) {
-				assertTrue(it.next());
-				assertTrue(hs.containsKey(TestUtils.byteBufferToString(it.key())));
-			}
+		try (Database<ByteBuffer, ByteBuffer>.ReadIterator it = db.readIterator()) {
+			assertFalse(it.seekHigher(TestUtils.stringToByteBuffer("key9")));
 		}
 		db.stop();
 	}
@@ -220,9 +254,10 @@ public class DatabaseWriteIteratorTest {
 			db.put(TestUtils.stringToByteBuffer(entry.getKey()), TestUtils.stringToByteBuffer(entry.getValue()));
 		}
 
-		try (Database<ByteBuffer, ByteBuffer>.WriteIterator it = db.iterator()) {
+		try (Database<ByteBuffer, ByteBuffer>.ReadIterator it = db.readIterator()) {
 			assertTrue(it.seekHigherEq(TestUtils.stringToByteBuffer("key4")));
 			assertTrue(TestUtils.byteBufferToString(it.key()).equals("key5"));
+			assertTrue(TestUtils.byteBufferToString(it.value()).equals("value5"));
 			while (it.isNext()) {
 				assertTrue(it.next());
 				assertTrue(hs.containsKey(TestUtils.byteBufferToString(it.key())));
@@ -240,13 +275,65 @@ public class DatabaseWriteIteratorTest {
 			db.put(TestUtils.stringToByteBuffer(entry.getKey()), TestUtils.stringToByteBuffer(entry.getValue()));
 		}
 
-		try (Database<ByteBuffer, ByteBuffer>.WriteIterator it = db.iterator()) {
+		try (Database<ByteBuffer, ByteBuffer>.ReadIterator it = db.readIterator()) {
 			assertTrue(it.seekHigherEq(TestUtils.stringToByteBuffer("key3")));
 			assertTrue(TestUtils.byteBufferToString(it.key()).equals("key3"));
+			assertTrue(TestUtils.byteBufferToString(it.value()).equals("value3"));
 			while (it.isNext()) {
 				assertTrue(it.next());
 				assertTrue(hs.containsKey(TestUtils.byteBufferToString(it.key())));
 			}
+		}
+		db.stop();
+	}
+
+	@Test
+	public void variousSeekTest() {
+		TreeMap<String, String> hs = buildHashMapWithGaps(10);
+		Database<ByteBuffer, ByteBuffer> db = buildDB(ENGINE);
+
+		for (Map.Entry<String, String> entry : hs.entrySet()) {
+			db.put(TestUtils.stringToByteBuffer(entry.getKey()), TestUtils.stringToByteBuffer(entry.getValue()));
+		}
+
+		try (Database<ByteBuffer, ByteBuffer>.ReadIterator it = db.readIterator()) {
+			assertTrue(it.seekToLast());
+			assertTrue(TestUtils.byteBufferToString(it.key()).equals("key9"));
+			assertTrue(TestUtils.byteBufferToString(it.value()).equals("value9"));
+			assertFalse(it.isNext());
+
+			assertTrue(it.seekToFirst());
+			assertTrue(TestUtils.byteBufferToString(it.key()).equals("key1"));
+			assertTrue(TestUtils.byteBufferToString(it.value()).equals("value1"));
+
+			assertTrue(it.seekHigherEq(TestUtils.stringToByteBuffer("key3")));
+			assertTrue(TestUtils.byteBufferToString(it.key()).equals("key3"));
+			assertTrue(TestUtils.byteBufferToString(it.value()).equals("value3"));
+
+			assertTrue(it.seekHigherEq(TestUtils.stringToByteBuffer("key4")));
+			assertTrue(TestUtils.byteBufferToString(it.key()).equals("key5"));
+			assertTrue(TestUtils.byteBufferToString(it.value()).equals("value5"));
+
+			assertTrue(it.seekLowerEq(TestUtils.stringToByteBuffer("key8")));
+			assertTrue(TestUtils.byteBufferToString(it.key()).equals("key7"));
+			assertTrue(TestUtils.byteBufferToString(it.value()).equals("value7"));
+
+			assertTrue(it.seekHigher(TestUtils.stringToByteBuffer("key0")));
+			assertTrue(TestUtils.byteBufferToString(it.key()).equals("key1"));
+			assertTrue(TestUtils.byteBufferToString(it.value()).equals("value1"));
+
+			assertTrue(it.seekLower(TestUtils.stringToByteBuffer("key99")));
+			assertTrue(TestUtils.byteBufferToString(it.key()).equals("key9"));
+			assertTrue(TestUtils.byteBufferToString(it.value()).equals("value9"));
+
+			assertTrue(it.seekLowerEq(TestUtils.stringToByteBuffer("key10")));
+			assertTrue(TestUtils.byteBufferToString(it.key()).equals("key1"));
+			assertTrue(TestUtils.byteBufferToString(it.value()).equals("value1"));
+
+			assertTrue(it.seekToFirst());
+			assertTrue(TestUtils.byteBufferToString(it.key()).equals("key1"));
+			assertTrue(TestUtils.byteBufferToString(it.value()).equals("value1"));
+			assertTrue(it.isNext());
 		}
 		db.stop();
 	}
