@@ -1,17 +1,14 @@
-XXX XXX XX 2021 Igor Chorążewicz <igor.chorazewicz@intel.com>
+Fri Jul 02 2021 Łukasz Stolarczuk <lukasz.stolarczuk@intel.com>
 
 	* Version 1.2.0
 
 	Improvements:
-	- add new Builder methods to read config params from JSON objects
 	- add ReadIterator experimental API - it allows iterating through
 		records and read (currently only entire) value
+	- add new Builder methods to read config params from JSON objects
 
-	Minor changes:
-	-
-
-	Other:
-	-
+	Requirement notice:
+	- since this release, pmemkv is required in version at least 1.4
 
 Tue Jun 08 2021 Igor Chorążewicz <igor.chorazewicz@intel.com>
 

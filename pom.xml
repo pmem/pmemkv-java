@@ -6,7 +6,7 @@
 
     <groupId>io.pmem</groupId>
     <artifactId>pmemkv-root</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
     <name>pmemkv-root</name>
     <description>Java binding for pmemkv (top-level, parent artifact)</description>
     <url>https://github.com/pmem/pmemkv-java</url>
