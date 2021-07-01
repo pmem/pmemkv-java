@@ -43,9 +43,10 @@ public class Database<K, V> {
 	 * iterate over records in db. It allows reading record's key and value, but not
 	 * modify them. Any changes to iterators will not be reflected in the database.
 	 * This object can only be created using Database method:
-	 * {@link io.pmem.pmemkv.Database#readIterator() readIterator()} . Holding
-	 * simultaneously, in the same thread, more than one iterator is undefined
-	 * behavior.
+	 * {@link io.pmem.pmemkv.Database#readIterator() readIterator()} .
+	 * <p>
+	 * Holding simultaneously, in the same thread, more than one iterator is
+	 * undefined behavior.
 	 * <p>
 	 * IMPORTANT: This is an EXPERIMENTAL feature and should not be used in
 	 * production code. For now, we don't guarantee stability of this API.
@@ -65,7 +66,7 @@ public class Database<K, V> {
 
 		/**
 		 * Changes iterator position to a record with the given key.
-		 *
+		 * <p>
 		 * If the record is present and no errors occurred, returns true. If the record
 		 * does not exist, false is returned and the iterator position is undefined. It
 		 * internally aborts all uncommitted changes made to an element previously
@@ -85,7 +86,7 @@ public class Database<K, V> {
 
 		/**
 		 * Changes iterator position to a record with a key lower than the given key.
-		 *
+		 * <p>
 		 * If the record is present and no errors occurred, returns true. If the record
 		 * does not exist, false is returned and the iterator position is undefined. It
 		 * internally aborts all uncommitted changes made to an element previously
@@ -106,7 +107,7 @@ public class Database<K, V> {
 		/**
 		 * Changes iterator position to a record with a key equal to or lower than the
 		 * given key.
-		 *
+		 * <p>
 		 * If the record is present and no errors occurred, returns true. If the record
 		 * does not exist, false is returned and the iterator position is undefined. It
 		 * internally aborts all uncommitted changes made to an element previously
@@ -126,7 +127,7 @@ public class Database<K, V> {
 
 		/**
 		 * Changes iterator position to a record with a key higher than the given key.
-		 *
+		 * <p>
 		 * If the record is present and no errors occurred, returns true. If the record
 		 * does not exist, false is returned and the iterator position is undefined. It
 		 * internally aborts all uncommitted changes made to an element previously
@@ -147,7 +148,7 @@ public class Database<K, V> {
 		/**
 		 * Changes iterator position to a record with a key equal to or higher than the
 		 * given key.
-		 *
+		 * <p>
 		 * If the record is present and no errors occurred, returns true. If the record
 		 * does not exist, false is returned and the iterator position is undefined. It
 		 * internally aborts all uncommitted changes made to an element previously
@@ -167,7 +168,7 @@ public class Database<K, V> {
 
 		/**
 		 * Changes iterator position to a first record.
-		 *
+		 * <p>
 		 * If db isn't empty and no errors occurred, returns true. If db is empty, false
 		 * is returned and the iterator position is undefined. It internally aborts all
 		 * uncommitted changes made to an element previously pointed by the iterator.
@@ -183,7 +184,7 @@ public class Database<K, V> {
 
 		/**
 		 * Changes iterator position to a last record.
-		 *
+		 * <p>
 		 * If db isn't empty and no errors occurred, returns true. If db is empty, false
 		 * is returned and the iterator position is undefined. It internally aborts all
 		 * uncommitted changes made to an element previously pointed by the iterator.
@@ -198,10 +199,10 @@ public class Database<K, V> {
 		}
 
 		/**
-		 * Returns key of a record currently pointed by the iterator. It is just a copy
-		 * of the current record - key cannot be updated in the Database using this
-		 * method.
-		 *
+		 * Returns the entire key of a record currently pointed by the iterator. It is
+		 * just a copy of the current record - key cannot be updated in the Database
+		 * using this method.
+		 * <p>
 		 * If the iterator is on an undefined position, calling this method is undefined
 		 * behaviour.
 		 *
@@ -223,10 +224,10 @@ public class Database<K, V> {
 		}
 
 		/**
-		 * Returns value of a record currently pointed by the iterator. It is just a
-		 * copy of the current record - data cannot be written to the Database using
-		 * this method.
-		 *
+		 * Returns the entire value of a record currently pointed by the iterator. It is
+		 * just a copy of the current record - data cannot be written to the Database
+		 * using this method.
+		 * <p>
 		 * If the iterator is on an undefined position, calling this method is undefined
 		 * behaviour.
 		 *
@@ -249,7 +250,7 @@ public class Database<K, V> {
 
 		/**
 		 * Checks if there is a next record available.
-		 *
+		 * <p>
 		 * If true is returned, it is guaranteed that iterator.next() will return
 		 * status::OK, otherwise iterator is already on the last element and
 		 * iterator.next() will return false.
@@ -263,7 +264,7 @@ public class Database<K, V> {
 
 		/**
 		 * Changes iterator position to the next record.
-		 *
+		 * <p>
 		 * If the next record exists, returns true, otherwise false is returned and the
 		 * iterator position is undefined.
 		 *
