@@ -15,15 +15,12 @@ Make a package:
 - mvn package
 - verify created packages: .jar's (with java code and docs) and .so (JNI, C++ code)
 
-Create release branch:
-- for major/minor release:
-  - create stable-$VER branch now: git checkout -b stable-$VER
-
 Publish changes:
 - for major/minor release:
   - git push upstream HEAD:master $VERSION
-  - create and push to upstream stable-$VERSION branch
-  - create PR from stable-$VERSION to master
+  - create and push to upstream stable-$VERSION branch:
+    - git checkout -b stable-$VER
+    - git push upstream HEAD:stable-$VER
 - for patch release:
   - git push upstream HEAD:stable-$VER $VERSION
   - create PR from stable-$VER to next stable (or master, if release is from most recent stable branch)

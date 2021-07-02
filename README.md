@@ -4,17 +4,17 @@
 
 # pmemkv-java
 
-Java bindings for pmemkv, using Java Native Interface. Currently functionally equal to pmemkv in version 1.0.
-Some of the new functionalities (from pmemkv 1.1+) are not available yet.
+Java bindings for pmemkv, using Java Native Interface. It's mostly functionally equal to pmemkv
+in version 1.0, but some of the new functionalities (e.g. from pmemkv 1.4) are already available.
 
 All known issues and limitations are logged as GitHub issues or are described
 in pmemkv's man pages.
 
-Java API is documented with javadocs and can be found as html here:
+Java API is documented with javadocs and can be found as html on https://pmem.io/pmemkv-java
+for every branch/release. For most recent always see [master](https://pmem.io/pmemkv-java/master/html/index.html) docs.
 
-- [master](https://pmem.io/pmemkv-java/master/html/index.html)
-- [v1.1](https://pmem.io/pmemkv-java/v1.1/html/index.html)
-- [v1.0](https://pmem.io/pmemkv-java/v1.0/html/index.html)
+Latest releases can be found on the ["releases" tab](https://github.com/pmem/pmemkv-java/releases).
+Up-to-date support/maintenance status of branches/releases is available on [pmem.io](https://pmem.io/pmemkv-java).
 
 ## Dependencies
 
