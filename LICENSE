@@ -39,5 +39,7 @@ with the following exceptions:
   * v1.0/html/stylesheet.css
   * v1.1/html/script.js
   * v1.1/html/stylesheet.css
+  * v1.2/html/script.js
+  * v1.2/html/stylesheet.css
   are licensed under the Apache License, version 2.0
   (see: http://www.apache.org/licenses).
