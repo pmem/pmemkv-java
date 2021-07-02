@@ -8,22 +8,22 @@ Make a release locally:
 - add an entry to ChangeLog, remember to change the day of the week in the release date
   - for major/minor releases mention compatibility with the previous release
 - update "pmemkv-java" project's version in all pom.xml files
+- update version tested in the `run-maven-example.sh` script
 - git commit -a -S -m "common: $VERSION release"
 - git tag -a -s -m "pmemkv-java version $VERSION" $VERSION
 
 Make a package:
 - mvn package
-- verify created packages: .jar's (with java code and docs) and .so (JNI, C++ code)
-
-Create release branch:
-- for major/minor release:
-  - create stable-$VER branch now: git checkout -b stable-$VER
+- verify created packages:
+  - .jar's (with java code and docs) and
+  - .so (JNI, C++ code)
 
 Publish changes:
 - for major/minor release:
   - git push upstream HEAD:master $VERSION
-  - create and push to upstream stable-$VERSION branch
-  - create PR from stable-$VERSION to master
+  - create and push to upstream stable-$VERSION branch:
+    - git checkout -b stable-$VER
+    - git push upstream HEAD:stable-$VER
 - for patch release:
   - git push upstream HEAD:stable-$VER $VERSION
   - create PR from stable-$VER to next stable (or master, if release is from most recent stable branch)
