@@ -30,6 +30,7 @@ echo "### Verifying execution of examples"
 echo "###########################################################"
 cd examples
 run_example StringExample
+run_standalone_example StringExample
 run_example ByteBufferExample
 run_example MixedTypesExample
 run_example IteratorExample
