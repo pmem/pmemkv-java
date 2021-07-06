@@ -18,9 +18,8 @@ PREFIX=/usr
 PACKAGE_TYPE=${1^^} #To uppercase
 echo "PACKAGE_TYPE: ${PACKAGE_TYPE}"
 
-# Merge pull request #1048 from lukaszstolarczuk/tests-gdb; 04.03.2021
-# It contains new exception: pool_invalid_argument
-LIBPMEMOBJ_CPP_VERSION="7cc2f387fa261f370a3c5f0f9e122756bc2fffb0"
+# master: Merge pull request #1126 from igchor/test_workaround; 05.07.2021
+LIBPMEMOBJ_CPP_VERSION="2543afae7b1e9e82809a3e4280753b33cdab8136"
 
 build_dir=$(mktemp -d -t libpmemobj-cpp-XXX)
 
@@ -34,7 +33,7 @@ cd build
 
 # turn off all redundant components
 cmake .. -DCPACK_GENERATOR="${PACKAGE_TYPE}" -DCMAKE_INSTALL_PREFIX=${PREFIX} \
-	-DBUILD_EXAMPLES=OFF -DBUILD_TESTS=OFF -DBUILD_DOC=OFF -DBUILD_BENCHMARKS=OFF
+	-DBUILD_EXAMPLES=OFF -DBUILD_TESTS=OFF -DTESTS_USE_VALGRIND=OFF -DBUILD_DOC=OFF -DBUILD_BENCHMARKS=OFF
 
 if [ "${PACKAGE_TYPE}" = "" ]; then
 	make -j$(nproc) install

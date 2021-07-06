@@ -21,8 +21,8 @@ if [ -z "${PACKAGE_TYPE}" ]; then
 	exit 1
 fi
 
-# master: Merge pull request #952 from karczex/dram_cmap_engine; 05.03.2021
-current_pmemkv_version="e135a8c757a8deb9a58d826954780d9eaf1ec5ab"
+# master: Merge pull request #991 from lukaszstolarczuk/update-dockers; 05.07.2021
+current_pmemkv_version="fd0f0f20989b1d8c75f54f3151542475a7da37d0"
 
 # stable-1.0: 1.0.3 release; 06.10.2020
 stable_1_pmemkv_version="77ae3ef23dc2b2db9c012dc343b125a785a0ffbc"
@@ -48,7 +48,7 @@ prepare_pmemkv () {
 	cd build
 	# turn off all redundant components
 	cmake .. -DCPACK_GENERATOR="${PACKAGE_TYPE}" -DCMAKE_INSTALL_PREFIX=${PREFIX} \
-		-DBUILD_EXAMPLES=OFF -DBUILD_TESTS=OFF -DBUILD_DOC=OFF
+		-DBUILD_EXAMPLES=OFF -DBUILD_TESTS=OFF -DTESTS_USE_VALGRIND=OFF -DBUILD_DOC=OFF
 	make -j$(nproc) package
 	mv * /opt/"${version_name}"
 	cd ..
