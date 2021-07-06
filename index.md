@@ -12,7 +12,9 @@ Java bindings for **pmemkv**, using Java Native Interface.
 Current code of pmemkv-java can be accessed on [github page](https://github.com/pmem/pmemkv-java).
 
 The API of pmemkv-java binding is documented in the following docs:
+
 * [master](./master/html/index.html) - it implements additional API of libpmemkv (and requires min. version of 1.4)
+* [v1.2](./v1.2/html/index.html) - it implements additional API of libpmemkv (and requires min. version of 1.4)
 * [v1.1](./v1.1/html/index.html) - it is functionally equivalent to libpmemkv 1.0
 * [v1.0](./v1.0/html/index.html) - it is functionally equivalent to libpmemkv 1.0
 
@@ -23,8 +25,9 @@ seen on the ["releases" tab on the Github page](https://github.com/pmem/pmemkv-j
 
 | Version branch | First release date | Last patch release | Maintenance status |
 | -------------- | ------------------ | ------------------ | ------------------ |
+| stable-1.2 | Jul 02, 2021 | N/A | Full |
 | stable-1.1 | Jun 08, 2021 | N/A | Full |
-| stable-1.0 | Jun 30, 2020 | Mar 12, 2021 | Full |
+| stable-1.0 | Jun 30, 2020 | 1.0.1 (Mar 12, 2021) | Full |
 
 Possible statuses:
 1. Full maintenance:
