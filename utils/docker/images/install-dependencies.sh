@@ -31,8 +31,8 @@ echo "Extra mvn params (taken from env): ${MVN_PARAMS}"
 PREFIX=/usr
 # common: release 1.4, 15.02.2021
 PMEMKV_VERSION="ecb8fd65c5b07ed002d1018418ef809ab50d4e18"
-# common: release 1.0.1, 11.03.2021
-JAVA_VERSION="827f911c977d475511ca9b29cdec3c12425a3936"
+# common: release 1.2.0, 02.07.2021
+JAVA_VERSION="9a32f9f518198ae575242b448f61514c231b5a60"
 
 echo "Build and install PMEMKV (JNI needs it)"
 git clone https://github.com/pmem/pmemkv.git
@@ -49,7 +49,8 @@ cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo \
 	-DENGINE_VSMAP=OFF \
 	-DBUILD_DOC=OFF \
 	-DBUILD_EXAMPLES=OFF \
-	-DBUILD_TESTS=OFF
+	-DBUILD_TESTS=OFF \
+	-DTESTS_USE_VALGRIND=OFF
 make -j$(nproc)
 make -j$(nproc) install
 
@@ -75,7 +76,7 @@ rm -r ${deps_dir}
 
 echo "Uninstall pmemkv"
 cd ${WORKDIR}/pmemkv/build
-make uninstall
+make -j$(nproc) uninstall
 
 echo "Remove installed binding files (from local mvn repository)"
 rm -r /opt/java/repository/io/pmem/*
