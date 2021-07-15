@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        CONFIG: ["TYPE=maven OS=ubuntu OS_VER=20.04_clean PUSH_IMAGE=1"]
+        CONFIG: ["TYPE=maven OS=ubuntu OS_VER=21.04_clean PUSH_IMAGE=1"]
     steps:
       - name: Clone the git repo
         uses: actions/checkout@v2
