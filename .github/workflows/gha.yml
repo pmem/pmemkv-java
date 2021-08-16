@@ -29,8 +29,10 @@ jobs:
       matrix:
         CONFIG: ["OS=ubuntu OS_VER=20.04 PMEMKV=master PUSH_IMAGE=1",
                  "OS=ubuntu OS_VER=20.04 PMEMKV=stable-1.4",
+                 "OS=ubuntu OS_VER=20.04 PMEMKV=stable-1.5",
                  "OS=fedora OS_VER=34 PMEMKV=master PUSH_IMAGE=1",
                  "OS=fedora OS_VER=34 PMEMKV=stable-1.4",
+                 "OS=fedora OS_VER=34 PMEMKV=stable-1.5",
                  "OS=fedora OS_VER=33 PMEMKV=master PUSH_IMAGE=1"]
     steps:
       - name: Set image version and force image action for stable branch

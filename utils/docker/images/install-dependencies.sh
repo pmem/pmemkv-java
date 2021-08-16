@@ -15,7 +15,7 @@ source /opt/setup-maven-settings.sh
 
 # ...and set the same script as an entrypoint for all users (newly defined in the future)
 if [ -n "${SKIP_MAVEN_RUNTIME_SETUP}" ]; then
-	echo "Variable 'SKIP_MAVEN_RUNTIME_SETUP' is set; skipping building dependencies"
+	echo "Variable 'SKIP_MAVEN_RUNTIME_SETUP' is set; skipping maven setting setup"
 else
 	echo "source /opt/setup-maven-settings.sh" >> /etc/skel/.bashrc
 fi
@@ -29,8 +29,8 @@ MVN_PARAMS="${PMEMKV_MVN_PARAMS}"
 echo "Extra mvn params (taken from env): ${MVN_PARAMS}"
 
 PREFIX=/usr
-# common: release 1.4, 15.02.2021
-PMEMKV_VERSION="ecb8fd65c5b07ed002d1018418ef809ab50d4e18"
+# common: release 1.5.0, 27.07.2021
+PMEMKV_VERSION="a92abed550ece9c5c70b6be17db8e9cb19e328e4"
 # common: release 1.2.0, 02.07.2021
 JAVA_VERSION="9a32f9f518198ae575242b448f61514c231b5a60"
 
