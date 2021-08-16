@@ -24,9 +24,6 @@ ARG SKIP_PMEMKV_BUILD
 ARG SKIP_DEPENDENCIES_BUILD
 ARG SKIP_MAVEN_RUNTIME_SETUP
 
-ARG LIBPMEMOBJ_CPP_DEPS="\
-	libatomic"
-
 # Base development packages
 ARG BASE_DEPS="\
 	cmake \
@@ -84,9 +81,6 @@ RUN dnf update -y \
 	${PMEMKV_DEPS} \
 	${MISC_DEPS} \
 && dnf clean all
-
-# Install glibc-debuginfo
-RUN dnf debuginfo-install -y glibc
 
 # Install pmdk
 COPY install-pmdk.sh install-pmdk.sh
