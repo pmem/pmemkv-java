@@ -7,15 +7,15 @@
 #
 
 # Pull base image
-FROM registry.fedoraproject.org/fedora:32
+FROM registry.fedoraproject.org/fedora:34
 MAINTAINER igor.chorazewicz@intel.com
 
 # Set required environment variables
 ENV OS fedora
-ENV OS_VER 32
+ENV OS_VER 34
 ENV PACKAGE_MANAGER rpm
 ENV NOTTY 1
-ENV JAVA_HOME /usr/lib/jvm/java-openjdk/
+ENV JAVA_HOME /usr/lib/jvm/java-1.8.0
 
 # Additional parameters to build docker without building components
 ARG SKIP_PMDK_BUILD
