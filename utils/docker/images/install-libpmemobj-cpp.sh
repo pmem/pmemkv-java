@@ -18,12 +18,12 @@ PREFIX=/usr
 PACKAGE_TYPE=${1^^} #To uppercase
 echo "PACKAGE_TYPE: ${PACKAGE_TYPE}"
 
-# master: Merge pull request #1126 from igchor/test_workaround; 05.07.2021
-LIBPMEMOBJ_CPP_VERSION="2543afae7b1e9e82809a3e4280753b33cdab8136"
+# common: 1.13.0 release; 27.07.2021
+LIBPMEMOBJ_CPP_VERSION="9599f724d4edc3a3d973bac14eeebdc1bc31d327"
 
 build_dir=$(mktemp -d -t libpmemobj-cpp-XXX)
 
-git clone https://github.com/pmem/libpmemobj-cpp --shallow-since=2020-06-01 ${build_dir}
+git clone https://github.com/pmem/libpmemobj-cpp --shallow-since=2020-12-01 ${build_dir}
 
 pushd ${build_dir}
 git checkout ${LIBPMEMOBJ_CPP_VERSION}

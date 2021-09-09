@@ -21,11 +21,14 @@ if [ -z "${PACKAGE_TYPE}" ]; then
 	exit 1
 fi
 
-# master: Merge pull request #991 from lukaszstolarczuk/update-dockers; 05.07.2021
-current_pmemkv_version="fd0f0f20989b1d8c75f54f3151542475a7da37d0"
+# master: Merge pull request #1033 from karczex/pmemkv_cpp_always_avialable; 29.07.2021
+current_pmemkv_version="0b5707aabc1050433394019b19bd0983e6f1631d"
 
 # stable-1.4: 1.4 release; 15.02.2021
 stable_1_4_pmemkv_version="ecb8fd65c5b07ed002d1018418ef809ab50d4e18"
+
+# stable-1.5: release 1.5.0, 27.07.2021
+stable_1_5_pmemkv_version="a92abed550ece9c5c70b6be17db8e9cb19e328e4"
 
 prepare_pmemkv () {
 	pmemkv_version="${1}"
@@ -48,6 +51,7 @@ cd pmemkv
 
 prepare_pmemkv "${current_pmemkv_version}" "pmemkv-master"
 prepare_pmemkv "${stable_1_4_pmemkv_version}" "pmemkv-stable-1.4"
+prepare_pmemkv "${stable_1_5_pmemkv_version}" "pmemkv-stable-1.5"
 
 cd ..
 rm -r pmemkv

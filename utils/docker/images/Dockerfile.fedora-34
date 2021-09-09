@@ -7,15 +7,15 @@
 #
 
 # Pull base image
-FROM registry.fedoraproject.org/fedora:32
+FROM registry.fedoraproject.org/fedora:34
 MAINTAINER igor.chorazewicz@intel.com
 
 # Set required environment variables
 ENV OS fedora
-ENV OS_VER 32
+ENV OS_VER 34
 ENV PACKAGE_MANAGER rpm
 ENV NOTTY 1
-ENV JAVA_HOME /usr/lib/jvm/java-openjdk/
+ENV JAVA_HOME /usr/lib/jvm/java-1.8.0
 
 # Additional parameters to build docker without building components
 ARG SKIP_PMDK_BUILD
@@ -23,9 +23,6 @@ ARG SKIP_LIBPMEMOBJ_CPP_BUILD
 ARG SKIP_PMEMKV_BUILD
 ARG SKIP_DEPENDENCIES_BUILD
 ARG SKIP_MAVEN_RUNTIME_SETUP
-
-ARG LIBPMEMOBJ_CPP_DEPS="\
-	libatomic"
 
 # Base development packages
 ARG BASE_DEPS="\
@@ -84,9 +81,6 @@ RUN dnf update -y \
 	${PMEMKV_DEPS} \
 	${MISC_DEPS} \
 && dnf clean all
-
-# Install glibc-debuginfo
-RUN dnf debuginfo-install -y glibc
 
 # Install pmdk
 COPY install-pmdk.sh install-pmdk.sh
