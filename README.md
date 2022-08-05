@@ -38,7 +38,7 @@ You can add our project as a dependency and use it freely. Make sure to use it e
 <dependency>
   <groupId>io.pmem</groupId>
   <artifactId>pmemkv-root</artifactId>
-  <version>[1.0.1,)</version>
+  <version>[1.2.0,)</version>
 </dependency>
 ```
 
@@ -115,7 +115,7 @@ If you want to use our examples with pmemkv from maven repository, you can take 
 It boils down to changing build command (`mvn package`) to e.g.:
 
 ```sh
-mvn package -Dpmemkv.packageName=pmemkv-root -Dpmemkv.packageVersion=1.1.0
+mvn package -Dpmemkv.packageName=pmemkv-root -Dpmemkv.packageVersion=1.2.0
 ```
 
 ## Contributing
