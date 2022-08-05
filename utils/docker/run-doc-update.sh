@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright 2018-2021, Intel Corporation
+# Copyright 2018-2022, Intel Corporation
 
 #
 # run-doc-update.sh - is called inside a Docker container,
 #		to build docs for 'valid branches' and to create a pull request
-#		with and update of javadocs, html files (on gh-pages).
+#		with and update of javadocs, html files (on 'docs' branch).
 #
 
 set -e
@@ -28,7 +28,7 @@ REPO_DIR=$(mktemp -d -t pmemkvjava-XXX)
 ARTIFACTS_DIR=$(mktemp -d -t ARTIFACTS-XXX)
 MVN_PARAMS="${PMEMKV_MVN_PARAMS}"
 
-# Only 'master' or 'stable-*' branches are valid; determine docs location dir on gh-pages branch
+# Only 'master' or 'stable-*' branches are valid; determine docs location dir on 'docs' branch
 TARGET_BRANCH=${CI_BRANCH}
 if [[ "${TARGET_BRANCH}" == "master" ]]; then
 	TARGET_DOCS_DIR="master"
@@ -68,9 +68,9 @@ mvn install -Dmaven.test.skip=true -e ${MVN_PARAMS}
 mvn javadoc:javadoc -e ${MVN_PARAMS}
 cp -r ${REPO_DIR}/pmemkv-binding/target/site/apidocs ${ARTIFACTS_DIR}/
 
-# Checkout gh-pages and copy docs
-GH_PAGES_NAME="${TARGET_DOCS_DIR}-gh-pages-update"
-git checkout -B ${GH_PAGES_NAME} upstream/gh-pages
+# Checkout 'docs' branch and copy docs there
+GH_PAGES_NAME="${TARGET_DOCS_DIR}-docs-update"
+git checkout -B ${GH_PAGES_NAME} upstream/docs
 git clean -dfx
 
 # Clean old content, since some files might have been deleted
@@ -84,12 +84,12 @@ echo "Add and push changes:"
 # In that case we want to force push anyway (there might be open pull request with
 # changes which were reverted).
 git add -A
-git commit -m "doc: automatic gh-pages docs update" && true
+git commit -m "doc: automatic docs update" && true
 git push -f ${ORIGIN} ${GH_PAGES_NAME}
 
 echo "Make or update pull request:"
 # When there is already an open PR or there are no changes an error is thrown, which we ignore.
-hub pull-request -f -b ${DOC_REPO_OWNER}:gh-pages -h ${BOT_NAME}:${GH_PAGES_NAME} \
-	-m "doc: automatic gh-pages update for ${TARGET_BRANCH}" && true
+hub pull-request -f -b ${DOC_REPO_OWNER}:docs -h ${BOT_NAME}:${GH_PAGES_NAME} \
+	-m "doc: automatic docs update for ${TARGET_BRANCH}" && true
 
 popd

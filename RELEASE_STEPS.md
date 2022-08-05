@@ -35,4 +35,5 @@ Publish package and make it official:
 - publish package to mvn central repository
 
 Later, for major/minor release:
-- once gh-pages contains new documentation, add $VER entry in docs links and in "Releases' support status" table (and update any status if needed) on gh-pages
+- once 'docs' branch contains new documentation, move its content to pmem.io and add $VER entry in docs links
+  and in "Releases' support status" table (and update any status if needed)

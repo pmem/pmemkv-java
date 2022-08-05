@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-/* Copyright 2020, Intel Corporation */
+/* Copyright 2020-2022, Intel Corporation */
 
 package io.pmem.pmemkv;
 
@@ -10,7 +10,7 @@ package io.pmem.pmemkv;
  *      "https://pmem.io/pmemkv/master/manpages/libpmemkv.3.html#errors">Pmemkv
  *      errors</a>
  * @see <a href= "https://github.com/pmem/pmemkv#storage-engines">Currently
- *      avaiable pmemkv engines</a>
+ *      available pmemkv engines</a>
  */
 @SuppressWarnings("serial")
 public class WrongEngineNameException extends DatabaseException {

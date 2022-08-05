@@ -28,7 +28,7 @@ Up-to-date support/maintenance status of branches/releases is available on [pmem
 
 ### Maven repository
 
-This pmemkv binding is accesible from maven repository:
+This pmemkv binding is accessible from maven repository:
 
 [io.pmem namespace @ maven.org](https://repo1.maven.org/maven2/io/pmem/pmemkv-root)
 
@@ -38,7 +38,7 @@ You can add our project as a dependency and use it freely. Make sure to use it e
 <dependency>
   <groupId>io.pmem</groupId>
   <artifactId>pmemkv-root</artifactId>
-  <version>[1.0.1,)</version>
+  <version>[1.2.0,)</version>
 </dependency>
 ```
 
@@ -115,7 +115,7 @@ If you want to use our examples with pmemkv from maven repository, you can take 
 It boils down to changing build command (`mvn package`) to e.g.:
 
 ```sh
-mvn package -Dpmemkv.packageName=pmemkv-root -Dpmemkv.packageVersion=1.1.0
+mvn package -Dpmemkv.packageName=pmemkv-root -Dpmemkv.packageVersion=1.2.0
 ```
 
 ## Contributing
