@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-/* Copyright 2017-2021, Intel Corporation */
+/* Copyright 2017-2022, Intel Corporation */
 
 #include <common.h>
 
@@ -93,7 +93,7 @@ extern "C" JNIEXPORT void JNICALL Java_io_pmem_pmemkv_Database_database_1stop
 
 void Callback_get_value_buffer(const char* v, size_t vb, void *arg) {
     const auto c = static_cast<Context*>(arg);
-    // OutOfMemoryError may occurr
+    // OutOfMemoryError may occur
     if (jobject valuebuf = c->env->NewDirectByteBuffer(const_cast<char*>(v), vb)) {
         c->env->CallStaticVoidMethod(c->env->GetObjectClass(c->db), c->mid, c->db, c->callback, vb, valuebuf);
         c->env->DeleteLocalRef(valuebuf);

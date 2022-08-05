@@ -28,7 +28,7 @@ Up-to-date support/maintenance status of branches/releases is available on [pmem
 
 ### Maven repository
 
-This pmemkv binding is accesible from maven repository:
+This pmemkv binding is accessible from maven repository:
 
 [io.pmem namespace @ maven.org](https://repo1.maven.org/maven2/io/pmem/pmemkv-root)
 

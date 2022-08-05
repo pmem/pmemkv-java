@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-/* Copyright 2021, Intel Corporation */
+/* Copyright 2021-2022, Intel Corporation */
 
 package io.pmem.pmemkv;
 
@@ -44,7 +44,7 @@ class TestUtils {
 	}
 
 	/*
-	 * This method executes passed functions in parallel. Each funtion will be
+	 * This method executes passed functions in parallel. Each function will be
 	 * executed on numberOfThreads / functions.length threads.
 	 */
 	public static void runParallel(int numberOfThreads, Callback... functions) {
