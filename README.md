@@ -1,8 +1,18 @@
+# pmemkv-java
 [![GHA build status](https://github.com/pmem/pmemkv-java/workflows/pmemkv-java/badge.svg?branch=master)](https://github.com/pmem/pmemkv-java/actions)
 [![PMEMKV-JAVA version](https://img.shields.io/github/tag/pmem/pmemkv-java.svg)](https://github.com/pmem/pmemkv-java/releases/latest)
 [![pmemkv-root maven central](https://maven-badges.herokuapp.com/maven-central/io.pmem/pmemkv-root/badge.svg?style=flat-for-the-badge)](https://search.maven.org/artifact/io.pmem/pmemkv-root)
 
-# pmemkv-java
+## ⚠️ Discontinuation of the project
+The **pmemkv-java** project will no longer be maintained by Intel.
+- Intel has ceased development and contributions including, but not limited to, maintenance, bug fixes, new releases,
+or updates, to this project.
+- Intel no longer accepts patches to this project.
+- If you have an ongoing need to use this project, are interested in independently developing it, or would like to
+maintain patches for the open source software community, please create your own fork of this project.
+- You will find more information [here](https://pmem.io/blog/2022/11/update-on-pmdk-and-our-long-term-support-strategy/).
+
+## Introduction
 
 Java bindings for pmemkv, using Java Native Interface. It's mostly functionally equal to pmemkv
 in version 1.0, but some of the new functionalities (e.g. from pmemkv 1.4) are already available.
@@ -137,7 +147,4 @@ mvn javadoc:javadoc
 
 ## Contact us
 
-For more information about **pmemkv** and java bindings, contact Igor Chorążewicz (igor.chorazewicz@intel.com),
-Piotr Balcer (piotr.balcer@intel.com) or post on our **#pmem** Slack channel using
-[this invite link](https://join.slack.com/t/pmem-io/shared_invite/enQtNzU4MzQ2Mzk3MDQwLWQ1YThmODVmMGFkZWI0YTdhODg4ODVhODdhYjg3NmE4N2ViZGI5NTRmZTBiNDYyOGJjYTIyNmZjYzQxODcwNDg)
-or [Google group](https://groups.google.com/group/pmem).
+If you read the [blog post](https://pmem.io/blog/2022/11/update-on-pmdk-and-our-long-term-support-strategy/) and still have some questions (especially about discontinuation of the project), please contact us using the dedicated e-mail: pmdk_support@intel.com.
